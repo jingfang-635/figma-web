@@ -1,0 +1,208 @@
+{
+  "route": "/departments",
+  "refShot": "imports/figma/screens/科室管理.png",
+  "pageHeader": {
+    "title": "科室管理",
+    "subtitle": "管理门诊基础资料、排班与预约信息"
+  },
+  "kpiRow": [
+    {
+      "key": "departments",
+      "label": "启用科室"
+    },
+    {
+      "key": "doctors",
+      "label": "在诊医生"
+    },
+    {
+      "key": "pendingAppointments",
+      "label": "待就诊"
+    },
+    {
+      "key": "todayAppointments",
+      "label": "今日订单"
+    }
+  ],
+  "listCard": {
+    "title": "科室列表",
+    "subtitle": "维护小程序展示的科室名称、说明和图标",
+    "primaryAction": "+ 新增科室",
+    "resource": "departments",
+    "columns": [
+      {
+        "key": "dept",
+        "title": "科室",
+        "variant": "iconTitleDesc",
+        "nameField": "name",
+        "descField": "description"
+      },
+      {
+        "key": "doctorCount",
+        "title": "医生数量",
+        "variant": "doctorCount"
+      },
+      {
+        "key": "sortOrder",
+        "title": "排序",
+        "variant": "text"
+      },
+      {
+        "key": "status",
+        "title": "状态",
+        "variant": "tag"
+      },
+      {
+        "key": "actions",
+        "title": "操作",
+        "variant": "iconEditDelete"
+      }
+    ]
+  },
+  "modal": {
+    "id": "create-department",
+    "title": "新增科室",
+    "layout": "horizontal",
+    "extra": [
+      "iconUpload"
+    ],
+    "width": 520,
+    "fields": [
+      {
+        "key": "name",
+        "label": "科室名称",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "icon",
+        "label": "科室图标",
+        "type": "upload",
+        "required": true
+      },
+      {
+        "key": "description",
+        "label": "科室描述",
+        "type": "textarea"
+      },
+      {
+        "key": "sortOrder",
+        "label": "排序",
+        "type": "number"
+      },
+      {
+        "key": "status",
+        "label": "状态",
+        "type": "select",
+        "options": [
+          {
+            "value": "active",
+            "label": "启用"
+          },
+          {
+            "value": "inactive",
+            "label": "停用"
+          }
+        ]
+      }
+    ]
+  },
+  "layout": {
+    "viewport": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1068
+    },
+    "regions": [
+      {
+        "id": "pageHeader",
+        "nodeId": "157:326",
+        "width": 60,
+        "height": 21,
+        "font": {
+          "title": 15,
+          "weight": 500,
+          "color": "#1890FF"
+        },
+        "color": "#1890FF"
+      },
+      {
+        "id": "listCard",
+        "nodeId": "157:397",
+        "width": 60,
+        "height": 21
+      }
+    ],
+    "modal": {
+      "id": "modal",
+      "nodeId": "157:4181",
+      "name": "新增科室",
+      "box": {
+        "x": 20,
+        "y": 6988,
+        "w": 64,
+        "h": 23
+      }
+    }
+  },
+  "sample": {
+    "kpi": {
+      "departments": 6,
+      "doctors": 6,
+      "pendingAppointments": 0,
+      "todayAppointments": 0
+    },
+    "rows": [
+      {
+        "id": 1,
+        "name": "内科",
+        "description": "重症、发热、咳嗽等",
+        "sortOrder": 1,
+        "status": "active",
+        "_count": {
+          "doctors": 1
+        }
+      },
+      {
+        "id": 2,
+        "name": "儿科",
+        "description": "儿童保健、常见疾病",
+        "sortOrder": 2,
+        "status": "active",
+        "_count": {
+          "doctors": 1
+        }
+      },
+      {
+        "id": 3,
+        "name": "妇科",
+        "description": "妇科炎症、月经不调",
+        "sortOrder": 3,
+        "status": "active",
+        "_count": {
+          "doctors": 1
+        }
+      },
+      {
+        "id": 4,
+        "name": "口腔科",
+        "description": "牙痛、龋齿、牙周炎",
+        "sortOrder": 4,
+        "status": "active",
+        "_count": {
+          "doctors": 1
+        }
+      },
+      {
+        "id": 5,
+        "name": "皮肤科",
+        "description": "皮炎、湿疹、过敏等",
+        "sortOrder": 5,
+        "status": "active",
+        "_count": {
+          "doctors": 1
+        }
+      }
+    ]
+  }
+}

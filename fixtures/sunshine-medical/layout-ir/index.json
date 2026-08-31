@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "slug": "sunshine-medical",
+  "fileKey": "KLYzRbufrish4gmY4jpUS0",
+  "extractedAt": "2026-08-31T01:12:37.335Z",
+  "frames": [
+    {
+      "id": "sidebar",
+      "path": "fixtures/sunshine-medical/layout-ir/sidebar.json",
+      "nodeId": "157:4526",
+      "name": "sidebar"
+    },
+    {
+      "id": "home",
+      "path": "fixtures/sunshine-medical/layout-ir/home.json",
+      "nodeId": "157:2",
+      "name": "首页"
+    },
+    {
+      "id": "organization",
+      "path": "fixtures/sunshine-medical/layout-ir/organization.json",
+      "nodeId": "157:203",
+      "name": "机构信息"
+    },
+    {
+      "id": "departments",
+      "path": "fixtures/sunshine-medical/layout-ir/departments.json",
+      "nodeId": "157:312",
+      "name": "科室管理"
+    },
+    {
+      "id": "schedules",
+      "path": "fixtures/sunshine-medical/layout-ir/schedules.json",
+      "nodeId": "157:756",
+      "name": "排班管理"
+    },
+    {
+      "id": "modal-create-dept",
+      "path": "fixtures/sunshine-medical/layout-ir/modal-create-dept.json",
+      "nodeId": "157:4177",
+      "name": "新增科室弹窗"
+    }
+  ],
+  "tokenPath": "fixtures/sunshine-medical/layout-ir/tokens.json"
+}

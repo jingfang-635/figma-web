@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Figma → 全栈 · 生成前决策</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0f1419;
+      --bg1: #171e26;
+      --bg2: #1e2832;
+      --line: #2c3948;
+      --text: #e8eef4;
+      --muted: #8b9aab;
+      --accent: #3ecf8e;
+      --accent-dim: rgba(62, 207, 142, 0.14);
+      --warn: #f0b429;
+      --danger: #f07178;
+      --radius: 12px;
+      --shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+      --font: "IBM Plex Sans", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(62, 207, 142, 0.12), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(90, 140, 200, 0.1), transparent 50%),
+        linear-gradient(180deg, #0c1015 0%, var(--bg0) 40%, #121820 100%);
+      line-height: 1.5;
+    }
+
+    .wrap {
+      width: min(920px, calc(100% - 32px));
+      margin: 40px auto 64px;
+    }
+
+    header {
+      margin-bottom: 28px;
+      animation: rise 0.5s ease both;
+    }
+    header .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 54ch;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(30, 40, 50, 0.92), rgba(23, 30, 38, 0.98));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: rise 0.55s ease 0.05s both;
+    }
+
+    form { display: grid; gap: 0; }
+
+    .step {
+      padding: 22px 24px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .step:last-of-type { border-bottom: none; }
+
+    .step-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .step-num {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(62, 207, 142, 0.28);
+    }
+    .step-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .step-hint {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .field {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--bg0);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field:focus {
+      border-color: rgba(62, 207, 142, 0.55);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .field::placeholder { color: #5f7082; }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .opt {
+      position: relative;
+      cursor: pointer;
+    }
+    .opt input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .opt-card {
+      height: 100%;
+      padding: 14px 14px 14px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--bg1);
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .opt:hover .opt-card {
+      border-color: #3d4f63;
+      transform: translateY(-1px);
+    }
+    .opt input:checked + .opt-card {
+      border-color: rgba(62, 207, 142, 0.65);
+      background: linear-gradient(180deg, rgba(62, 207, 142, 0.12), rgba(62, 207, 142, 0.04));
+      box-shadow: inset 0 0 0 1px rgba(62, 207, 142, 0.2);
+    }
+    .opt-card strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .opt-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+    .badge {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-dim);
+      vertical-align: 1px;
+    }
+    .badge.phase2 {
+      color: var(--warn);
+      background: rgba(240, 180, 41, 0.14);
+    }
+
+    .hidden { display: none !important; }
+
+    .footer {
+      padding: 20px 24px 24px;
+      background: rgba(0, 0, 0, 0.18);
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 14px;
+    }
+    .summary-label {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .summary-box {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+    .summary-code {
+      flex: 1;
+      min-width: 240px;
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px dashed #3a4b5d;
+      background: var(--bg0);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      font: inherit;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: transform 0.12s, opacity 0.12s, background 0.12s;
+    }
+    button:active { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--accent);
+      color: #082016;
+    }
+    .btn-primary:hover { filter: brightness(1.05); }
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: none;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .btn-ghost:hover { background: var(--bg2); }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #143528;
+      border: 1px solid rgba(62, 207, 142, 0.4);
+      color: var(--text);
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 20;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .error {
+      margin: 8px 0 0;
+      color: var(--danger);
+      font-size: 0.82rem;
+      min-height: 1.2em;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 20px); margin: 24px auto 40px; }
+      .step { padding: 18px 16px 20px; }
+      .footer { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">figma-to-fullstack</p>
+      <h1>生成前决策</h1>
+      <p>完成下列选项后，复制摘要发给助手即可继续 Design IR → App Spec → 全栈生成。</p>
+    </header>
+
+    <div class="panel">
+      <form id="decisionForm" novalidate>
+        <!-- 1 -->
+        <section class="step" data-step="1">
+          <div class="step-head">
+            <div class="step-num">1</div>
+            <div>
+              <h2 class="step-title">Figma 来源</h2>
+              <p class="step-hint">URL 或 fileKey（必填）</p>
+            </div>
+          </div>
+          <input
+            class="field"
+            id="figma"
+            name="figma"
+            type="text"
+            placeholder="https://www.figma.com/design/… 或 fileKey"
+            value="https://www.figma.com/design/WZR7JiF1Q8GOaxOheQV8Ur/Untitled?node-id=0-1"
+            required
+          />
+          <p class="error" id="figmaError"></p>
+        </section>
+
+        <!-- 2 -->
+        <section class="step" data-step="2">
+          <div class="step-head">
+            <div class="step-num">2</div>
+            <div>
+              <h2 class="step-title">后端语言</h2>
+              <p class="step-hint">决定后续栈与数据库选项</p>
+            </div>
+          </div>
+          <div class="options" role="radiogroup" aria-label="后端语言">
+            <label class="opt">
+              <input type="radio" name="language" value="Node" checked />
+              <div class="opt-card">
+                <strong>Node <span class="badge">默认</span></strong>
+                <span>NestJS / Express · Prisma</span>
+              </div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="language" value="Java" />
+              <div class="opt-card">
+                <strong>Java</strong>
+                <span>Spring Boot · JPA / MyBatis</span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- 3 -->
+        <section class="step" data-step="3">
+          <div class="step-head">
+            <div class="step-num">3</div>
+            <div>
+              <h2 class="step-title">栈组合</h2>
+              <p class="step-hint">按后端语言筛选；默认推荐 A</p>
+            </div>
+          </div>
+          <div class="options" id="stackOptions" role="radiogroup" aria-label="栈组合"></div>
+        </section>
+
+        <!-- 4 -->
+        <section class="step" data-step="4">
+          <div class="step-head">
+            <div class="step-num">4</div>
+            <div>
+              <h2 class="step-title">页面范围</h2>
+              <p class="step-hint">一期实现范围</p>
+            </div>
+          </div>
+          <div class="options" role="radiogroup" aria-label="页面范围">
+            <label class="opt">
+              <input type="radio" name="pages" value="只做已画屏" checked />
+              <div class="opt-card">
+                <strong>只做已画屏</strong>
+                <span>仅实现 Figma 中已画出的屏幕</span>
+              </div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="pages" value="导航全做" />
+              <div class="opt-card">
+                <strong>导航全做</strong>
+                <span>缺屏用骨架页补齐导航项</span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- 5 -->
+        <section class="step" data-step="5">
+          <div class="step-head">
+            <div class="step-num">5</div>
+            <div>
+              <h2 class="step-title">鉴权</h2>
+              <p class="step-hint">API / 页面访问控制</p>
+            </div>
+          </div>
+          <div class="options" role="radiogroup" aria-label="鉴权">
+            <label class="opt">
+              <input type="radio" name="auth" value="JWT" checked />
+              <div class="opt-card">
+                <strong>JWT <span class="badge">默认</span></strong>
+                <span>登录签发 Token，保护业务接口</span>
+              </div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="auth" value="无鉴权" />
+              <div class="opt-card">
+                <strong>无鉴权</strong>
+                <span>开放接口，适合演示原型</span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- 6 -->
+        <section class="step" data-step="6">
+          <div class="step-head">
+            <div class="step-num">6</div>
+            <div>
+              <h2 class="step-title">产出路径</h2>
+              <p class="step-hint">代码落盘位置</p>
+            </div>
+          </div>
+          <div class="options" role="radiogroup" aria-label="产出路径">
+            <label class="opt">
+              <input type="radio" name="output" value="apps" checked />
+              <div class="opt-card">
+                <strong>apps/web + apps/api</strong>
+                <span>长期开发 monorepo 结构</span>
+              </div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="output" value="output" />
+              <div class="opt-card">
+                <strong>output/&lt;runId&gt;/</strong>
+                <span>按次生成，便于对比多轮产出</span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- 7 -->
+        <section class="step" data-step="7">
+          <div class="step-head">
+            <div class="step-num">7</div>
+            <div>
+              <h2 class="step-title">数据库运行时</h2>
+              <p class="step-hint">随后端语言变化</p>
+            </div>
+          </div>
+          <div class="options" id="dbOptions" role="radiogroup" aria-label="数据库运行时"></div>
+        </section>
+
+        <div class="footer">
+          <p class="summary-label">决策摘要（可复制发给助手）</p>
+          <div class="summary-box">
+            <pre class="summary-code" id="summary">—</pre>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn-primary" id="copyBtn">复制摘要</button>
+            <button type="button" class="btn-ghost" id="resetBtn">恢复默认</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status">已复制到剪贴板</div>
+
+  <script>
+    const STACKS = {
+      Node: [
+        {
+          id: "A",
+          title: "A · React + NestJS + PostgreSQL + Prisma",
+          desc: "默认推荐",
+          badge: "默认",
+        },
+        {
+          id: "A2",
+          title: "A2 · React + Express + PostgreSQL + Prisma",
+          desc: "更轻量的 Node API",
+        },
+        {
+          id: "B",
+          title: "B · Vue3 + NestJS + PostgreSQL + Prisma",
+          desc: "Vue 前端 + Nest 后端",
+        },
+      ],
+      Java: [
+        {
+          id: "C",
+          title: "C · React + Spring Boot + MySQL + JPA",
+          desc: "Java 主推组合",
+        },
+        {
+          id: "D",
+          title: "D · Vue3 + Spring Boot + MySQL + MyBatis",
+          desc: "二期支持",
+          badge: "二期",
+          badgeClass: "phase2",
+        },
+      ],
+    };
+
+    const DBS = {
+      Node: [
+        { id: "Docker", title: "Docker PostgreSQL", desc: "默认；docker compose 拉起", badge: "默认" },
+        { id: "本机PG", title: "本机已有 PG", desc: "使用本机 PostgreSQL" },
+        { id: "SQLite", title: "临时 SQLite", desc: "免 Docker，适合快速试跑" },
+      ],
+      Java: [
+        { id: "DockerMySQL", title: "Docker MySQL", desc: "默认；docker compose 拉起", badge: "默认" },
+        { id: "本机MySQL", title: "本机已有 MySQL", desc: "使用本机 MySQL" },
+      ],
+    };
+
+    const DEFAULTS = {
+      figma: "https://www.figma.com/design/WZR7JiF1Q8GOaxOheQV8Ur/Untitled?node-id=0-1",
+      language: "Node",
+      stack: "A",
+      pages: "只做已画屏",
+      auth: "JWT",
+      output: "apps",
+      db: "SQLite",
+    };
+
+    const form = document.getElementById("decisionForm");
+    const stackOptions = document.getElementById("stackOptions");
+    const dbOptions = document.getElementById("dbOptions");
+    const summaryEl = document.getElementById("summary");
+    const figmaError = document.getElementById("figmaError");
+    const toast = document.getElementById("toast");
+
+    function selected(name) {
+      const el = form.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : "";
+    }
+
+    function renderRadios(container, name, items, preferred) {
+      const keep = preferred || selected(name) || items[0]?.id;
+      container.innerHTML = items
+        .map((item) => {
+          const checked = item.id === keep ? "checked" : "";
+          const badge = item.badge
+            ? `<span class="badge ${item.badgeClass || ""}">${item.badge}</span>`
+            : "";
+          return `
+            <label class="opt">
+              <input type="radio" name="${name}" value="${item.id}" ${checked} />
+              <div class="opt-card">
+                <strong>${item.title}${badge}</strong>
+                <span>${item.desc}</span>
+              </div>
+            </label>
+          `;
+        })
+        .join("");
+    }
+
+    function syncLanguageDependent(preferredStack, preferredDb) {
+      const lang = selected("language") || "Node";
+      renderRadios(stackOptions, "stack", STACKS[lang], preferredStack);
+      renderRadios(dbOptions, "db", DBS[lang], preferredDb);
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const figma = document.getElementById("figma").value.trim();
+      const ok = Boolean(figma);
+      figmaError.textContent = ok ? "" : "请填写 Figma URL 或 fileKey";
+      document.getElementById("copyBtn").disabled = !ok;
+
+      const line = [
+        selected("language"),
+        selected("stack"),
+        selected("pages"),
+        selected("auth"),
+        selected("output"),
+        selected("db"),
+      ].join(" / ");
+
+      summaryEl.textContent = ok
+        ? `Figma: ${figma}\n${line}`
+        : "请完成第 1 项后再复制摘要";
+    }
+
+    function applyDefaults() {
+      document.getElementById("figma").value = DEFAULTS.figma;
+      form.querySelector(`input[name="language"][value="${DEFAULTS.language}"]`).checked = true;
+      form.querySelector(`input[name="pages"][value="${DEFAULTS.pages}"]`).checked = true;
+      form.querySelector(`input[name="auth"][value="${DEFAULTS.auth}"]`).checked = true;
+      form.querySelector(`input[name="output"][value="${DEFAULTS.output}"]`).checked = true;
+      syncLanguageDependent(DEFAULTS.stack, DEFAULTS.db);
+    }
+
+    form.addEventListener("change", (e) => {
+      if (e.target.name === "language") {
+        syncLanguageDependent();
+      } else {
+        updateSummary();
+      }
+    });
+    document.getElementById("figma").addEventListener("input", updateSummary);
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      updateSummary();
+      const text = summaryEl.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1600);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(summaryEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        toast.textContent = "请手动复制选中内容";
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+          toast.textContent = "已复制到剪贴板";
+        }, 1800);
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", applyDefaults);
+
+    applyDefaults();
+  </script>
+</body>
+</html>

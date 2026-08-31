@@ -1,0 +1,3881 @@
+{
+  "id": "home",
+  "name": "首页",
+  "nodeId": "157:2",
+  "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 1068
+  },
+  "extractedAt": "2026-08-31T01:12:37.335Z",
+  "fileKey": "KLYzRbufrish4gmY4jpUS0",
+  "regions": [
+    {
+      "id": "pageHeader",
+      "nodeId": "157:12",
+      "name": "首页",
+      "box": {
+        "x": 57,
+        "y": 84,
+        "w": 30,
+        "h": 21
+      },
+      "font": {
+        "title": 15,
+        "weight": 500,
+        "color": "#1890FF"
+      }
+    },
+    {
+      "id": "chart",
+      "nodeId": "157:87",
+      "name": "📈 近7天预约量趋势",
+      "box": {
+        "x": 264,
+        "y": 275,
+        "w": 124,
+        "h": 20
+      },
+      "font": {
+        "size": 14,
+        "color": "#262626"
+      }
+    },
+    {
+      "id": "chart",
+      "nodeId": "157:123",
+      "name": "🥧 近7天各科室预约量",
+      "box": {
+        "x": 858,
+        "y": 275,
+        "w": 138,
+        "h": 20
+      },
+      "font": {
+        "size": 14,
+        "color": "#262626"
+      }
+    },
+    {
+      "id": "chart",
+      "nodeId": "157:152",
+      "name": "💰 近7天挂号收入",
+      "box": {
+        "x": 264,
+        "y": 550,
+        "w": 110,
+        "h": 20
+      },
+      "font": {
+        "size": 14,
+        "color": "#262626"
+      }
+    },
+    {
+      "id": "chart",
+      "nodeId": "157:190",
+      "name": "📊 关键指标",
+      "box": {
+        "x": 858,
+        "y": 550,
+        "w": 74,
+        "h": 20
+      },
+      "font": {
+        "size": 14,
+        "color": "#262626"
+      }
+    }
+  ],
+  "exportables": [],
+  "icons": {
+    "nav": {},
+    "depts": {}
+  },
+  "texts": [
+    "＋",
+    "阳光医疗门诊",
+    "预约挂号管理后台",
+    "首页",
+    "🏠",
+    "机构信息",
+    "🏥",
+    "科室管理",
+    "🏷️",
+    "医生管理",
+    "👨‍⚕️",
+    "排班管理",
+    "📅",
+    "预约记录",
+    "📋",
+    "3",
+    "患者管理",
+    "👥",
+    "订单管理",
+    "💰",
+    "评价管理",
+    "⭐",
+    "📊",
+    "系统运营",
+    "▶",
+    "地址管理",
+    "📍",
+    "广告图管理",
+    "🖼️",
+    "公告管理",
+    "📢",
+    "新闻管理",
+    "📰",
+    "▶",
+    "新闻列表",
+    "新闻分类",
+    "导航栏",
+    "🧭",
+    "意见反馈",
+    "💬",
+    "预约规则",
+    "📏",
+    "消息通知",
+    "🔔",
+    "⚙️",
+    "系统管理",
+    "▶",
+    "用户管理",
+    "👤",
+    "角色管理",
+    "🔐",
+    "操作日志",
+    "📝",
+    "A",
+    "admin",
+    "系统管理员",
+    "退出",
+    "首页",
+    "预约数据、就诊数据与收入的运营分析",
+    "本月预约量",
+    "106",
+    "就诊率",
+    "96.2%",
+    "爽约率",
+    "3.8%",
+    "本月收入",
+    "¥5,280",
+    "📈 近7天预约量趋势",
+    "25",
+    "20",
+    "15",
+    "10",
+    "5",
+    "12",
+    "8",
+    "15",
+    "10",
+    "18",
+    "22",
+    "5"
+  ],
+  "tree": {
+    "id": "157:2",
+    "name": "首页",
+    "type": "FRAME",
+    "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1068
+    },
+    "fill": "#F5F7FA",
+    "children": [
+      {
+        "id": "157:3",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 1440,
+          "h": 1068
+        },
+        "fill": "#F5F7FA"
+      },
+      {
+        "id": "157:4",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 220,
+          "h": 1068
+        },
+        "fill": "#FFFFFF"
+      },
+      {
+        "id": "157:5",
+        "name": "border-right",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 219,
+          "y": 0,
+          "w": 1,
+          "h": 1068
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:6",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 20,
+          "y": 16,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#20BF88",
+        "radius": 8
+      },
+      {
+        "id": "157:7",
+        "name": "＋",
+        "type": "TEXT",
+        "box": {
+          "x": 28,
+          "y": 21,
+          "w": 20,
+          "h": 28
+        },
+        "fill": "#FFFFFF",
+        "text": "＋",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 20,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:8",
+        "name": "阳光医疗门诊",
+        "type": "TEXT",
+        "box": {
+          "x": 66,
+          "y": 15,
+          "w": 96,
+          "h": 21
+        },
+        "fill": "#262626",
+        "text": "阳光医疗门诊",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 16,
+          "weight": 500,
+          "lineHeight": 20.799999237060547,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:9",
+        "name": "预约挂号管理后台",
+        "type": "TEXT",
+        "box": {
+          "x": 66,
+          "y": 37,
+          "w": 96,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "预约挂号管理后台",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:10",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 12,
+          "y": 73,
+          "w": 195,
+          "h": 42
+        },
+        "fill": "#E6F7FF",
+        "radius": 6
+      },
+      {
+        "id": "157:11",
+        "name": "border-left",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 12,
+          "y": 73,
+          "w": 3,
+          "h": 42
+        },
+        "fill": "#1890FF"
+      },
+      {
+        "id": "157:12",
+        "name": "首页",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 84,
+          "w": 30,
+          "h": 21
+        },
+        "fill": "#1890FF",
+        "text": "首页",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 500,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:13",
+        "name": "🏠",
+        "type": "TEXT",
+        "box": {
+          "x": 27,
+          "y": 83,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#1890FF",
+        "text": "🏠",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:14",
+        "name": "机构信息",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 128,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "机构信息",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:15",
+        "name": "🏥",
+        "type": "TEXT",
+        "box": {
+          "x": 26,
+          "y": 127,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "🏥",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:16",
+        "name": "科室管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 172,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "科室管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:17",
+        "name": "🏷️",
+        "type": "TEXT",
+        "box": {
+          "x": 25,
+          "y": 171,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "🏷️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:18",
+        "name": "医生管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 216,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "医生管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:19",
+        "name": "👨‍⚕️",
+        "type": "TEXT",
+        "box": {
+          "x": 27,
+          "y": 215,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "👨‍⚕️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:20",
+        "name": "排班管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 260,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "排班管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:21",
+        "name": "📅",
+        "type": "TEXT",
+        "box": {
+          "x": 26,
+          "y": 259,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "📅",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:22",
+        "name": "预约记录",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 304,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "预约记录",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:23",
+        "name": "📋",
+        "type": "TEXT",
+        "box": {
+          "x": 27,
+          "y": 303,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "📋",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:24",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 173,
+          "y": 305,
+          "w": 22,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "radius": 9
+      },
+      {
+        "id": "157:25",
+        "name": "3",
+        "type": "TEXT",
+        "box": {
+          "x": 181,
+          "y": 306,
+          "w": 7,
+          "h": 16
+        },
+        "fill": "#FFFFFF",
+        "text": "3",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 11,
+          "weight": 400,
+          "lineHeight": 15.399999618530273,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:26",
+        "name": "患者管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 348,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "患者管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:27",
+        "name": "👥",
+        "type": "TEXT",
+        "box": {
+          "x": 25,
+          "y": 347,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "👥",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:28",
+        "name": "订单管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 392,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "订单管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:29",
+        "name": "💰",
+        "type": "TEXT",
+        "box": {
+          "x": 27,
+          "y": 391,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "💰",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:30",
+        "name": "评价管理",
+        "type": "TEXT",
+        "box": {
+          "x": 57,
+          "y": 436,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "评价管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:31",
+        "name": "⭐",
+        "type": "TEXT",
+        "box": {
+          "x": 25,
+          "y": 435,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "⭐",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:32",
+        "name": "line",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 28,
+          "y": 475,
+          "w": 163,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:33",
+        "name": "📊",
+        "type": "TEXT",
+        "box": {
+          "x": 24,
+          "y": 494,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#8C8C8C",
+        "text": "📊",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:34",
+        "name": "系统运营",
+        "type": "TEXT",
+        "box": {
+          "x": 54,
+          "y": 495,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#8C8C8C",
+        "text": "系统运营",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:35",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 184,
+          "y": 500,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 500,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:36",
+        "name": "地址管理",
+        "type": "TEXT",
+        "box": {
+          "x": 61,
+          "y": 534,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "地址管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:37",
+        "name": "📍",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 534,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📍",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:38",
+        "name": "广告图管理",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 572,
+          "w": 70,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "广告图管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:39",
+        "name": "🖼️",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 572,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🖼️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:40",
+        "name": "公告管理",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 610,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "公告管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:41",
+        "name": "📢",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 610,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📢",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:42",
+        "name": "新闻管理",
+        "type": "TEXT",
+        "box": {
+          "x": 65,
+          "y": 648,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "新闻管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:43",
+        "name": "📰",
+        "type": "TEXT",
+        "box": {
+          "x": 36,
+          "y": 648,
+          "w": 14,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "📰",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:44",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 184,
+          "y": 653,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 400,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:45",
+        "name": "新闻列表",
+        "type": "TEXT",
+        "box": {
+          "x": 55,
+          "y": 681,
+          "w": 52,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "新闻列表",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:46",
+        "name": "新闻分类",
+        "type": "TEXT",
+        "box": {
+          "x": 55,
+          "y": 712,
+          "w": 52,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "新闻分类",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:47",
+        "name": "导航栏",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 745,
+          "w": 42,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "导航栏",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:48",
+        "name": "🧭",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 745,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🧭",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:49",
+        "name": "意见反馈",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 783,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "意见反馈",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:50",
+        "name": "💬",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 783,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "💬",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:51",
+        "name": "预约规则",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 821,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "预约规则",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:52",
+        "name": "📏",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 821,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📏",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:53",
+        "name": "消息通知",
+        "type": "TEXT",
+        "box": {
+          "x": 68,
+          "y": 859,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "消息通知",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:54",
+        "name": "🔔",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 859,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🔔",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:55",
+        "name": "line",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 28,
+          "y": 895,
+          "w": 163,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:56",
+        "name": "⚙️",
+        "type": "TEXT",
+        "box": {
+          "x": 24,
+          "y": 914,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#8C8C8C",
+        "text": "⚙️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:57",
+        "name": "系统管理",
+        "type": "TEXT",
+        "box": {
+          "x": 54,
+          "y": 915,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#8C8C8C",
+        "text": "系统管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:58",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 184,
+          "y": 920,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 500,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:59",
+        "name": "用户管理",
+        "type": "TEXT",
+        "box": {
+          "x": 66,
+          "y": 954,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "用户管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:60",
+        "name": "👤",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 954,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "👤",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:61",
+        "name": "角色管理",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 992,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "角色管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:62",
+        "name": "🔐",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 992,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🔐",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:63",
+        "name": "操作日志",
+        "type": "TEXT",
+        "box": {
+          "x": 70,
+          "y": 1030,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "操作日志",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:64",
+        "name": "📝",
+        "type": "TEXT",
+        "box": {
+          "x": 39,
+          "y": 1030,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📝",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:65",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 220,
+          "y": 0,
+          "w": 1220,
+          "h": 52
+        },
+        "fill": "#FFFFFF"
+      },
+      {
+        "id": "157:66",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 220,
+          "y": 51,
+          "w": 1220,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:67",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 1267,
+          "y": 11,
+          "w": 30,
+          "h": 30
+        },
+        "fill": "#E6F7FF",
+        "radius": 15
+      },
+      {
+        "id": "157:68",
+        "name": "A",
+        "type": "TEXT",
+        "box": {
+          "x": 1278,
+          "y": 17,
+          "w": 9,
+          "h": 19
+        },
+        "fill": "#1890FF",
+        "text": "A",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 500,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:69",
+        "name": "admin",
+        "type": "TEXT",
+        "box": {
+          "x": 1305,
+          "y": 8,
+          "w": 43,
+          "h": 20
+        },
+        "fill": "#333333",
+        "text": "admin",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#333333"
+        }
+      },
+      {
+        "id": "157:70",
+        "name": "系统管理员",
+        "type": "TEXT",
+        "box": {
+          "x": 1305,
+          "y": 27,
+          "w": 65,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "系统管理员",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:71",
+        "name": "退出",
+        "type": "TEXT",
+        "box": {
+          "x": 1390,
+          "y": 17,
+          "w": 26,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "退出",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:72",
+        "name": "首页",
+        "type": "TEXT",
+        "box": {
+          "x": 244,
+          "y": 72,
+          "w": 44,
+          "h": 31
+        },
+        "fill": "#262626",
+        "text": "首页",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 500,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:73",
+        "name": "预约数据、就诊数据与收入的运营分析",
+        "type": "TEXT",
+        "box": {
+          "x": 244,
+          "y": 106,
+          "w": 221,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "预约数据、就诊数据与收入的运营分析",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:74",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 244,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:75",
+        "name": "本月预约量",
+        "type": "TEXT",
+        "box": {
+          "x": 268,
+          "y": 163,
+          "w": 60,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "本月预约量",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:76",
+        "name": "106",
+        "type": "TEXT",
+        "box": {
+          "x": 268,
+          "y": 182,
+          "w": 48,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "106",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:77",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 541,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:78",
+        "name": "就诊率",
+        "type": "TEXT",
+        "box": {
+          "x": 565,
+          "y": 163,
+          "w": 36,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "就诊率",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:79",
+        "name": "96.2%",
+        "type": "TEXT",
+        "box": {
+          "x": 565,
+          "y": 182,
+          "w": 83,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "96.2%",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:80",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 838,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:81",
+        "name": "爽约率",
+        "type": "TEXT",
+        "box": {
+          "x": 862,
+          "y": 163,
+          "w": 36,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "爽约率",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:82",
+        "name": "3.8%",
+        "type": "TEXT",
+        "box": {
+          "x": 862,
+          "y": 182,
+          "w": 67,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "3.8%",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:83",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 1135,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:84",
+        "name": "本月收入",
+        "type": "TEXT",
+        "box": {
+          "x": 1159,
+          "y": 163,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "本月收入",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:85",
+        "name": "¥5,280",
+        "type": "TEXT",
+        "box": {
+          "x": 1159,
+          "y": 182,
+          "w": 89,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "¥5,280",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:86",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 244,
+          "y": 255,
+          "w": 578,
+          "h": 259
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:87",
+        "name": "📈 近7天预约量趋势",
+        "type": "TEXT",
+        "box": {
+          "x": 264,
+          "y": 275,
+          "w": 124,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "📈 近7天预约量趋势",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:88",
+        "name": "svg-icon",
+        "type": "FRAME",
+        "box": {
+          "x": 264,
+          "y": 310,
+          "w": 538,
+          "h": 180
+        },
+        "children": [
+          {
+            "id": "157:89",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 320,
+              "w": 0,
+              "h": 139
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:90",
+            "name": "25",
+            "type": "TEXT",
+            "box": {
+              "x": 304,
+              "y": 312,
+              "w": 15,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "25",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:91",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 320,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:92",
+            "name": "20",
+            "type": "TEXT",
+            "box": {
+              "x": 303,
+              "y": 347,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "20",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:93",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 355,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:94",
+            "name": "15",
+            "type": "TEXT",
+            "box": {
+              "x": 305,
+              "y": 382,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "15",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:95",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 390,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:96",
+            "name": "10",
+            "type": "TEXT",
+            "box": {
+              "x": 305,
+              "y": 416,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "10",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:97",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 424,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:98",
+            "name": "5",
+            "type": "TEXT",
+            "box": {
+              "x": 311,
+              "y": 451,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "5",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:99",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 459,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#D9D9D9"
+          },
+          {
+            "id": "157:100",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 390,
+              "y": 337,
+              "w": 346,
+              "h": 85
+            },
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:101",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 385,
+              "y": 388,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:102",
+            "name": "12",
+            "type": "TEXT",
+            "box": {
+              "x": 382,
+              "y": 373,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "12",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:103",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 443,
+              "y": 409,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:104",
+            "name": "8",
+            "type": "TEXT",
+            "box": {
+              "x": 444,
+              "y": 395,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:105",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 501,
+              "y": 371,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:106",
+            "name": "15",
+            "type": "TEXT",
+            "box": {
+              "x": 498,
+              "y": 356,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "15",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:107",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 558,
+              "y": 399,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:108",
+            "name": "10",
+            "type": "TEXT",
+            "box": {
+              "x": 556,
+              "y": 384,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "10",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:109",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 616,
+              "y": 355,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:110",
+            "name": "18",
+            "type": "TEXT",
+            "box": {
+              "x": 613,
+              "y": 340,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "18",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:111",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 673,
+              "y": 332,
+              "w": 10,
+              "h": 10
+            },
+            "fill": "#1890FF",
+            "stroke": "#1890FF"
+          },
+          {
+            "id": "157:112",
+            "name": "22",
+            "type": "TEXT",
+            "box": {
+              "x": 670,
+              "y": 317,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#1890FF",
+            "text": "22",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 700,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#1890FF"
+            }
+          },
+          {
+            "id": "157:113",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 730,
+              "y": 417,
+              "w": 10,
+              "h": 10
+            },
+            "fill": "#91D5FF",
+            "stroke": "#91D5FF"
+          },
+          {
+            "id": "157:114",
+            "name": "5",
+            "type": "TEXT",
+            "box": {
+              "x": 732,
+              "y": 422,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#1890FF",
+            "text": "5",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 700,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#1890FF"
+            }
+          },
+          {
+            "id": "157:115",
+            "name": "8/1",
+            "type": "TEXT",
+            "box": {
+              "x": 381,
+              "y": 467,
+              "w": 18,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/1",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:116",
+            "name": "8/2",
+            "type": "TEXT",
+            "box": {
+              "x": 437,
+              "y": 467,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/2",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:117",
+            "name": "8/3",
+            "type": "TEXT",
+            "box": {
+              "x": 495,
+              "y": 467,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/3",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:118",
+            "name": "8/4",
+            "type": "TEXT",
+            "box": {
+              "x": 553,
+              "y": 467,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/4",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:119",
+            "name": "8/5",
+            "type": "TEXT",
+            "box": {
+              "x": 610,
+              "y": 467,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/5",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:120",
+            "name": "8/6",
+            "type": "TEXT",
+            "box": {
+              "x": 668,
+              "y": 467,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/6",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:121",
+            "name": "今日",
+            "type": "TEXT",
+            "box": {
+              "x": 724,
+              "y": 468,
+              "w": 23,
+              "h": 14
+            },
+            "fill": "#1890FF",
+            "text": "今日",
+            "font": {
+              "family": "Inter",
+              "size": 11.314286231994629,
+              "weight": 700,
+              "lineHeight": 13.69285774230957,
+              "letterSpacing": 0,
+              "color": "#1890FF"
+            }
+          }
+        ]
+      },
+      {
+        "id": "157:122",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 838,
+          "y": 255,
+          "w": 578,
+          "h": 259
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:123",
+        "name": "🥧 近7天各科室预约量",
+        "type": "TEXT",
+        "box": {
+          "x": 858,
+          "y": 275,
+          "w": 138,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "🥧 近7天各科室预约量",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:124",
+        "name": "svg-icon",
+        "type": "FRAME",
+        "box": {
+          "x": 858,
+          "y": 310,
+          "w": 538,
+          "h": 180
+        },
+        "children": [
+          {
+            "id": "157:125",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 932,
+              "y": 325,
+              "w": 0,
+              "h": 134
+            },
+            "fill": "#000000",
+            "stroke": "#D9D9D9"
+          },
+          {
+            "id": "157:126",
+            "name": "40",
+            "type": "TEXT",
+            "box": {
+              "x": 907,
+              "y": 317,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "40",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:127",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 928,
+              "y": 325,
+              "w": 420,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:128",
+            "name": "30",
+            "type": "TEXT",
+            "box": {
+              "x": 907,
+              "y": 346,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "30",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:129",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 928,
+              "y": 355,
+              "w": 420,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:130",
+            "name": "20",
+            "type": "TEXT",
+            "box": {
+              "x": 907,
+              "y": 376,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "20",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:131",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 928,
+              "y": 385,
+              "w": 420,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:132",
+            "name": "10",
+            "type": "TEXT",
+            "box": {
+              "x": 909,
+              "y": 406,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "10",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:133",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 928,
+              "y": 415,
+              "w": 420,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:134",
+            "name": "0",
+            "type": "TEXT",
+            "box": {
+              "x": 915,
+              "y": 451,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "0",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:135",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 932,
+              "y": 459,
+              "w": 417,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#D9D9D9"
+          },
+          {
+            "id": "157:136",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 948,
+              "y": 333,
+              "w": 49,
+              "h": 127
+            },
+            "fill": "#1890FF"
+          },
+          {
+            "id": "157:137",
+            "name": "38",
+            "type": "TEXT",
+            "box": {
+              "x": 964,
+              "y": 314,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "38",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:138",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1030,
+              "y": 376,
+              "w": 49,
+              "h": 83
+            },
+            "fill": "#69C0FF"
+          },
+          {
+            "id": "157:139",
+            "name": "25",
+            "type": "TEXT",
+            "box": {
+              "x": 1047,
+              "y": 357,
+              "w": 15,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "25",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:140",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1113,
+              "y": 392,
+              "w": 49,
+              "h": 67
+            },
+            "fill": "#91D5FF"
+          },
+          {
+            "id": "157:141",
+            "name": "20",
+            "type": "TEXT",
+            "box": {
+              "x": 1129,
+              "y": 374,
+              "w": 16,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "20",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:142",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1195,
+              "y": 409,
+              "w": 49,
+              "h": 50
+            },
+            "fill": "#BAE7FF"
+          },
+          {
+            "id": "157:143",
+            "name": "15",
+            "type": "TEXT",
+            "box": {
+              "x": 1212,
+              "y": 390,
+              "w": 14,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "15",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:144",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1277,
+              "y": 432,
+              "w": 49,
+              "h": 27
+            },
+            "fill": "#E6F7FF"
+          },
+          {
+            "id": "157:145",
+            "name": "8",
+            "type": "TEXT",
+            "box": {
+              "x": 1298,
+              "y": 414,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:146",
+            "name": "内科",
+            "type": "TEXT",
+            "box": {
+              "x": 960,
+              "y": 467,
+              "w": 25,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "内科",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:147",
+            "name": "妇科",
+            "type": "TEXT",
+            "box": {
+              "x": 1043,
+              "y": 467,
+              "w": 25,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "妇科",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:148",
+            "name": "儿科",
+            "type": "TEXT",
+            "box": {
+              "x": 1125,
+              "y": 467,
+              "w": 25,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "儿科",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:149",
+            "name": "口腔科",
+            "type": "TEXT",
+            "box": {
+              "x": 1200,
+              "y": 467,
+              "w": 38,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "口腔科",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:150",
+            "name": "皮肤科",
+            "type": "TEXT",
+            "box": {
+              "x": 1282,
+              "y": 467,
+              "w": 38,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "皮肤科",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          }
+        ]
+      },
+      {
+        "id": "157:151",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 244,
+          "y": 530,
+          "w": 578,
+          "h": 259
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:152",
+        "name": "💰 近7天挂号收入",
+        "type": "TEXT",
+        "box": {
+          "x": 264,
+          "y": 550,
+          "w": 110,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "💰 近7天挂号收入",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:153",
+        "name": "svg-icon",
+        "type": "FRAME",
+        "box": {
+          "x": 264,
+          "y": 585,
+          "w": 538,
+          "h": 180
+        },
+        "children": [
+          {
+            "id": "157:154",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 595,
+              "w": 0,
+              "h": 139
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:155",
+            "name": "750",
+            "type": "TEXT",
+            "box": {
+              "x": 295,
+              "y": 587,
+              "w": 23,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "750",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:156",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 595,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:157",
+            "name": "600",
+            "type": "TEXT",
+            "box": {
+              "x": 294,
+              "y": 616,
+              "w": 24,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "600",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:158",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 624,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:159",
+            "name": "450",
+            "type": "TEXT",
+            "box": {
+              "x": 294,
+              "y": 645,
+              "w": 24,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "450",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:160",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 653,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:161",
+            "name": "300",
+            "type": "TEXT",
+            "box": {
+              "x": 294,
+              "y": 673,
+              "w": 24,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "300",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:162",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 682,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:163",
+            "name": "150",
+            "type": "TEXT",
+            "box": {
+              "x": 297,
+              "y": 702,
+              "w": 21,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "150",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:164",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 710,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#F0F0F0"
+          },
+          {
+            "id": "157:165",
+            "name": "0",
+            "type": "TEXT",
+            "box": {
+              "x": 311,
+              "y": 726,
+              "w": 8,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "0",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:166",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 332,
+              "y": 734,
+              "w": 422,
+              "h": 0
+            },
+            "fill": "#000000",
+            "stroke": "#D9D9D9"
+          },
+          {
+            "id": "157:167",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 390,
+              "y": 599,
+              "w": 346,
+              "h": 108
+            },
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:168",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 385,
+              "y": 663,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:169",
+            "name": "¥360",
+            "type": "TEXT",
+            "box": {
+              "x": 375,
+              "y": 648,
+              "w": 31,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥360",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:170",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 443,
+              "y": 684,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:171",
+            "name": "¥240",
+            "type": "TEXT",
+            "box": {
+              "x": 432,
+              "y": 670,
+              "w": 30,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥240",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:172",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 501,
+              "y": 636,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:173",
+            "name": "¥450",
+            "type": "TEXT",
+            "box": {
+              "x": 490,
+              "y": 621,
+              "w": 30,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥450",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:174",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 558,
+              "y": 674,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:175",
+            "name": "¥300",
+            "type": "TEXT",
+            "box": {
+              "x": 547,
+              "y": 659,
+              "w": 31,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥300",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:176",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 616,
+              "y": 619,
+              "w": 9,
+              "h": 9
+            },
+            "fill": "#FFFFFF",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:177",
+            "name": "¥540",
+            "type": "TEXT",
+            "box": {
+              "x": 605,
+              "y": 605,
+              "w": 30,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥540",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:178",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 673,
+              "y": 594,
+              "w": 10,
+              "h": 10
+            },
+            "fill": "#52C41A",
+            "stroke": "#52C41A"
+          },
+          {
+            "id": "157:179",
+            "name": "¥660",
+            "type": "TEXT",
+            "box": {
+              "x": 661,
+              "y": 580,
+              "w": 32,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥660",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 700,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:180",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 730,
+              "y": 702,
+              "w": 10,
+              "h": 10
+            },
+            "fill": "#B7EB8F",
+            "stroke": "#B7EB8F"
+          },
+          {
+            "id": "157:181",
+            "name": "¥150",
+            "type": "TEXT",
+            "box": {
+              "x": 720,
+              "y": 707,
+              "w": 30,
+              "h": 15
+            },
+            "fill": "#52C41A",
+            "text": "¥150",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 700,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          },
+          {
+            "id": "157:182",
+            "name": "8/1",
+            "type": "TEXT",
+            "box": {
+              "x": 381,
+              "y": 742,
+              "w": 18,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/1",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:183",
+            "name": "8/2",
+            "type": "TEXT",
+            "box": {
+              "x": 437,
+              "y": 742,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/2",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:184",
+            "name": "8/3",
+            "type": "TEXT",
+            "box": {
+              "x": 495,
+              "y": 742,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/3",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:185",
+            "name": "8/4",
+            "type": "TEXT",
+            "box": {
+              "x": 553,
+              "y": 742,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/4",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:186",
+            "name": "8/5",
+            "type": "TEXT",
+            "box": {
+              "x": 610,
+              "y": 742,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/5",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:187",
+            "name": "8/6",
+            "type": "TEXT",
+            "box": {
+              "x": 668,
+              "y": 742,
+              "w": 20,
+              "h": 15
+            },
+            "fill": "#000000",
+            "text": "8/6",
+            "font": {
+              "family": "Inter",
+              "size": 12.342857360839844,
+              "weight": 400,
+              "lineHeight": 14.937662124633789,
+              "letterSpacing": 0,
+              "color": "#000000"
+            }
+          },
+          {
+            "id": "157:188",
+            "name": "今日",
+            "type": "TEXT",
+            "box": {
+              "x": 724,
+              "y": 743,
+              "w": 23,
+              "h": 14
+            },
+            "fill": "#52C41A",
+            "text": "今日",
+            "font": {
+              "family": "Inter",
+              "size": 11.314286231994629,
+              "weight": 700,
+              "lineHeight": 13.69285774230957,
+              "letterSpacing": 0,
+              "color": "#52C41A"
+            }
+          }
+        ]
+      },
+      {
+        "id": "157:189",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 838,
+          "y": 530,
+          "w": 578,
+          "h": 259
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:190",
+        "name": "📊 关键指标",
+        "type": "TEXT",
+        "box": {
+          "x": 858,
+          "y": 550,
+          "w": 74,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "📊 关键指标",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:191",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 858,
+          "y": 585,
+          "w": 263,
+          "h": 78
+        },
+        "fill": "#FAFAFA",
+        "radius": 6
+      },
+      {
+        "id": "157:192",
+        "name": "96.2%",
+        "type": "TEXT",
+        "box": {
+          "x": 958,
+          "y": 599,
+          "w": 68,
+          "h": 31
+        },
+        "fill": "#1890FF",
+        "text": "96.2%",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 700,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:193",
+        "name": "就诊率",
+        "type": "TEXT",
+        "box": {
+          "x": 972,
+          "y": 633,
+          "w": 36,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "就诊率",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:194",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 1133,
+          "y": 585,
+          "w": 263,
+          "h": 78
+        },
+        "fill": "#FAFAFA",
+        "radius": 6
+      },
+      {
+        "id": "157:195",
+        "name": "3.8%",
+        "type": "TEXT",
+        "box": {
+          "x": 1239,
+          "y": 599,
+          "w": 55,
+          "h": 31
+        },
+        "fill": "#FF4D4F",
+        "text": "3.8%",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 700,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:196",
+        "name": "爽约率",
+        "type": "TEXT",
+        "box": {
+          "x": 1247,
+          "y": 633,
+          "w": 36,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "爽约率",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:197",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 858,
+          "y": 675,
+          "w": 263,
+          "h": 78
+        },
+        "fill": "#FAFAFA",
+        "radius": 6
+      },
+      {
+        "id": "157:198",
+        "name": "¥5,280",
+        "type": "TEXT",
+        "box": {
+          "x": 955,
+          "y": 689,
+          "w": 73,
+          "h": 31
+        },
+        "fill": "#52C41A",
+        "text": "¥5,280",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 700,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:199",
+        "name": "本月收入",
+        "type": "TEXT",
+        "box": {
+          "x": 966,
+          "y": 723,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "本月收入",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:200",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 1133,
+          "y": 675,
+          "w": 263,
+          "h": 78
+        },
+        "fill": "#FAFAFA",
+        "radius": 6
+      },
+      {
+        "id": "157:201",
+        "name": "106",
+        "type": "TEXT",
+        "box": {
+          "x": 1246,
+          "y": 689,
+          "w": 39,
+          "h": 31
+        },
+        "fill": "#FA8C16",
+        "text": "106",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 700,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FA8C16"
+        }
+      },
+      {
+        "id": "157:202",
+        "name": "本月预约量",
+        "type": "TEXT",
+        "box": {
+          "x": 1235,
+          "y": 723,
+          "w": 60,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "本月预约量",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      }
+    ]
+  }
+}

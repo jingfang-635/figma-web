@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+imports/figma/
+*.log
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/.env
+apps/web/dist/
+artifacts/

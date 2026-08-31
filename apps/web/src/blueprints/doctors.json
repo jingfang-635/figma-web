@@ -1,0 +1,214 @@
+{
+  "route": "/doctors",
+  "refShot": "imports/figma/screens/医生管理.png",
+  "pageHeader": {
+    "title": "医生管理",
+    "subtitle": "管理门诊基础资料、排班与预约信息"
+  },
+  "kpiRow": [
+    {
+      "key": "departments",
+      "label": "启用科室"
+    },
+    {
+      "key": "doctors",
+      "label": "在诊医生"
+    },
+    {
+      "key": "pendingAppointments",
+      "label": "待就诊"
+    },
+    {
+      "key": "todayAppointments",
+      "label": "今日订单"
+    }
+  ],
+  "listCard": {
+    "title": "医生列表",
+    "subtitle": "挂号费按医生配置，医生停用后用户端不再展示",
+    "primaryAction": "+ 新增医生",
+    "searchPlaceholder": "搜索医生、科室或擅长",
+    "departmentFilter": "全部科室",
+    "resource": "doctors",
+    "columns": [
+      {
+        "key": "doctor",
+        "title": "医生",
+        "variant": "avatarTitleDesc"
+      },
+      {
+        "key": "department",
+        "title": "科室",
+        "variant": "deptTag"
+      },
+      {
+        "key": "specialty",
+        "title": "擅长",
+        "variant": "ellipsis"
+      },
+      {
+        "key": "experience",
+        "title": "经验/好评",
+        "variant": "expRate"
+      },
+      {
+        "key": "fee",
+        "title": "挂号费",
+        "variant": "fee"
+      },
+      {
+        "key": "status",
+        "title": "状态",
+        "variant": "tag"
+      },
+      {
+        "key": "actions",
+        "title": "操作",
+        "variant": "iconEditDelete"
+      }
+    ]
+  },
+  "modal": {
+    "id": "create-doctor",
+    "title": "新增医生",
+    "layout": "horizontal",
+    "extra": [
+      "avatarUpload"
+    ],
+    "width": 520,
+    "height": 717,
+    "fields": [
+      {
+        "key": "avatar",
+        "label": "医生头像",
+        "type": "upload"
+      },
+      {
+        "key": "name",
+        "label": "医生姓名",
+        "type": "text",
+        "required": true,
+        "placeholder": "请输入姓名"
+      },
+      {
+        "key": "title",
+        "label": "职称",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "departmentId",
+        "label": "所属科室",
+        "type": "select",
+        "required": true
+      },
+      {
+        "key": "fee",
+        "label": "挂号费(¥)",
+        "type": "number",
+        "required": true
+      },
+      {
+        "key": "experienceYears",
+        "label": "从业年限",
+        "type": "number"
+      },
+      {
+        "key": "goodRate",
+        "label": "好评率(%)",
+        "type": "number"
+      },
+      {
+        "key": "specialty",
+        "label": "擅长领域",
+        "type": "textarea",
+        "placeholder": "逗号分隔"
+      },
+      {
+        "key": "status",
+        "label": "状态",
+        "type": "select",
+        "options": [
+          {
+            "value": "active",
+            "label": "在诊"
+          },
+          {
+            "value": "inactive",
+            "label": "停诊"
+          }
+        ]
+      }
+    ]
+  },
+  "sample": {
+    "kpi": {
+      "departments": 6,
+      "doctors": 6,
+      "pendingAppointments": 0,
+      "todayAppointments": 0
+    },
+    "rows": [
+      {
+        "id": 1,
+        "name": "张伟",
+        "title": "副主任医师",
+        "departmentId": 1,
+        "department": {
+          "id": 1,
+          "name": "内科"
+        },
+        "specialty": "高血压、糖尿病、冠心病等慢性病...",
+        "experienceYears": 15,
+        "goodRate": 99,
+        "fee": 30,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "name": "李娜",
+        "title": "主任医师 副教授",
+        "departmentId": 3,
+        "department": {
+          "id": 3,
+          "name": "妇科"
+        },
+        "specialty": "妇科炎症、月经不调、宫颈疾病、...",
+        "experienceYears": 16,
+        "goodRate": 99,
+        "fee": 30,
+        "status": "active"
+      },
+      {
+        "id": 3,
+        "name": "王磊",
+        "title": "主治医师",
+        "departmentId": 2,
+        "department": {
+          "id": 2,
+          "name": "儿科"
+        },
+        "specialty": "儿童感冒、咳嗽、发热等常见病",
+        "experienceYears": 10,
+        "goodRate": 98,
+        "fee": 25,
+        "status": "active"
+      },
+      {
+        "id": 4,
+        "name": "王磊",
+        "title": "主治医师",
+        "departmentId": 4,
+        "department": {
+          "id": 4,
+          "name": "口腔科"
+        },
+        "specialty": "牙体牙髓、牙周疾病",
+        "experienceYears": 9,
+        "goodRate": 98,
+        "fee": 35,
+        "status": "active"
+      }
+    ]
+  }
+}

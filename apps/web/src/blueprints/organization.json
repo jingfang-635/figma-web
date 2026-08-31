@@ -1,0 +1,117 @@
+{
+  "route": "/organization",
+  "refShot": "imports/figma/screens/机构信息.png",
+  "pageHeader": {
+    "title": "机构信息",
+    "subtitle": "管理门诊基础资料、排班与预约信息"
+  },
+  "kpiRow": [
+    {
+      "key": "departments",
+      "label": "启用科室"
+    },
+    {
+      "key": "doctors",
+      "label": "在诊医生"
+    },
+    {
+      "key": "pendingAppointments",
+      "label": "待就诊"
+    },
+    {
+      "key": "todayAppointments",
+      "label": "今日订单"
+    }
+  ],
+  "formCard": {
+    "title": "机构基础信息",
+    "subtitle": "小程序首页、预约详情和后台使用同一份机构资料",
+    "primaryAction": "保存机构信息",
+    "resource": "organizations",
+    "layout": "twoColumn",
+    "fields": [
+      {
+        "key": "name",
+        "label": "机构名称",
+        "type": "text",
+        "required": true,
+        "span": 12
+      },
+      {
+        "key": "phone",
+        "label": "联系电话",
+        "type": "text",
+        "span": 12
+      },
+      {
+        "key": "subtitle",
+        "label": "机构副标题",
+        "type": "text",
+        "span": 12
+      },
+      {
+        "key": "businessHours",
+        "label": "营业时间",
+        "type": "text",
+        "span": 12
+      },
+      {
+        "key": "address",
+        "label": "机构地址",
+        "type": "text",
+        "span": 24
+      },
+      {
+        "key": "description",
+        "label": "机构简介",
+        "type": "textarea",
+        "span": 24,
+        "maxLength": 1000
+      }
+    ]
+  },
+  "layout": {
+    "viewport": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1068
+    },
+    "regions": [
+      {
+        "id": "pageHeader",
+        "nodeId": "157:215",
+        "width": 60,
+        "height": 21,
+        "font": {
+          "title": 15,
+          "weight": 500,
+          "color": "#1890FF"
+        },
+        "color": "#1890FF"
+      },
+      {
+        "id": "formCard",
+        "nodeId": "157:288",
+        "width": 90,
+        "height": 21
+      }
+    ]
+  },
+  "sample": {
+    "kpi": {
+      "departments": 6,
+      "doctors": 6,
+      "pendingAppointments": 0,
+      "todayAppointments": 0
+    },
+    "form": {
+      "name": "阳光医疗门诊",
+      "phone": "010-8888 8888",
+      "subtitle": "以患者为中心 · 专业守护健康",
+      "businessHours": "周一至周日 08:00-17:30",
+      "address": "北京市示范区健康路 88 号",
+      "description": "正规医疗机构，拥有专业医疗团队，为患者提供贴心、便捷的门诊服务。"
+    }
+  }
+}

@@ -1,0 +1,286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  status      String   @default("active")
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  username  String?
+  phone     String?
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Organization {
+  id            Int      @id @default(autoincrement())
+  name          String
+  subtitle      String?
+  address       String?
+  phone         String?
+  email         String?
+  description   String?
+  businessHours String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Department {
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String   @unique
+  icon        String?
+  description String?
+  status      String   @default("active")
+  sortOrder   Int      @default(0)
+  doctors     Doctor[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Doctor {
+  id              Int            @id @default(autoincrement())
+  name            String
+  title           String?
+  departmentId    Int
+  department      Department     @relation(fields: [departmentId], references: [id])
+  phone           String?
+  avatar          String?
+  specialty       String?
+  fee             Float?
+  experienceYears Int?
+  goodRate        Int?
+  status          String         @default("active")
+  schedules       Schedule[]
+  appointments    Appointment[]
+  reviews         Review[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Schedule {
+  id           Int            @id @default(autoincrement())
+  doctorId     Int
+  doctor       Doctor         @relation(fields: [doctorId], references: [id])
+  date         String
+  startTime    String
+  endTime      String
+  quota        Int            @default(10)
+  remark       String?
+  status       String         @default("available")
+  appointments Appointment[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Appointment {
+  id              Int      @id @default(autoincrement())
+  appointmentNo   String?
+  patientName     String
+  patientPhone    String
+  doctorId        Int
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  scheduleId      Int
+  schedule        Schedule @relation(fields: [scheduleId], references: [id])
+  status          String   @default("pending")
+  appointmentDate String
+  amount          Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  idCard    String?
+  gender    String?
+  age       Int?
+  address   String?
+  tags      String?
+  status    String   @default("active")
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id         Int       @id @default(autoincrement())
+  orderNo    String    @unique
+  patientId  Int
+  patient    Patient   @relation(fields: [patientId], references: [id])
+  doctorName String?
+  department String?
+  amount     Float
+  status     String    @default("pending")
+  type       String
+  payMethod  String?
+  paidAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  patientName String
+  doctorId    Int
+  doctor      Doctor   @relation(fields: [doctorId], references: [id])
+  rating      Int
+  content     String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id           Int      @id @default(autoincrement())
+  title        String
+  content      String
+  type         String
+  triggerScene String?
+  status       String   @default("active")
+  targetUser   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NotificationLog {
+  id             Int      @id @default(autoincrement())
+  receiver       String
+  template       String
+  contentSummary String?
+  sentAt         DateTime @default(now())
+  status         String   @default("sent")
+  createdAt      DateTime @default(now())
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  province  String
+  city      String
+  district  String
+  detail    String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Announcement {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  publisher String?
+  status    String    @default("draft")
+  publishAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model NewsCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  image     String?
+  sortOrder Int      @default(0)
+  status    String   @default("active")
+  news      News[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model News {
+  id         Int          @id @default(autoincrement())
+  title      String
+  content    String
+  smallImage String?
+  largeImage String?
+  type       String       @default("图文")
+  categoryId Int
+  category   NewsCategory @relation(fields: [categoryId], references: [id])
+  status     String       @default("draft")
+  publishAt  DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model NavItem {
+  id        Int       @id @default(autoincrement())
+  label     String
+  icon      String?
+  path      String
+  params    String?
+  sortOrder Int       @default(0)
+  status    String    @default("active")
+  parentId  Int?
+  parent    NavItem?  @relation("NavItemChildren", fields: [parentId], references: [id])
+  children  NavItem[] @relation("NavItemChildren")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  userName  String
+  content   String
+  images    String?
+  contact   String?
+  status    String   @default("pending")
+  reply     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppointmentRule {
+  id          Int      @id @default(autoincrement())
+  name        String
+  advanceDays Int      @default(7)
+  deadline    String?
+  cancelRule  String?
+  noShowLimit Int?
+  cancelHours Int      @default(24)
+  maxPerDay   Int      @default(3)
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OperationLog {
+  id        Int      @id @default(autoincrement())
+  userName  String
+  action    String
+  module    String
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+}

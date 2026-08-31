@@ -1,0 +1,266 @@
+{
+  "route": "/schedules",
+  "refShot": "imports/figma/screens/排班管理.png",
+  "pageHeader": {
+    "title": "排班管理",
+    "subtitle": "管理医生出诊时间表，支持单日/批量排班，用户端根据排班展示可预约时段"
+  },
+  "kpiRow": [
+    {
+      "key": "departments",
+      "label": "启用科室"
+    },
+    {
+      "key": "doctors",
+      "label": "在诊医生"
+    },
+    {
+      "key": "pendingAppointments",
+      "label": "待就诊"
+    },
+    {
+      "key": "todayAppointments",
+      "label": "今日订单"
+    }
+  ],
+  "calendar": {
+    "filters": [
+      "department",
+      "doctor"
+    ],
+    "views": [
+      "calendar",
+      "list"
+    ],
+    "legend": [
+      {
+        "color": "#1890FF",
+        "label": "可预约"
+      },
+      {
+        "color": "#FA8C16",
+        "label": "已约满"
+      },
+      {
+        "color": "#FF4D4F",
+        "label": "停诊"
+      },
+      {
+        "color": "#13C2C2",
+        "label": "上午"
+      },
+      {
+        "color": "#EB2F96",
+        "label": "下午"
+      }
+    ],
+    "actions": [
+      "批量排班",
+      "＋ 新增排班"
+    ]
+  },
+  "layout": {
+    "viewport": {
+      "x": 0,
+      "y": 1148,
+      "w": 1440,
+      "h": 1068
+    },
+    "regions": [
+      {
+        "id": "pageHeader",
+        "nodeId": "157:774",
+        "width": 60,
+        "height": 21,
+        "font": {
+          "title": 15,
+          "weight": 500,
+          "color": "#1890FF"
+        },
+        "color": "#1890FF"
+      },
+      {
+        "id": "calendar",
+        "nodeId": "157:846",
+        "width": 68,
+        "height": 19
+      }
+    ]
+  },
+  "sample": {
+    "kpi": {
+      "departments": 6,
+      "doctors": 6,
+      "pendingAppointments": 0,
+      "todayAppointments": 0
+    },
+    "cursor": "2026-08-01",
+    "rows": [
+      {
+        "id": 1,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 30,
+        "booked": 12,
+        "status": "available",
+        "tone": "morning",
+        "doctor": {
+          "name": "张伟"
+        }
+      },
+      {
+        "id": 2,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 20,
+        "booked": 20,
+        "status": "full",
+        "tone": "full",
+        "doctor": {
+          "name": "张伟"
+        }
+      },
+      {
+        "id": 3,
+        "date": "2026-08-10",
+        "startTime": "14:00",
+        "endTime": "17:00",
+        "quota": 40,
+        "booked": 15,
+        "status": "available",
+        "tone": "available",
+        "doctor": {
+          "name": "李娜"
+        }
+      },
+      {
+        "id": 4,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 10,
+        "booked": 1,
+        "status": "available",
+        "doctor": {
+          "name": "hidden"
+        }
+      },
+      {
+        "id": 5,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 10,
+        "booked": 1,
+        "status": "available",
+        "doctor": {
+          "name": "hidden"
+        }
+      },
+      {
+        "id": 6,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 10,
+        "booked": 1,
+        "status": "available",
+        "doctor": {
+          "name": "hidden"
+        }
+      },
+      {
+        "id": 7,
+        "date": "2026-08-10",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 10,
+        "booked": 1,
+        "status": "available",
+        "doctor": {
+          "name": "hidden"
+        }
+      },
+      {
+        "id": 8,
+        "date": "2026-08-11",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 25,
+        "booked": 5,
+        "status": "available",
+        "tone": "morning",
+        "doctor": {
+          "name": "王磊"
+        }
+      },
+      {
+        "id": 9,
+        "date": "2026-08-11",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 20,
+        "booked": 8,
+        "status": "available",
+        "tone": "morning",
+        "doctor": {
+          "name": "李娜"
+        }
+      },
+      {
+        "id": 10,
+        "date": "2026-08-11",
+        "startTime": "14:00",
+        "endTime": "17:00",
+        "quota": 30,
+        "booked": 10,
+        "status": "available",
+        "tone": "available",
+        "doctor": {
+          "name": "陈静"
+        }
+      },
+      {
+        "id": 11,
+        "date": "2026-08-12",
+        "startTime": "08:00",
+        "endTime": "12:00",
+        "quota": 20,
+        "booked": 0,
+        "status": "available",
+        "tone": "morning",
+        "doctor": {
+          "name": "刘洋"
+        }
+      },
+      {
+        "id": 12,
+        "date": "2026-08-12",
+        "startTime": "14:00",
+        "endTime": "17:00",
+        "quota": 15,
+        "booked": 7,
+        "status": "available",
+        "tone": "afternoon",
+        "doctor": {
+          "name": "赵强"
+        }
+      },
+      {
+        "id": 13,
+        "date": "2026-08-14",
+        "startTime": "14:00",
+        "endTime": "17:00",
+        "quota": 50,
+        "booked": 30,
+        "status": "available",
+        "tone": "available",
+        "doctor": {
+          "name": "张伟"
+        }
+      }
+    ]
+  }
+}

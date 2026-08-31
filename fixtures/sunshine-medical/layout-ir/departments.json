@@ -1,0 +1,3766 @@
+{
+  "id": "departments",
+  "name": "科室管理",
+  "nodeId": "157:312",
+  "frame": {
+    "x": 3040,
+    "y": 0,
+    "w": 1440,
+    "h": 1068
+  },
+  "extractedAt": "2026-08-31T01:12:37.335Z",
+  "fileKey": "KLYzRbufrish4gmY4jpUS0",
+  "regions": [
+    {
+      "id": "pageHeader",
+      "nodeId": "157:326",
+      "name": "科室管理",
+      "box": {
+        "x": 3097,
+        "y": 172,
+        "w": 60,
+        "h": 21
+      },
+      "font": {
+        "title": 15,
+        "weight": 500,
+        "color": "#1890FF"
+      }
+    },
+    {
+      "id": "listCard",
+      "nodeId": "157:397",
+      "name": "科室列表",
+      "box": {
+        "x": 3304,
+        "y": 271,
+        "w": 60,
+        "h": 21
+      }
+    }
+  ],
+  "exportables": [],
+  "icons": {
+    "nav": {},
+    "depts": {}
+  },
+  "texts": [
+    "＋",
+    "阳光医疗门诊",
+    "预约挂号管理后台",
+    "首页",
+    "🏠",
+    "机构信息",
+    "🏥",
+    "科室管理",
+    "🏷️",
+    "医生管理",
+    "👨‍⚕️",
+    "排班管理",
+    "📅",
+    "预约记录",
+    "📋",
+    "3",
+    "患者管理",
+    "👥",
+    "订单管理",
+    "💰",
+    "评价管理",
+    "⭐",
+    "📊",
+    "系统运营",
+    "▶",
+    "地址管理",
+    "📍",
+    "广告图管理",
+    "🖼️",
+    "公告管理",
+    "📢",
+    "新闻管理",
+    "📰",
+    "▶",
+    "新闻列表",
+    "新闻分类",
+    "导航栏",
+    "🧭",
+    "意见反馈",
+    "💬",
+    "预约规则",
+    "📏",
+    "消息通知",
+    "🔔",
+    "⚙️",
+    "系统管理",
+    "▶",
+    "用户管理",
+    "👤",
+    "角色管理",
+    "🔐",
+    "操作日志",
+    "📝",
+    "A",
+    "admin",
+    "系统管理员",
+    "退出",
+    "科室管理",
+    "管理门诊基础资料、排班与预约信息",
+    "启用科室",
+    "6",
+    "在诊医生",
+    "6",
+    "待就诊",
+    "0",
+    "今日订单",
+    "0",
+    "科室列表",
+    "维护小程序展示的科室名称、说明和图标",
+    "＋ 新增科室",
+    "科室",
+    "医生数量",
+    "排序",
+    "状态",
+    "操作",
+    "🫁",
+    "内科",
+    "重症、发热、咳嗽等",
+    "1",
+    "1"
+  ],
+  "tree": {
+    "id": "157:312",
+    "name": "科室管理",
+    "type": "FRAME",
+    "box": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1068
+    },
+    "fill": "#F5F7FA",
+    "children": [
+      {
+        "id": "157:313",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3040,
+          "y": 0,
+          "w": 1440,
+          "h": 1068
+        },
+        "fill": "#F5F7FA"
+      },
+      {
+        "id": "157:314",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3040,
+          "y": 0,
+          "w": 220,
+          "h": 1068
+        },
+        "fill": "#FFFFFF"
+      },
+      {
+        "id": "157:315",
+        "name": "border-right",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3259,
+          "y": 0,
+          "w": 1,
+          "h": 1068
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:316",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3060,
+          "y": 16,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#20BF88",
+        "radius": 8
+      },
+      {
+        "id": "157:317",
+        "name": "＋",
+        "type": "TEXT",
+        "box": {
+          "x": 3068,
+          "y": 21,
+          "w": 20,
+          "h": 28
+        },
+        "fill": "#FFFFFF",
+        "text": "＋",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 20,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:318",
+        "name": "阳光医疗门诊",
+        "type": "TEXT",
+        "box": {
+          "x": 3106,
+          "y": 15,
+          "w": 96,
+          "h": 21
+        },
+        "fill": "#262626",
+        "text": "阳光医疗门诊",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 16,
+          "weight": 500,
+          "lineHeight": 20.799999237060547,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:319",
+        "name": "预约挂号管理后台",
+        "type": "TEXT",
+        "box": {
+          "x": 3106,
+          "y": 37,
+          "w": 96,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "预约挂号管理后台",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:320",
+        "name": "首页",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 84,
+          "w": 30,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "首页",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:321",
+        "name": "🏠",
+        "type": "TEXT",
+        "box": {
+          "x": 3067,
+          "y": 83,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "🏠",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:322",
+        "name": "机构信息",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 128,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "机构信息",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:323",
+        "name": "🏥",
+        "type": "TEXT",
+        "box": {
+          "x": 3066,
+          "y": 127,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "🏥",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:324",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3052,
+          "y": 161,
+          "w": 195,
+          "h": 42
+        },
+        "fill": "#E6F7FF",
+        "radius": 6
+      },
+      {
+        "id": "157:325",
+        "name": "border-left",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3052,
+          "y": 161,
+          "w": 3,
+          "h": 42
+        },
+        "fill": "#1890FF"
+      },
+      {
+        "id": "157:326",
+        "name": "科室管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 172,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#1890FF",
+        "text": "科室管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 500,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:327",
+        "name": "🏷️",
+        "type": "TEXT",
+        "box": {
+          "x": 3065,
+          "y": 171,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#1890FF",
+        "text": "🏷️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:328",
+        "name": "医生管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 216,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "医生管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:329",
+        "name": "👨‍⚕️",
+        "type": "TEXT",
+        "box": {
+          "x": 3067,
+          "y": 215,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "👨‍⚕️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:330",
+        "name": "排班管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 260,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "排班管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:331",
+        "name": "📅",
+        "type": "TEXT",
+        "box": {
+          "x": 3066,
+          "y": 259,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "📅",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:332",
+        "name": "预约记录",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 304,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "预约记录",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:333",
+        "name": "📋",
+        "type": "TEXT",
+        "box": {
+          "x": 3067,
+          "y": 303,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "📋",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:334",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3213,
+          "y": 305,
+          "w": 22,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "radius": 9
+      },
+      {
+        "id": "157:335",
+        "name": "3",
+        "type": "TEXT",
+        "box": {
+          "x": 3221,
+          "y": 306,
+          "w": 7,
+          "h": 16
+        },
+        "fill": "#FFFFFF",
+        "text": "3",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 11,
+          "weight": 400,
+          "lineHeight": 15.399999618530273,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:336",
+        "name": "患者管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 348,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "患者管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:337",
+        "name": "👥",
+        "type": "TEXT",
+        "box": {
+          "x": 3065,
+          "y": 347,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "👥",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:338",
+        "name": "订单管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 392,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "订单管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:339",
+        "name": "💰",
+        "type": "TEXT",
+        "box": {
+          "x": 3067,
+          "y": 391,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "💰",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:340",
+        "name": "评价管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3097,
+          "y": 436,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "评价管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:341",
+        "name": "⭐",
+        "type": "TEXT",
+        "box": {
+          "x": 3065,
+          "y": 435,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#595959",
+        "text": "⭐",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 400,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:342",
+        "name": "line",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3068,
+          "y": 475,
+          "w": 163,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:343",
+        "name": "📊",
+        "type": "TEXT",
+        "box": {
+          "x": 3064,
+          "y": 494,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#8C8C8C",
+        "text": "📊",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:344",
+        "name": "系统运营",
+        "type": "TEXT",
+        "box": {
+          "x": 3094,
+          "y": 495,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#8C8C8C",
+        "text": "系统运营",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:345",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 3224,
+          "y": 500,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 500,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:346",
+        "name": "地址管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3101,
+          "y": 534,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "地址管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:347",
+        "name": "📍",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 534,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📍",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:348",
+        "name": "广告图管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 572,
+          "w": 70,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "广告图管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:349",
+        "name": "🖼️",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 572,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🖼️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:350",
+        "name": "公告管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 610,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "公告管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:351",
+        "name": "📢",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 610,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📢",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:352",
+        "name": "新闻管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3105,
+          "y": 648,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "新闻管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:353",
+        "name": "📰",
+        "type": "TEXT",
+        "box": {
+          "x": 3076,
+          "y": 648,
+          "w": 14,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "📰",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:354",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 3224,
+          "y": 653,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 400,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:355",
+        "name": "新闻列表",
+        "type": "TEXT",
+        "box": {
+          "x": 3095,
+          "y": 681,
+          "w": 52,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "新闻列表",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:356",
+        "name": "新闻分类",
+        "type": "TEXT",
+        "box": {
+          "x": 3095,
+          "y": 712,
+          "w": 52,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "新闻分类",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:357",
+        "name": "导航栏",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 745,
+          "w": 42,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "导航栏",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:358",
+        "name": "🧭",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 745,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🧭",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:359",
+        "name": "意见反馈",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 783,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "意见反馈",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:360",
+        "name": "💬",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 783,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "💬",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:361",
+        "name": "预约规则",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 821,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "预约规则",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:362",
+        "name": "📏",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 821,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📏",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:363",
+        "name": "消息通知",
+        "type": "TEXT",
+        "box": {
+          "x": 3108,
+          "y": 859,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "消息通知",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:364",
+        "name": "🔔",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 859,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🔔",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:365",
+        "name": "line",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3068,
+          "y": 895,
+          "w": 163,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:366",
+        "name": "⚙️",
+        "type": "TEXT",
+        "box": {
+          "x": 3064,
+          "y": 914,
+          "w": 17,
+          "h": 24
+        },
+        "fill": "#8C8C8C",
+        "text": "⚙️",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 17,
+          "weight": 500,
+          "lineHeight": 23.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:367",
+        "name": "系统管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3094,
+          "y": 915,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#8C8C8C",
+        "text": "系统管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:368",
+        "name": "▶",
+        "type": "TEXT",
+        "box": {
+          "x": 3224,
+          "y": 920,
+          "w": 10,
+          "h": 14
+        },
+        "fill": "#BFBFBF",
+        "text": "▶",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 10,
+          "weight": 500,
+          "lineHeight": 14,
+          "letterSpacing": 0,
+          "color": "#BFBFBF"
+        }
+      },
+      {
+        "id": "157:369",
+        "name": "用户管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3106,
+          "y": 954,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "用户管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:370",
+        "name": "👤",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 954,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "👤",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:371",
+        "name": "角色管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 992,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "角色管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:372",
+        "name": "🔐",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 992,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "🔐",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:373",
+        "name": "操作日志",
+        "type": "TEXT",
+        "box": {
+          "x": 3110,
+          "y": 1030,
+          "w": 56,
+          "h": 20
+        },
+        "fill": "#595959",
+        "text": "操作日志",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 400,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:374",
+        "name": "📝",
+        "type": "TEXT",
+        "box": {
+          "x": 3079,
+          "y": 1030,
+          "w": 15,
+          "h": 21
+        },
+        "fill": "#595959",
+        "text": "📝",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 400,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:375",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3260,
+          "y": 0,
+          "w": 1220,
+          "h": 52
+        },
+        "fill": "#FFFFFF"
+      },
+      {
+        "id": "157:376",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3260,
+          "y": 51,
+          "w": 1220,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:377",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4307,
+          "y": 11,
+          "w": 30,
+          "h": 30
+        },
+        "fill": "#E6F7FF",
+        "radius": 15
+      },
+      {
+        "id": "157:378",
+        "name": "A",
+        "type": "TEXT",
+        "box": {
+          "x": 4318,
+          "y": 17,
+          "w": 9,
+          "h": 19
+        },
+        "fill": "#1890FF",
+        "text": "A",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 500,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:379",
+        "name": "admin",
+        "type": "TEXT",
+        "box": {
+          "x": 4345,
+          "y": 8,
+          "w": 43,
+          "h": 20
+        },
+        "fill": "#333333",
+        "text": "admin",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#333333"
+        }
+      },
+      {
+        "id": "157:380",
+        "name": "系统管理员",
+        "type": "TEXT",
+        "box": {
+          "x": 4345,
+          "y": 27,
+          "w": 65,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "系统管理员",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:381",
+        "name": "退出",
+        "type": "TEXT",
+        "box": {
+          "x": 4430,
+          "y": 17,
+          "w": 26,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "退出",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:382",
+        "name": "科室管理",
+        "type": "TEXT",
+        "box": {
+          "x": 3284,
+          "y": 72,
+          "w": 88,
+          "h": 31
+        },
+        "fill": "#262626",
+        "text": "科室管理",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 22,
+          "weight": 500,
+          "lineHeight": 30.799999237060547,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:383",
+        "name": "管理门诊基础资料、排班与预约信息",
+        "type": "TEXT",
+        "box": {
+          "x": 3284,
+          "y": 106,
+          "w": 208,
+          "h": 19
+        },
+        "fill": "#8C8C8C",
+        "text": "管理门诊基础资料、排班与预约信息",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:384",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3284,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:385",
+        "name": "启用科室",
+        "type": "TEXT",
+        "box": {
+          "x": 3308,
+          "y": 163,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "启用科室",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:386",
+        "name": "6",
+        "type": "TEXT",
+        "box": {
+          "x": 3308,
+          "y": 182,
+          "w": 16,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "6",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:387",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3581,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:388",
+        "name": "在诊医生",
+        "type": "TEXT",
+        "box": {
+          "x": 3605,
+          "y": 163,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "在诊医生",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:389",
+        "name": "6",
+        "type": "TEXT",
+        "box": {
+          "x": 3605,
+          "y": 182,
+          "w": 16,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "6",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:390",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3878,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:391",
+        "name": "待就诊",
+        "type": "TEXT",
+        "box": {
+          "x": 3902,
+          "y": 163,
+          "w": 36,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "待就诊",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:392",
+        "name": "0",
+        "type": "TEXT",
+        "box": {
+          "x": 3902,
+          "y": 182,
+          "w": 16,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "0",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:393",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4175,
+          "y": 143,
+          "w": 281,
+          "h": 92
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:394",
+        "name": "今日订单",
+        "type": "TEXT",
+        "box": {
+          "x": 4199,
+          "y": 163,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "今日订单",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:395",
+        "name": "0",
+        "type": "TEXT",
+        "box": {
+          "x": 4199,
+          "y": 182,
+          "w": 16,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "text": "0",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 28,
+          "weight": 500,
+          "lineHeight": 28,
+          "letterSpacing": 0,
+          "color": "#1890FF"
+        }
+      },
+      {
+        "id": "157:396",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3284,
+          "y": 255,
+          "w": 1172,
+          "h": 487
+        },
+        "fill": "#FFFFFF",
+        "radius": 8,
+        "shadow": {
+          "r": 2,
+          "x": 0,
+          "y": 1
+        }
+      },
+      {
+        "id": "157:397",
+        "name": "科室列表",
+        "type": "TEXT",
+        "box": {
+          "x": 3304,
+          "y": 271,
+          "w": 60,
+          "h": 21
+        },
+        "fill": "#262626",
+        "text": "科室列表",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 15,
+          "weight": 500,
+          "lineHeight": 21,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:398",
+        "name": "维护小程序展示的科室名称、说明和图标",
+        "type": "TEXT",
+        "box": {
+          "x": 3304,
+          "y": 295,
+          "w": 216,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "维护小程序展示的科室名称、说明和图标",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:399",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4333,
+          "y": 271,
+          "w": 103,
+          "h": 31
+        },
+        "fill": "#1890FF",
+        "stroke": "#1890FF",
+        "radius": 6
+      },
+      {
+        "id": "157:400",
+        "name": "＋ 新增科室",
+        "type": "TEXT",
+        "box": {
+          "x": 4350,
+          "y": 278,
+          "w": 68,
+          "h": 19
+        },
+        "fill": "#FFFFFF",
+        "text": "＋ 新增科室",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:401",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 327,
+          "w": 399,
+          "h": 37
+        },
+        "fill": "#FAFAFA"
+      },
+      {
+        "id": "157:402",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 363,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:403",
+        "name": "科室",
+        "type": "TEXT",
+        "box": {
+          "x": 3324,
+          "y": 337,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "科室",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:404",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 327,
+          "w": 155,
+          "h": 37
+        },
+        "fill": "#FAFAFA"
+      },
+      {
+        "id": "157:405",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 363,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:406",
+        "name": "医生数量",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 337,
+          "w": 48,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "医生数量",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:407",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 327,
+          "w": 103,
+          "h": 37
+        },
+        "fill": "#FAFAFA"
+      },
+      {
+        "id": "157:408",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 363,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:409",
+        "name": "排序",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 337,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "排序",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:410",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 327,
+          "w": 142,
+          "h": 37
+        },
+        "fill": "#FAFAFA"
+      },
+      {
+        "id": "157:411",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 363,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:412",
+        "name": "状态",
+        "type": "TEXT",
+        "box": {
+          "x": 3973,
+          "y": 337,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "状态",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:413",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 327,
+          "w": 333,
+          "h": 37
+        },
+        "fill": "#FAFAFA"
+      },
+      {
+        "id": "157:414",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 363,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:415",
+        "name": "操作",
+        "type": "TEXT",
+        "box": {
+          "x": 4392,
+          "y": 337,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "操作",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:416",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 364,
+          "w": 399,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:417",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 425,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:418",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3324,
+          "y": 377,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#EBF5FF",
+        "radius": 18
+      },
+      {
+        "id": "157:419",
+        "name": "🫁",
+        "type": "TEXT",
+        "box": {
+          "x": 3336,
+          "y": 383,
+          "w": 18,
+          "h": 26
+        },
+        "fill": "#595959",
+        "text": "🫁",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 18,
+          "weight": 400,
+          "lineHeight": 25.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:420",
+        "name": "内科",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 376,
+          "w": 28,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "内科",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:421",
+        "name": "重症、发热、咳嗽等",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 397,
+          "w": 108,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "重症、发热、咳嗽等",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:422",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 364,
+          "w": 155,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:423",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 425,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:424",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 386,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:425",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 364,
+          "w": 103,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:426",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 425,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:427",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 386,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:428",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 364,
+          "w": 142,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:429",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 425,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:430",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3973,
+          "y": 384,
+          "w": 42,
+          "h": 22
+        },
+        "fill": "#F6FFED",
+        "stroke": "#B7EB8F",
+        "radius": 4
+      },
+      {
+        "id": "157:431",
+        "name": "启用",
+        "type": "TEXT",
+        "box": {
+          "x": 3982,
+          "y": 387,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#52C41A",
+        "text": "启用",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:432",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 364,
+          "w": 333,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:433",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 425,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:434",
+        "name": "✏️ 编辑",
+        "type": "TEXT",
+        "box": {
+          "x": 4301,
+          "y": 387,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#595959",
+        "text": "✏️ 编辑",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:435",
+        "name": "🗑️ 删除",
+        "type": "TEXT",
+        "box": {
+          "x": 4364,
+          "y": 387,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "text": "🗑️ 删除",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:436",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 426,
+          "w": 399,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:437",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 487,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:438",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3324,
+          "y": 439,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#FFF0F5",
+        "radius": 18
+      },
+      {
+        "id": "157:439",
+        "name": "🧸",
+        "type": "TEXT",
+        "box": {
+          "x": 3330,
+          "y": 445,
+          "w": 18,
+          "h": 26
+        },
+        "fill": "#595959",
+        "text": "🧸",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 18,
+          "weight": 400,
+          "lineHeight": 25.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:440",
+        "name": "儿科",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 438,
+          "w": 28,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "儿科",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:441",
+        "name": "儿童保健、常见疾病",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 459,
+          "w": 108,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "儿童保健、常见疾病",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:442",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 426,
+          "w": 155,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:443",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 487,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:444",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 448,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:445",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 426,
+          "w": 103,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:446",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 487,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:447",
+        "name": "2",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 448,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "2",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:448",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 426,
+          "w": 142,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:449",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 487,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:450",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3973,
+          "y": 446,
+          "w": 42,
+          "h": 22
+        },
+        "fill": "#F6FFED",
+        "stroke": "#B7EB8F",
+        "radius": 4
+      },
+      {
+        "id": "157:451",
+        "name": "启用",
+        "type": "TEXT",
+        "box": {
+          "x": 3982,
+          "y": 449,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#52C41A",
+        "text": "启用",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:452",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 426,
+          "w": 333,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:453",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 487,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:454",
+        "name": "✏️ 编辑",
+        "type": "TEXT",
+        "box": {
+          "x": 4301,
+          "y": 449,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#595959",
+        "text": "✏️ 编辑",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:455",
+        "name": "🗑️ 删除",
+        "type": "TEXT",
+        "box": {
+          "x": 4364,
+          "y": 449,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "text": "🗑️ 删除",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:456",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 488,
+          "w": 399,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:457",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 549,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:458",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3324,
+          "y": 501,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#FFF0F5",
+        "radius": 18
+      },
+      {
+        "id": "157:459",
+        "name": "🌸",
+        "type": "TEXT",
+        "box": {
+          "x": 3330,
+          "y": 507,
+          "w": 18,
+          "h": 26
+        },
+        "fill": "#595959",
+        "text": "🌸",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 18,
+          "weight": 400,
+          "lineHeight": 25.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:460",
+        "name": "妇科",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 500,
+          "w": 28,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "妇科",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:461",
+        "name": "妇科炎症、月经不调",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 521,
+          "w": 108,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "妇科炎症、月经不调",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:462",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 488,
+          "w": 155,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:463",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 549,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:464",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 510,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:465",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 488,
+          "w": 103,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:466",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 549,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:467",
+        "name": "3",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 510,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "3",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:468",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 488,
+          "w": 142,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:469",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 549,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:470",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3973,
+          "y": 508,
+          "w": 42,
+          "h": 22
+        },
+        "fill": "#F6FFED",
+        "stroke": "#B7EB8F",
+        "radius": 4
+      },
+      {
+        "id": "157:471",
+        "name": "启用",
+        "type": "TEXT",
+        "box": {
+          "x": 3982,
+          "y": 511,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#52C41A",
+        "text": "启用",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:472",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 488,
+          "w": 333,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:473",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 549,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:474",
+        "name": "✏️ 编辑",
+        "type": "TEXT",
+        "box": {
+          "x": 4301,
+          "y": 511,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#595959",
+        "text": "✏️ 编辑",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:475",
+        "name": "🗑️ 删除",
+        "type": "TEXT",
+        "box": {
+          "x": 4364,
+          "y": 511,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "text": "🗑️ 删除",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:476",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 550,
+          "w": 399,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:477",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 611,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:478",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3324,
+          "y": 563,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#E8FFF3",
+        "radius": 18
+      },
+      {
+        "id": "157:479",
+        "name": "🦷",
+        "type": "TEXT",
+        "box": {
+          "x": 3331,
+          "y": 569,
+          "w": 18,
+          "h": 26
+        },
+        "fill": "#595959",
+        "text": "🦷",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 18,
+          "weight": 400,
+          "lineHeight": 25.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:480",
+        "name": "口腔科",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 562,
+          "w": 42,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "口腔科",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:481",
+        "name": "牙痛、龋齿、牙周炎",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 583,
+          "w": 108,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "牙痛、龋齿、牙周炎",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:482",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 550,
+          "w": 155,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:483",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 611,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:484",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 572,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:485",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 550,
+          "w": 103,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:486",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 611,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:487",
+        "name": "4",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 572,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "4",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:488",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 550,
+          "w": 142,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:489",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 611,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:490",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3973,
+          "y": 570,
+          "w": 42,
+          "h": 22
+        },
+        "fill": "#F6FFED",
+        "stroke": "#B7EB8F",
+        "radius": 4
+      },
+      {
+        "id": "157:491",
+        "name": "启用",
+        "type": "TEXT",
+        "box": {
+          "x": 3982,
+          "y": 573,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#52C41A",
+        "text": "启用",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:492",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 550,
+          "w": 333,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:493",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 611,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:494",
+        "name": "✏️ 编辑",
+        "type": "TEXT",
+        "box": {
+          "x": 4301,
+          "y": 573,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#595959",
+        "text": "✏️ 编辑",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:495",
+        "name": "🗑️ 删除",
+        "type": "TEXT",
+        "box": {
+          "x": 4364,
+          "y": 573,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "text": "🗑️ 删除",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:496",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 612,
+          "w": 399,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:497",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3304,
+          "y": 673,
+          "w": 399,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:498",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3324,
+          "y": 625,
+          "w": 36,
+          "h": 36
+        },
+        "fill": "#F0E6FF",
+        "radius": 18
+      },
+      {
+        "id": "157:499",
+        "name": "🩺",
+        "type": "TEXT",
+        "box": {
+          "x": 3330,
+          "y": 631,
+          "w": 18,
+          "h": 26
+        },
+        "fill": "#595959",
+        "text": "🩺",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 18,
+          "weight": 400,
+          "lineHeight": 25.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:500",
+        "name": "皮肤科",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 624,
+          "w": 42,
+          "h": 20
+        },
+        "fill": "#262626",
+        "text": "皮肤科",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 14,
+          "weight": 500,
+          "lineHeight": 19.600000381469727,
+          "letterSpacing": 0,
+          "color": "#262626"
+        }
+      },
+      {
+        "id": "157:501",
+        "name": "皮炎、湿疹、过敏等",
+        "type": "TEXT",
+        "box": {
+          "x": 3370,
+          "y": 645,
+          "w": 108,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "皮炎、湿疹、过敏等",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:502",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 612,
+          "w": 155,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:503",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3703,
+          "y": 673,
+          "w": 155,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:504",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 3715,
+          "y": 634,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:505",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 612,
+          "w": 103,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:506",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3858,
+          "y": 673,
+          "w": 103,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:507",
+        "name": "5",
+        "type": "TEXT",
+        "box": {
+          "x": 3870,
+          "y": 634,
+          "w": 8,
+          "h": 19
+        },
+        "fill": "#595959",
+        "text": "5",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 13,
+          "weight": 400,
+          "lineHeight": 18.200000762939453,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:508",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 612,
+          "w": 142,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:509",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3961,
+          "y": 673,
+          "w": 142,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:510",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 3973,
+          "y": 632,
+          "w": 42,
+          "h": 22
+        },
+        "fill": "#F6FFED",
+        "stroke": "#B7EB8F",
+        "radius": 4
+      },
+      {
+        "id": "157:511",
+        "name": "启用",
+        "type": "TEXT",
+        "box": {
+          "x": 3982,
+          "y": 635,
+          "w": 24,
+          "h": 17
+        },
+        "fill": "#52C41A",
+        "text": "启用",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 500,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#52C41A"
+        }
+      },
+      {
+        "id": "157:512",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 612,
+          "w": 333,
+          "h": 62
+        }
+      },
+      {
+        "id": "157:513",
+        "name": "border-bottom",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4103,
+          "y": 673,
+          "w": 333,
+          "h": 1
+        },
+        "fill": "#F0F0F0"
+      },
+      {
+        "id": "157:514",
+        "name": "✏️ 编辑",
+        "type": "TEXT",
+        "box": {
+          "x": 4301,
+          "y": 635,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#595959",
+        "text": "✏️ 编辑",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#595959"
+        }
+      },
+      {
+        "id": "157:515",
+        "name": "🗑️ 删除",
+        "type": "TEXT",
+        "box": {
+          "x": 4364,
+          "y": 635,
+          "w": 39,
+          "h": 17
+        },
+        "fill": "#FF4D4F",
+        "text": "🗑️ 删除",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FF4D4F"
+        }
+      },
+      {
+        "id": "157:516",
+        "name": "共 5 条记录",
+        "type": "TEXT",
+        "box": {
+          "x": 4265,
+          "y": 708,
+          "w": 61,
+          "h": 17
+        },
+        "fill": "#8C8C8C",
+        "text": "共 5 条记录",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#8C8C8C"
+        }
+      },
+      {
+        "id": "157:517",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4340,
+          "y": 702,
+          "w": 28,
+          "h": 28
+        },
+        "fill": "#FFFFFF80",
+        "stroke": "#D9D9D9",
+        "radius": 4
+      },
+      {
+        "id": "157:518",
+        "name": "‹",
+        "type": "TEXT",
+        "box": {
+          "x": 4352,
+          "y": 708,
+          "w": 4,
+          "h": 17
+        },
+        "fill": "#59595980",
+        "text": "‹",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#59595980"
+        }
+      },
+      {
+        "id": "157:519",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4374,
+          "y": 702,
+          "w": 28,
+          "h": 28
+        },
+        "fill": "#1890FF",
+        "stroke": "#1890FF",
+        "radius": 4
+      },
+      {
+        "id": "157:520",
+        "name": "1",
+        "type": "TEXT",
+        "box": {
+          "x": 4385,
+          "y": 708,
+          "w": 7,
+          "h": 17
+        },
+        "fill": "#FFFFFF",
+        "text": "1",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "157:521",
+        "name": "box",
+        "type": "RECTANGLE",
+        "box": {
+          "x": 4408,
+          "y": 702,
+          "w": 28,
+          "h": 28
+        },
+        "fill": "#FFFFFF80",
+        "stroke": "#D9D9D9",
+        "radius": 4
+      },
+      {
+        "id": "157:522",
+        "name": "›",
+        "type": "TEXT",
+        "box": {
+          "x": 4420,
+          "y": 708,
+          "w": 4,
+          "h": 17
+        },
+        "fill": "#59595980",
+        "text": "›",
+        "font": {
+          "family": "Noto Sans SC",
+          "size": 12,
+          "weight": 400,
+          "lineHeight": 16.799999237060547,
+          "letterSpacing": 0,
+          "color": "#59595980"
+        }
+      }
+    ]
+  }
+}
