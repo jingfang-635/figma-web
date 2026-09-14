@@ -4,12 +4,12 @@
   "figma": {
     "fileKey": "KLYzRbufrish4gmY4jpUS0",
     "url": "https://www.figma.com/design/KLYzRbufrish4gmY4jpUS0",
-    "extractedAt": "2026-08-31T01:12:58.716Z"
+    "extractedAt": "2026-09-14T13:35:22.378Z"
   },
   "tokens": {
     "color": {
-      "primary": "#1677FF",
-      "primaryHover": "#4096FF",
+      "primary": "#1890FF",
+      "primaryHover": "#4BA8FF",
       "primarySoft": "#E6F4FF",
       "sidebarBg": "#FFFFFF",
       "sidebarText": "#595959",
@@ -19,13 +19,13 @@
       "headerBg": "#FFFFFF",
       "pageBg": "#F5F7FA",
       "surface": "#FFFFFF",
-      "text": "#1890FF",
+      "text": "#1F2937",
       "textSecondary": "#595959",
       "border": "#E5E7EB",
       "success": "#52C41A",
       "warning": "#FA8C16",
       "danger": "#FF4D4F",
-      "info": "#1677FF",
+      "info": "#1890FF",
       "tableHead": "#FAFAFA"
     },
     "font": {
@@ -316,7 +316,6 @@
       "regions": {
         "title": "医生管理",
         "subtitle": "管理门诊基础资料、排班与预约信息",
-        "cardTitle": "医生列表",
         "stats": [
           {
             "key": "departments",
@@ -347,6 +346,7 @@
             "label": "全部科室"
           }
         ],
+        "cardTitle": "医生列表",
         "actions": [
           {
             "label": "＋ 新增医生",
@@ -446,7 +446,7 @@
           {
             "key": "specialty",
             "label": "擅长领域",
-            "type": "text"
+            "type": "textarea"
           },
           {
             "key": "status",
@@ -680,10 +680,22 @@
           }
         ],
         "statusMap": {
-          "pending": { "label": "待就诊", "color": "warning" },
-          "confirmed": { "label": "已确认", "color": "processing" },
-          "completed": { "label": "已就诊", "color": "success" },
-          "cancelled": { "label": "已取消", "color": "error" }
+          "pending": {
+            "label": "待就诊",
+            "color": "warning"
+          },
+          "confirmed": {
+            "label": "已确认",
+            "color": "processing"
+          },
+          "completed": {
+            "label": "已就诊",
+            "color": "success"
+          },
+          "cancelled": {
+            "label": "已取消",
+            "color": "error"
+          }
         },
         "table": {
           "columns": [
@@ -843,9 +855,18 @@
             "type": "select",
             "label": "全部标签",
             "options": [
-              { "value": "慢性病患者", "label": "慢性病患者" },
-              { "value": "VIP", "label": "VIP" },
-              { "value": "黑名单", "label": "黑名单" }
+              {
+                "value": "慢性病患者",
+                "label": "慢性病患者"
+              },
+              {
+                "value": "VIP",
+                "label": "VIP"
+              },
+              {
+                "value": "黑名单",
+                "label": "黑名单"
+              }
             ]
           }
         ],
@@ -2086,9 +2107,18 @@
             "type": "select",
             "required": true,
             "options": [
-              { "value": "12:00", "label": "12:00" },
-              { "value": "16:00", "label": "16:00" },
-              { "value": "17:00", "label": "17:00" }
+              {
+                "value": "12:00",
+                "label": "12:00"
+              },
+              {
+                "value": "16:00",
+                "label": "16:00"
+              },
+              {
+                "value": "17:00",
+                "label": "17:00"
+              }
             ]
           },
           {
@@ -2097,9 +2127,18 @@
             "type": "select",
             "required": true,
             "options": [
-              { "value": "就诊前2小时可取消", "label": "就诊前2小时可取消" },
-              { "value": "就诊前4小时可取消", "label": "就诊前4小时可取消" },
-              { "value": "就诊前6小时可取消", "label": "就诊前6小时可取消" }
+              {
+                "value": "就诊前2小时可取消",
+                "label": "就诊前2小时可取消"
+              },
+              {
+                "value": "就诊前4小时可取消",
+                "label": "就诊前4小时可取消"
+              },
+              {
+                "value": "就诊前6小时可取消",
+                "label": "就诊前6小时可取消"
+              }
             ]
           },
           {
@@ -2172,19 +2211,43 @@
             "type": "select",
             "label": "全部评分",
             "options": [
-              { "value": "5", "label": "5星" },
-              { "value": "4", "label": "4星" },
-              { "value": "3", "label": "3星" },
-              { "value": "2", "label": "2星" },
-              { "value": "1", "label": "1星" }
+              {
+                "value": "5",
+                "label": "5星"
+              },
+              {
+                "value": "4",
+                "label": "4星"
+              },
+              {
+                "value": "3",
+                "label": "3星"
+              },
+              {
+                "value": "2",
+                "label": "2星"
+              },
+              {
+                "value": "1",
+                "label": "1星"
+              }
             ]
           }
         ],
         "actions": [],
         "statusMap": {
-          "pending": { "label": "待处理", "color": "warning" },
-          "published": { "label": "已展示", "color": "success" },
-          "hidden": { "label": "已隐藏", "color": "default" }
+          "pending": {
+            "label": "待处理",
+            "color": "warning"
+          },
+          "published": {
+            "label": "已展示",
+            "color": "success"
+          },
+          "hidden": {
+            "label": "已隐藏",
+            "color": "default"
+          }
         },
         "table": {
           "columns": [
@@ -2462,7 +2525,7 @@
         {
           "key": "specialty",
           "label": "擅长领域",
-          "type": "text"
+          "type": "textarea"
         },
         {
           "key": "status",

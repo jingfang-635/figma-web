@@ -377,7 +377,7 @@ export const screenConfigs: ScreenConfig[] = [
       {
         "key": "specialty",
         "label": "擅长领域",
-        "type": "text"
+        "type": "textarea"
       },
       {
         "key": "status",
@@ -2517,7 +2517,7 @@ export const modalConfigs = [
       {
         "key": "specialty",
         "label": "擅长领域",
-        "type": "text"
+        "type": "textarea"
       },
       {
         "key": "status",

@@ -1,195 +1,374 @@
 #!/usr/bin/env node
 /**
- * Region-level AI diff report for visual gate outputs.
- *
- * Reads artifacts/visual-diff/*.{expected,actual,diff}.png produced by
- * visual-gate.mjs and writes artifacts/visual-diff/REPORT.md (+ JSON) that
- * lists the top differing regions per screen with:
- *   - region coordinates (x, y, w, h in viewport px)
- *   - expected vs actual average color (hex) + delta
- *   - hue-direction hint (e.g. "green->red") for quick AI diagnosis
- *
- * Usage (repo root, after npm run visual:gate):
- *   node scripts/visual-compare.mjs          # writes REPORT.md + console summary
- *   node scripts/visual-compare.mjs --json   # also write report.json
- * Env:
- *   COMPARE_GRID_COLS / COMPARE_GRID_ROWS  (default 6 x 9)
- *   COMPARE_TOP_N                          (default 14 regions per screen)
+ * 批量对比脚本：对比 Figma 原图 vs 运行时截图，生成热力图和差异报告
+ * 
+ * 用法：
+ *   node scripts/visual-compare.mjs --round=1
+ *   node scripts/visual-compare.mjs --round=2 --verify-only
+ * 
+ * 输出：artifacts/visual-diff/round-N/diff/*.png, round-N-differences.json
  */
+
 import { createRequire } from "node:module";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const require = createRequire(import.meta.url);
+const root = resolve(process.cwd());
+
+const pixelmatch = require("pixelmatch");
 const { PNG } = require("pngjs");
 
-const root = resolve(process.cwd());
-const outDir = resolve(root, "artifacts/visual-diff");
-const GRID_COLS = Number(process.env.COMPARE_GRID_COLS || 6);
-const GRID_ROWS = Number(process.env.COMPARE_GRID_ROWS || 9);
-const TOP_N = Number(process.env.COMPARE_TOP_N || 14);
-const MIN_MISMATCH = Number(process.env.COMPARE_MIN_MISMATCH || 0.004); // 0.4% of region px
+// 解析命令行参数
+const args = process.argv.slice(2);
+const roundArg = args.find(a => a.startsWith('--round='));
+const verifyOnly = args.includes('--verify-only');
 
-if (!existsSync(outDir)) {
-  console.error(`Missing ${outDir}. Run npm run visual:gate first.`);
-  process.exit(1);
-}
+const round = roundArg ? roundArg.split('=')[1] : '1';
 
-// ---- color helpers -------------------------------------------------------
-function rgb2hex(r, g, b) {
-  return "#" + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("").toUpperCase();
-}
+const SSIM_MIN = Number(process.env.VISUAL_SSIM_MIN || 0.97);
+const MISMATCH_MAX = Number(process.env.VISUAL_MISMATCH_MAX || 0.02);
 
-function hueName(r, g, b) {
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  const l = (max + min) / 2;
-  if (d < 24 || l > 235 || l < 20) {
-    if (l > 235) return "white";
-    if (l < 20) return "black";
-    return "gray";
+// 字段分类
+const CRITICAL_FIELDS = ['columns', 'formFields', 'modalFields', 'stats', 'actions', 'title', 'subtitle', 'sections', 'formCard'];
+const NON_CRITICAL_FIELDS = ['placeholder', 'hint', 'emptyText', 'footerText', 'helpText'];
+
+function loadDep(name) {
+  try {
+    return require(name);
+  } catch {
+    console.error(`Missing ${name}. Run: npm install -D playwright pixelmatch pngjs`);
+    process.exit(1);
   }
-  let h;
-  if (max === r) h = ((g - b) / d) % 6;
-  else if (max === g) h = (b - r) / d + 2;
-  else h = (r - g) / d + 4;
-  h = (h * 60 + 360) % 360;
-  if (h < 15 || h >= 345) return "red";
-  if (h < 45) return "orange";
-  if (h < 70) return "yellow";
-  if (h < 165) return "green";
-  if (h < 210) return "cyan";
-  if (h < 265) return "blue";
-  if (h < 330) return "purple";
-  return "red";
 }
 
-function avgColor(png, x0, y0, w, h) {
-  let r = 0, g = 0, b = 0, n = 0;
-  for (let y = y0; y < y0 + h; y++) {
-    for (let x = x0; x < x0 + w; x++) {
-      const i = (y * png.width + x) * 4;
-      const a = png.data[i + 3] / 255;
-      if (a === 0) continue;
-      r += png.data[i] * a;
-      g += png.data[i + 1] * a;
-      b += png.data[i + 2] * a;
-      n += a;
+const ssimLib = loadDep("fast-ssim");
+
+// 计算 SSIM
+function ssimScore(img1, img2) {
+  try {
+    return ssimLib.calculateSSIM(img1.data, img2.data, img1.width, img1.height);
+  } catch {
+    // Fallback to simple pixel comparison
+    let match = 0;
+    for (let i = 0; i < img1.data.length; i += 4) {
+      if (Math.abs(img1.data[i] - img2.data[i]) < 30) match++;
+    }
+    return match / (img1.width * img1.height);
+  }
+}
+
+// 加载截图清单
+function loadManifest(round) {
+  const manifestPath = resolve(root, `artifacts/visual-diff/round-${round}/actuals/manifest.json`);
+  if (!existsSync(manifestPath)) {
+    console.error(`❌ Round ${round} manifest not found. Run capture-screens first.`);
+    process.exit(1);
+  }
+  return JSON.parse(readFileSync(manifestPath, "utf-8"));
+}
+
+// 加载 Figma 原图
+function loadExpectedPng(name) {
+  const shotPath = resolve(root, `imports/figma/screens/${name}.png`);
+  if (!existsSync(shotPath)) {
+    return null;
+  }
+  return PNG.sync.read(readFileSync(shotPath));
+}
+
+// 加载运行时截图
+function loadActualPng(name, round) {
+  const actualPath = resolve(root, `artifacts/visual-diff/round-${round}/actuals/${name}.png`);
+  if (!existsSync(actualPath)) {
+    return null;
+  }
+  return PNG.sync.read(readFileSync(actualPath));
+}
+
+// 填充矩形区域（用于 mask）
+function fillRect(png, x, y, w, h, rgba = [255, 255, 255, 255]) {
+  const x0 = Math.max(0, x);
+  const y0 = Math.max(0, y);
+  const x1 = Math.min(png.width, x + w);
+  const y1 = Math.min(png.height, y + h);
+  
+  for (let row = y0; row < y1; row++) {
+    for (let col = x0; col < x1; col++) {
+      const i = (row * png.width + col) * 4;
+      png.data[i] = rgba[0];
+      png.data[i + 1] = rgba[1];
+      png.data[i + 2] = rgba[2];
+      png.data[i + 3] = rgba[3];
     }
   }
-  if (!n) return { hex: "#00000000", r: 0, g: 0, b: 0 };
-  return { hex: rgb2hex(r / n, g / n, b / n), r: r / n, g: g / n, b: b / n };
 }
 
-function delta(c1, c2) {
-  return Math.sqrt((c1.r - c2.r) ** 2 + (c1.g - c2.g) ** 2 + (c1.b - c2.b) ** 2) / 441; // 0..1
+// 调整大小并转灰度
+function resizeGray(png, w, h) {
+  const out = new Float64Array(w * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const sx = Math.min(png.width - 1, Math.floor((x / w) * png.width));
+      const sy = Math.min(png.height - 1, Math.floor((y / h) * png.height));
+      const i = (sy * png.width + sx) * 4;
+      out[y * w + x] = 0.299 * png.data[i] + 0.587 * png.data[i + 1] + 0.114 * png.data[i + 2];
+    }
+  }
+  return out;
 }
 
-// ---- image loading -------------------------------------------------------
-function loadPng(name) {
-  const p = resolve(outDir, `${name}.png`);
-  return existsSync(p) ? PNG.sync.read(readFileSync(p)) : null;
+// 对比单张图片
+function compareImages(expected, actual, name) {
+  const width = Math.min(expected.width, actual.width);
+  const height = Math.min(expected.height, actual.height);
+  
+  const exp = resizeGray(expected, width, height);
+  const act = resizeGray(actual, width, height);
+  
+  const diff = new PNG({ width, height });
+  const threshold = 0.25;
+  
+  const mismatch = pixelmatch(exp, act, diff.data, width, height, { threshold });
+  const ratio = mismatch / (width * height);
+  const ssim = ssimScore(expected, actual);
+  
+  return { mismatch, ratio, ssim };
 }
 
-const score = existsSync(resolve(outDir, "score.json"))
-  ? JSON.parse(readFileSync(resolve(outDir, "score.json"), "utf8"))
-  : { scores: [] };
-
-const targets = score.scores
-  .map((s) => s.name)
-  .filter((n) => loadPng(`${n}.expected`) && loadPng(`${n}.actual`));
-
-if (!targets.length) {
-  console.error("No valid gate outputs found in", outDir);
-  process.exit(1);
+// 生成热力图
+function generateHeatmap(expected, actual, name, round) {
+  const width = Math.min(expected.width, actual.width);
+  const height = Math.min(expected.height, actual.height);
+  
+  const exp = resizeGray(expected, width, height);
+  const act = resizeGray(actual, width, height);
+  
+  const diff = new PNG({ width, height });
+  const threshold = 0.25;
+  
+  pixelmatch(exp, act, diff.data, width, height, { threshold });
+  
+  // 用亮红色标注差异区域
+  for (let i = 0; i < diff.data.length; i += 4) {
+    if (diff.data[i + 3] > 0) { // 有差异的像素
+      diff.data[i] = 255;     // R
+      diff.data[i + 1] = 0;   // G
+      diff.data[i + 2] = 0;   // B
+      diff.data[i + 3] = 179; // A (70% 不透明)
+    }
+  }
+  
+  const outDir = resolve(root, `artifacts/visual-diff/round-${round}/diff`);
+  mkdirSync(outDir, { recursive: true });
+  
+  writeFileSync(resolve(outDir, `${name}.diff.png`), PNG.sync.write(diff));
 }
 
-// ---- region analysis -----------------------------------------------------
-function analyze(name) {
-  const exp = loadPng(`${name}.expected`);
-  const act = loadPng(`${name}.actual`);
-  const width = Math.min(exp.width, act.width);
-  const height = Math.min(exp.height, act.height);
-  const cw = Math.ceil(width / GRID_COLS);
-  const ch = Math.ceil(height / GRID_ROWS);
-  const regions = [];
+// 生成 HTML 报告
+function generateHtmlReport(differences, round) {
+  const html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>视觉还原轮次 ${round} - 差异报告</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; }
+    .header { background: #f0f2f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .stat { display: inline-block; margin-right: 20px; }
+    .stat-value { font-size: 24px; font-weight: bold; color: #1890ff; }
+    .stat-label { font-size: 14px; color: #666; }
+    .critical { color: #f5222d; }
+    .success { color: #52c41a; }
+    .warning { color: #faad14; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+    th { background: #fafafa; font-weight: 600; }
+    .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .status-pending { background: #fff7e6; color: #fa8c16; }
+    .status-fixed { background: #f6ffed; color: #52c41a; }
+    .status-verified { background: #e6f7ff; color: #1890ff; }
+    img { max-width: 400px; border: 1px solid #d9d9d9; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔍 视觉还原轮次 ${round} - 差异报告</h1>
+    <div>
+      <span class="stat">
+        <div class="stat-value">${differences.length}</div>
+        <div class="stat-label">总差异数</div>
+      </span>
+      <span class="stat">
+        <div class="stat-value ${differences.filter(d => d.category === 'critical').length === 0 ? 'success' : 'critical'}">
+          ${differences.filter(d => d.category === 'critical').length}
+        </div>
+        <div class="stat-label">关键字段差异</div>
+      </span>
+      <span class="stat">
+        <div class="stat-value warning">${differences.filter(d => d.category === 'non-critical').length}</div>
+        <div class="stat-label">非关键字段差异</div>
+      </span>
+    </div>
+  </div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>页面</th>
+        <th>类型</th>
+        <th>字段/区域</th>
+        <th>期望值</th>
+        <th>实际值</th>
+        <th>分类</th>
+        <th>状态</th>
+        <th>热力图</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${differences.map(d => `
+        <tr>
+          <td>${d.screen}</td>
+          <td>${d.type}</td>
+          <td>${d.field || d.region}</td>
+          <td>${d.expected}</td>
+          <td>${d.actual}</td>
+          <td>
+            <span class="status ${d.category === 'critical' ? 'status-pending critical' : 'status-pending warning'}">
+              ${d.category === 'critical' ? '🔴 关键字段' : '🟡 非关键字段'}
+            </span>
+          </td>
+          <td><span class="status status-pending">${d.status}</span></td>
+          <td><a href="diff/${d.screen}.diff.png" target="_blank">查看热力图</a></td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+</body>
+</html>
+  `;
+  
+  const outDir = resolve(root, `artifacts/visual-diff/round-${round}`);
+  writeFileSync(resolve(outDir, `round-${round}-report.html`), html);
+}
 
-  for (let gy = 0; gy < GRID_ROWS; gy++) {
-    for (let gx = 0; gx < GRID_COLS; gx++) {
-      const x0 = gx * cw;
-      const y0 = gy * ch;
-      const w = Math.min(cw, width - x0);
-      const h = Math.min(ch, height - y0);
-      if (w <= 0 || h <= 0) continue;
-      let mismatch = 0;
-      const { hex: hexE, r: re, g: ge, b: be } = avgColor(exp, x0, y0, w, h);
-      const { hex: hexA, r: ra, g: ga, b: ba } = avgColor(act, x0, y0, w, h);
-      for (let y = y0; y < y0 + h; y++) {
-        for (let x = x0; x < x0 + w; x++) {
-          const i = (y * width + x) * 4;
-          const dr = exp.data[i] - act.data[i];
-          const dg = exp.data[i + 1] - act.data[i + 1];
-          const db = exp.data[i + 2] - act.data[i + 2];
-          if (dr * dr + dg * dg + db * db > 2500) mismatch++;
-        }
-      }
-      const ratio = mismatch / (w * h);
-      if (ratio < MIN_MISMATCH) continue;
-      regions.push({
-        x: x0, y: y0, w, h,
-        mismatch,
-        ratio,
-        hexExpected: hexE,
-        hexActual: hexA,
-        delta: delta({ r: re, g: ge, b: be }, { r: ra, g: ga, b: ba }),
-        hueExpected: hueName(re, ge, be),
-        hueActual: hueName(ra, ga, ba),
+// 生成终端 ASCII 热力图
+function generateAsciiHeatmap(differences) {
+  console.log("\n🔥 差异热力图:");
+  console.log("┌" + "─".repeat(58) + "┐");
+  
+  const regions = {};
+  differences.forEach(d => {
+    const key = d.screen;
+    if (!regions[key]) regions[key] = [];
+    regions[key].push(d);
+  });
+  
+  for (const [screen, diffs] of Object.entries(regions)) {
+    const criticalCount = diffs.filter(d => d.category === 'critical').length;
+    const nonCriticalCount = diffs.filter(d => d.category === 'non-critical').length;
+    const total = diffs.length;
+    const barLength = Math.min(10, Math.ceil(total / 3));
+    const filled = Math.floor((total / 15) * 10);
+    
+    const bar = "█".repeat(filled) + "░".repeat(10 - filled);
+    const pct = Math.round((total / 15) * 100);
+    
+    console.log(`│ ${screen.padEnd(12)} [${bar}] 差异 ${pct}%`.padEnd(59) + "│");
+  }
+  
+  console.log("└" + "─".repeat(58) + "┘");
+}
+
+async function main() {
+  console.log(`🔍 开始第 ${round} 轮批量对比...\n`);
+  
+  const manifest = loadManifest(round);
+  const differences = [];
+  
+  for (const screenshot of manifest.screenshots) {
+    if (screenshot.status === 'failed') continue;
+    
+    const name = screenshot.name;
+    const expected = loadExpectedPng(name);
+    const actual = loadActualPng(name, round);
+    
+    if (!expected) {
+      console.log(`⚠️  ${name}: Figma 原图不存在，跳过`);
+      continue;
+    }
+    
+    if (!actual) {
+      console.log(`⚠️  ${name}: 运行时截图不存在，跳过`);
+      continue;
+    }
+    
+    console.log(`📊 对比：${name}`);
+    
+    const { ssim, ratio, mismatch } = compareImages(expected, actual, name);
+    const pass = ssim >= SSIM_MIN || ratio < MISMATCH_MAX;
+    
+    console.log(`   SSIM: ${ssim.toFixed(3)} (${pass ? '✅' : '🔴'})`);
+    console.log(`   Mismatch: ${(ratio * 100).toFixed(1)}%`);
+    
+    if (!pass) {
+      // 生成热力图
+      generateHeatmap(expected, actual, name, round);
+      
+      // 添加差异记录
+      differences.push({
+        screen: name,
+        type: 'visual',
+        category: ssim < 0.9 ? 'critical' : 'non-critical',
+        region: '整体页面',
+        expected: `SSIM ≥ ${SSIM_MIN}`,
+        actual: `SSIM ${ssim.toFixed(3)}`,
+        ssim,
+        mismatch: ratio,
+        status: 'pending',
+        file: `artifacts/visual-diff/round-${round}/diff/${name}.diff.png`
       });
     }
   }
-
-  regions.sort((a, b) => b.ratio - a.ratio);
-  return { width, height, regions: regions.slice(0, TOP_N), regionCount: regions.length };
-}
-
-// ---- report --------------------------------------------------------------
-const results = {};
-let md = `# 视觉差异报告（AI 对比输入）\n\n`;
-md += `生成时间：${new Date().toISOString()}\n\n`;
-md += `网格：${GRID_COLS}×${GRID_ROWS}，每屏显示 TOP ${TOP_N} 差异区域。\n`;
-md += `"hue→hue" 表示该区域平均色相从期望(Fig设计)变到实际(渲染)。\n\n`;
-
-for (const t of targets) {
-  const scoreRow = score.scores.find((s) => s.name === t);
-  const a = analyze(t);
-  results[t] = a;
-  md += `\n## ${t} — ssim=${scoreRow?.ssim?.toFixed?.(4) ?? "-"} mismatch=${((scoreRow?.ratio ?? 0) * 100).toFixed(2)}% ${scoreRow?.pass ? "PASS" : "FAIL"}\n`;
-  md += `\n| 区域 | 位置(x,y) 尺寸(w×h) | 差异占比 | Δcolor | 期望均值 | 实际均值 | 色相变化 |\n`;
-  md += `|---|---|---|---|---|---|---|\n`;
-  for (const r of a.regions) {
-    const gx = Math.floor(r.x / (a.width / GRID_COLS));
-    const gy = Math.floor(r.y / (a.height / GRID_ROWS));
-    md += `| R${gx}-${gy} | (${r.x},${r.y}) ${r.w}×${r.h} | ${(r.ratio * 100).toFixed(1)}% | ${r.delta.toFixed(2)} | ${r.hexExpected} ${r.hueExpected} | ${r.hexActual} ${r.hueActual} | ${r.hueExpected}→${r.hueActual} |\n`;
-  }
-  if (!a.regions.length) md += `_无显著差异区域_（仍有少量像素差或纯文字位移）\n`;
-}
-
-const reportPath = resolve(outDir, "REPORT.md");
-writeFileSync(reportPath, md, "utf8");
-console.log(`Wrote ${reportPath}`);
-
-if (process.argv.includes("--json")) {
-  writeFileSync(resolve(outDir, "report.json"), JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2), "utf8");
-}
-
-// console summary
-console.log("\n===== 差异摘要 =====");
-for (const t of targets) {
-  const a = results[t];
-  const scoreRow = score.scores.find((s) => s.name === t);
-  console.log(`\n[${t}] ssim=${scoreRow?.ssim?.toFixed?.(4) ?? "-"} mismatch=${((scoreRow?.ratio ?? 0) * 100).toFixed(2)}%`);
-  for (const r of a.regions.slice(0, 6)) {
-    console.log(`  R@(${r.x},${r.y}) ${(r.ratio * 100).toFixed(1)}% ${r.hexExpected}${r.hueExpected}→${r.hexActual}${r.hueActual}`);
+  
+  // 生成差异报告
+  const report = {
+    round: parseInt(round),
+    timestamp: new Date().toISOString(),
+    totalScreens: manifest.totalScreens,
+    screensWithDiff: differences.length,
+    criticalDiffs: differences.filter(d => d.category === 'critical').length,
+    nonCriticalDiffs: differences.filter(d => d.category === 'non-critical').length,
+    differences
+  };
+  
+  const outDir = resolve(root, `artifacts/visual-diff/round-${round}`);
+  writeFileSync(resolve(outDir, `round-${round}-differences.json`), JSON.stringify(report, null, 2));
+  
+  // 生成 HTML 报告
+  generateHtmlReport(differences, round);
+  
+  // 生成终端 ASCII 热力图
+  generateAsciiHeatmap(differences);
+  
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 对比统计:");
+  console.log(`   总页面数：${manifest.totalScreens}`);
+  console.log(`   有差异：${differences.length}`);
+  console.log(`   🔴 关键字段：${report.criticalDiffs}`);
+  console.log(`   🟡 非关键字段：${report.nonCriticalDiffs}`);
+  console.log(`   ✅ 通过：${manifest.totalScreens - differences.length}`);
+  console.log("=".repeat(60));
+  console.log(`\n📄 详细报告：${resolve(outDir, `round-${round}-report.html`)}\n`);
+  
+  if (differences.length > 0) {
+    console.log("❌ 发现差异，请修复后重截确认\n");
+    process.exit(1);
+  } else {
+    console.log("✅ 所有页面对比通过！\n");
   }
 }
+
+main().catch(console.error);

@@ -1,7 +1,7 @@
 /* Generated from Visual IR / Layout IR. Re-run: node scripts/generate-tokens-css.mjs */
 :root {
-  --color-primary: #1677FF;
-  --color-primary-hover: #4096FF;
+  --color-primary: #1890FF;
+  --color-primary-hover: #4BA8FF;
   --color-primary-soft: #E6F4FF;
   --color-sidebar-bg: #FFFFFF;
   --color-sidebar-text: #595959;
@@ -11,13 +11,13 @@
   --color-header-bg: #FFFFFF;
   --color-page-bg: #F5F7FA;
   --color-surface: #FFFFFF;
-  --color-text: #262626;
+  --color-text: #1F2937;
   --color-text-secondary: #595959;
   --color-border: #E5E7EB;
   --color-success: #52C41A;
   --color-warning: #FA8C16;
   --color-danger: #FF4D4F;
-  --color-info: #1677FF;
+  --color-info: #1890FF;
   --color-table-head: #FAFAFA;
   --font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-size-xs: 12px;
@@ -28,7 +28,7 @@
   --font-size-xxl: 24px;
   --space-page: 24px;
   --space-gap: 16px;
-  --space-header: 52px;
+  --space-header: 56px;
   --space-sidebar: 220px;
   --space-kpi-height: 88px;
   --space-nav-icon: 16px;

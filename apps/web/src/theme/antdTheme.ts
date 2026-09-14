@@ -3,14 +3,14 @@ import type { ThemeConfig } from 'antd';
 
 export const antdTheme: ThemeConfig = {
   token: {
-    colorPrimary: '#1677FF',
+    colorPrimary: '#1890FF',
     colorSuccess: '#52C41A',
     colorWarning: '#FA8C16',
     colorError: '#FF4D4F',
-    colorInfo: '#1677FF',
+    colorInfo: '#1890FF',
     colorBgLayout: '#F5F7FA',
     colorBgContainer: '#FFFFFF',
-    colorText: '#262626',
+    colorText: '#1F2937',
     colorTextSecondary: '#595959',
     colorBorder: '#E5E7EB',
     borderRadius: 8,
@@ -23,12 +23,12 @@ export const antdTheme: ThemeConfig = {
       headerBg: '#FFFFFF',
       siderBg: '#FFFFFF',
       bodyBg: '#F5F7FA',
-      headerHeight: 52,
+      headerHeight: 56,
     },
     Menu: {
       itemBg: 'transparent',
-      itemSelectedBg: '#E6F7FF',
-      itemSelectedColor: '#1890FF',
+      itemSelectedBg: '#E6F4FF',
+      itemSelectedColor: '#595959',
       itemColor: '#595959',
       itemHoverBg: '#F5F5F5',
       itemBorderRadius: 6,

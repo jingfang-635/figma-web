@@ -172,11 +172,62 @@ Screen catalog（区域/侧栏/弹窗模板）：`scripts/lib/screen-catalog.mjs
 
 
 
-`version, name, stack, auth, entities[], apis[], screens[]`  
+`version, name, stack, auth, entities[], apis[], screens[], benchmarkScreens[]`  
 
 若仓库有 Schema：`docs/schemas/app-spec.schema.json`  
 
 `stack` 对象**不要**带 `label`/`description`（仅 id/language/frontend/backend/database/orm）。
+
+**新增 `benchmarkScreens` 字段**（必选，覆盖 5 种模式）：
+
+```json
+{
+  "benchmarkScreens": [
+    {
+      "id": "home",
+      "type": "chart",
+      "route": "/",
+      "name": "首页",
+      "description": "数据看板（图表页）"
+    },
+    {
+      "id": "departments",
+      "type": "list",
+      "route": "/departments",
+      "name": "科室管理",
+      "description": "科室列表（列表页）"
+    },
+    {
+      "id": "appointment-form",
+      "type": "form",
+      "route": "/appointments/new",
+      "name": "新增预约",
+      "description": "预约表单（表单页）"
+    },
+    {
+      "id": "doctor-detail",
+      "type": "detail",
+      "route": "/doctors/1",
+      "name": "医生详情",
+      "description": "医生详细信息（详情页）"
+    },
+    {
+      "id": "modal-create-dept",
+      "type": "modal",
+      "route": "/departments",
+      "name": "新增科室弹窗",
+      "description": "新增科室模态框（弹窗）"
+    }
+  ]
+}
+```
+
+**字段说明**：
+- `id` - 标杆屏唯一标识（用于截图和对比）
+- `type` - 屏类型：`chart` | `list` | `form` | `detail` | `modal`
+- `route` - 前端路由
+- `name` - 屏名称（与 Figma 截图文件名对应）
+- `description` - 描述（可选）
 
 
 

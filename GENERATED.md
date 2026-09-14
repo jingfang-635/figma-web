@@ -50,9 +50,9 @@
 
 **对齐方式**：Figma API 限流解除后，拉取了全部 21 屏 + 7 弹窗的节点真实文本（归档于 `fixtures/figma-fields.json`），并导出全部截图到 `imports/figma/screens/`。随后：
 
-- 按原型逐屏回填 [scripts/lib/screen-catalog.mjs](file:///d:/AITEST/figma-to-fullstack/scripts/lib/screen-catalog.mjs)（columns / formFields / filters / actions / stats / subtitle / statusMap），全部 `needsReview: false`
-- 同步扩展 [schema.prisma](file:///d:/AITEST/figma-to-fullstack/apps/api/prisma/schema.prisma)：医生(挂号费/从业年限/好评率/头像)、预约(编号/金额)、患者(标签/状态)、订单(医生/科室/支付方式/支付时间)、公告(发布人)、新闻(小图/大图/类型)、新闻分类(大图)、导航(图标/参数)、反馈(图片)、用户(用户名/手机号/状态)、角色(状态)、预约规则(截止/取消规则/爽约次数)、通知(触发场景)
-- 升级通用页 [ResourceListPage.tsx](file:///d:/AITEST/figma-to-fullstack/apps/web/src/templates/ResourceListPage.tsx)：支持按屏 KPI、select 筛选、多操作按钮、自定义行操作与逐屏状态文案（statusMap）
+- 按原型逐屏回填 [scripts/lib/screen-catalog.mjs](scripts/lib/screen-catalog.mjs)（columns / formFields / filters / actions / stats / subtitle / statusMap），全部 `needsReview: false`
+- 同步扩展 [schema.prisma](apps/api/prisma/schema.prisma)：医生(挂号费/从业年限/好评率/头像)、预约(编号/金额)、患者(标签/状态)、订单(医生/科室/支付方式/支付时间)、公告(发布人)、新闻(小图/大图/类型)、新闻分类(大图)、导航(图标/参数)、反馈(图片)、用户(用户名/手机号/状态)、角色(状态)、预约规则(截止/取消规则/爽约次数)、通知(触发场景)
+- 升级通用页 [ResourceListPage.tsx](apps/web/src/templates/ResourceListPage.tsx)：支持按屏 KPI、select 筛选、多操作按钮、自定义行操作与逐屏状态文案（statusMap）
 - 已通过字段一致性脚本校验：17 屏全部 OK，`needsReview: true` 数量为 0
 
 ## 快速启动

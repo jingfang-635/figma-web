@@ -211,6 +211,17 @@ function isLinkBlue(hex) {
   return b > r + 30 && b > 140;
 }
 
+/** Deterministic lighten toward white; only used to derive a hover shade from a named-node color. */
+function lightenHex(hex, ratio) {
+  if (!hex || hex.length < 7) return hex;
+  const n = parseInt(hex.slice(1, 7), 16);
+  const mix = (v) => Math.round(v + (255 - v) * ratio);
+  const r = mix((n >> 16) & 255),
+    g = mix((n >> 8) & 255),
+    b = mix(n & 255);
+  return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+
 function findAncestorWithFill(node, parentMap) {
   let cur = parentMap.get(node);
   while (cur) {
@@ -297,6 +308,20 @@ export function tokensFromNamedNodes(sidebar, pages) {
     if (gray?.fill) tokens.color.pageBg = gray.fill.slice(0, 7);
 
     const title = texts.find((t) => t.font?.size >= 18 && t.font?.weight >= 600);
+
+    // Brand primary comes from a named node — the page-title text, which the prototype
+    // paints with the accent blue — never from an area heuristic or the antd default.
+    const accentText =
+      texts.find((t) => t.text.trim() === page.name && isLinkBlue(t.font?.color)) ||
+      texts.find((t) => isLinkBlue(t.font?.color));
+    if (accentText?.font?.color) {
+      const c = accentText.font.color.slice(0, 7);
+      tokens.color.primary = c;
+      tokens.color.info = c;
+      tokens.color.primaryHover = lightenHex(c, 0.22);
+      if (accentText.text.trim() === page.name) tokens.color.primarySoft = tokens.color.sidebarActiveBg;
+    }
+
     if (title?.font?.color) {
       const c = title.font.color.slice(0, 7);
       if (!isLinkBlue(c)) tokens.color.text = c;

@@ -268,9 +268,7 @@ export function DepartmentsPage() {
         centered
         destroyOnClose
         className="dept-modal"
-        classNames={{ content: "dept-modal-content" }}
         styles={{
-          content: { width: 520, height: 493, maxHeight: 493, padding: 0, overflow: "hidden" },
           body: { padding: "16px 20px 0", overflow: "hidden" },
           header: { margin: 0 },
           footer: { margin: 0 },
