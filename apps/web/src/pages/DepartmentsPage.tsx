@@ -154,13 +154,14 @@ export function DepartmentsPage() {
       key: 'dept',
       render: (_, row) => {
         const visual = getDeptVisual(row.name);
+        const DeptGlyph = visual.icon;
         return (
           <div className="dept-cell">
             {visual.src ? (
               <img src={visual.src} alt="" className="dept-icon" width={40} height={40} />
             ) : (
               <div className="dept-icon-fallback" style={{ background: visual.bg }}>
-                {visual.emoji}
+                <DeptGlyph style={{ fontSize: 20, color: '#595959' }} />
               </div>
             )}
             <div>

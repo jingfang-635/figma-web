@@ -8,7 +8,7 @@
     "w": 520,
     "h": 493
   },
-  "extractedAt": "2026-09-14T13:35:21.998Z",
+  "extractedAt": "2026-09-20T14:29:02.870Z",
   "fileKey": "KLYzRbufrish4gmY4jpUS0",
   "regions": [
     {
@@ -36,7 +36,6 @@
     "请输入科室名称",
     "科室图标",
     "*",
-    "＋",
     "上传图标",
     "建议尺寸 200×200px",
     "支持 PNG / JPG / SVG，不超过 2MB",
@@ -278,25 +277,41 @@
         "radius": 6
       },
       {
-        "id": "157:4190",
-        "name": "＋",
-        "type": "TEXT",
+        "id": "272:1262",
+        "name": "PlusOutlined",
+        "type": "FRAME",
         "box": {
           "x": 148,
           "y": 7121,
           "w": 24,
           "h": 24
         },
-        "fill": "#BFBFBF",
-        "text": "＋",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 24,
-          "weight": 400,
-          "lineHeight": 24,
-          "letterSpacing": 0,
-          "color": "#BFBFBF"
-        }
+        "children": [
+          {
+            "id": "272:1263",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 159,
+              "y": 7123,
+              "w": 2,
+              "h": 19
+            },
+            "fill": "#BFBFBF"
+          },
+          {
+            "id": "272:1264",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 150,
+              "y": 7131,
+              "w": 19,
+              "h": 2
+            },
+            "fill": "#BFBFBF"
+          }
+        ]
       },
       {
         "id": "157:4191",

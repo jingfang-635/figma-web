@@ -1,5 +1,11 @@
 import { Card, Spin } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  DollarOutlined,
+  FundOutlined,
+  LineChartOutlined,
+  PieChartOutlined,
+} from '@ant-design/icons';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   Bar,
   BarChart,
@@ -175,12 +181,24 @@ export function DashboardPage() {
   const chartTitle = (id: string, fallback: string) =>
     bp.charts?.find((c) => c.id === id)?.title ?? fallback;
 
+  /** Figma chart titles embed emoji; strip them and render a vector icon instead. */
+  const chartTitleNode = (id: string, icon: ReactNode, fallback: string) => {
+    const raw = chartTitle(id, fallback);
+    const text = raw.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+\s*/u, '');
+    return (
+      <span className="chart-card-title">
+        <span className="chart-title-icon" aria-hidden>{icon}</span>
+        {text}
+      </span>
+    );
+  };
+
   return (
     <div>
       <PageHeaderBlock title={bp.pageHeader.title} subtitle={bp.pageHeader.subtitle} />
       <KpiRow items={kpiItems} />
       <div className="dash-chart-row">
-        <Card bordered={false} className="dash-chart-card" title={<span className="chart-card-title">{chartTitle('trend', '📈 近7天预约量趋势')}</span>}>
+        <Card bordered={false} className="dash-chart-card" title={chartTitleNode('trend', <LineChartOutlined />, '📈 近7天预约量趋势')}>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={trendData} margin={{ top: 16, right: 16, left: 4, bottom: 0 }}>
               <CartesianGrid stroke="#F0F0F0" vertical={false} syncWithTicks horizontalValues={[0, 5, 10, 15, 20, 25]} />
@@ -202,7 +220,7 @@ export function DashboardPage() {
             </LineChart>
           </ResponsiveContainer>
         </Card>
-        <Card bordered={false} className="dash-chart-card" title={<span className="chart-card-title">{chartTitle('deptBars', '🥧 近7天各科室预约量')}</span>}>
+        <Card bordered={false} className="dash-chart-card" title={chartTitleNode('deptBars', <PieChartOutlined />, '🥧 近7天各科室预约量')}>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={deptBarData} margin={{ top: 16, right: 28, left: 4, bottom: 0 }} barSize={49} barCategoryGap={33}>
               <CartesianGrid stroke="#F0F0F0" vertical={false} syncWithTicks horizontalValues={[0, 10, 20, 30, 40]} />
@@ -227,7 +245,7 @@ export function DashboardPage() {
             </BarChart>
           </ResponsiveContainer>
         </Card>
-        <Card bordered={false} className="dash-chart-card" title={<span className="chart-card-title">{chartTitle('income', '💰 近7天挂号收入')}</span>}>
+        <Card bordered={false} className="dash-chart-card" title={chartTitleNode('income', <DollarOutlined />, '💰 近7天挂号收入')}>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={incomeData} margin={{ top: 16, right: 16, left: 8, bottom: 0 }}>
               <CartesianGrid stroke="#F0F0F0" vertical={false} syncWithTicks horizontalValues={incomeTicks} />
@@ -249,7 +267,7 @@ export function DashboardPage() {
             </LineChart>
           </ResponsiveContainer>
         </Card>
-        <Card bordered={false} className="dash-chart-card" title={<span className="chart-card-title">{chartTitle('metrics', '📊 关键指标')}</span>}>
+        <Card bordered={false} className="dash-chart-card" title={chartTitleNode('metrics', <FundOutlined />, '📊 关键指标')}>
           <div className="metric-grid">
             <div className="metric-tile">
               <div className="metric-value" style={{ color: '#1890FF' }}>

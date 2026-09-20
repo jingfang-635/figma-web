@@ -14,6 +14,7 @@ import {
   Typography,
   message,
 } from 'antd';
+import { CalendarOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -339,10 +340,12 @@ export function SchedulePage() {
               className={view === 'calendar' ? 'active' : ''}
               onClick={() => setView('calendar')}
             >
-              📅 日历视图
+              <CalendarOutlined style={{ fontSize: 12 }} />
+              {' '}日历视图
             </button>
             <button type="button" className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}>
-              📋 列表视图
+              <UnorderedListOutlined style={{ fontSize: 12 }} />
+              {' '}列表视图
             </button>
           </div>
           <Button
@@ -361,7 +364,8 @@ export function SchedulePage() {
               setBatchOpen(true);
             }}
           >
-            📅 批量排班
+            <CalendarOutlined style={{ fontSize: 12 }} />
+            {' '}批量排班
           </Button>
           <Button type="primary" className="tb-create" onClick={() => openCreate()}>
             ＋ 新增排班

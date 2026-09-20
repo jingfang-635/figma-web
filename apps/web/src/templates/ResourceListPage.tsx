@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, StarFilled } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -28,6 +28,7 @@ import {
 } from '../api/client';
 import type { FormFieldConfig, ScreenConfig, ScreenSection } from '../generated/screenConfigs';
 import { KpiRow, PageHeaderBlock } from '../components/chrome/PageBlocks';
+import { ActionIcon, stripIconPrefix } from '../config/navIcons';
 import { useStats } from '../components/chrome/StatsContext';
 import { isVisualGate } from '../visual/gate';
 import { LIST_GATE_DEPTS, LIST_GATE_FORM, LIST_GATE_KPI, LIST_GATE_ROWS } from '../visual/listGateSamples';
@@ -140,7 +141,13 @@ function formatKpiValue(key: string, value: string | number | undefined): string
 function renderStars(value: unknown) {
   const n = Number(value);
   if (!Number.isFinite(n) || n <= 0) return '-';
-  return <span className="list-stars">{'⭐'.repeat(Math.min(5, Math.round(n)))}</span>;
+  return (
+    <span className="list-stars">
+      {Array.from({ length: Math.min(5, Math.round(n)) }, (_, i) => (
+        <StarFilled key={i} style={{ fontSize: 14 }} />
+      ))}
+    </span>
+  );
 }
 
 function renderTags(value: unknown) {
@@ -228,8 +235,8 @@ function FormConfigPage({ config }: { config: ScreenConfig }) {
         className="rules-card"
         title={formCard?.title ?? config.title}
         extra={
-          <Button type="primary" loading={saving} onClick={() => void save()}>
-            {formCard?.primaryAction ?? '保存'}
+          <Button type="primary" loading={saving} icon={<SaveOutlined />} onClick={() => void save()}>
+            {stripIconPrefix(formCard?.primaryAction ?? '保存')}
           </Button>
         }
       >
@@ -510,15 +517,15 @@ export function ResourceListPage({ config }: { config: ScreenConfig }) {
       return ['详情'];
     }
     if (config.route === '/patients') {
-      return String(row.status) === 'blacklisted' ? ['详情', '🔓 解禁'] : ['详情', '🔖 标签'];
+      return String(row.status) === 'blacklisted' ? ['详情', '解禁'] : ['详情', '标签'];
     }
     if (config.route === '/orders') {
       return String(row.status) === 'paid' ? ['详情', '退款'] : ['详情'];
     }
     if (config.route === '/reviews') {
       const st = String(row.status ?? '');
-      if (st === 'hidden') return ['💬 回复'];
-      return ['💬 回复', '🙈 隐藏'];
+      if (st === 'hidden') return ['回复'];
+      return ['回复', '隐藏'];
     }
     return config.rowActions;
   };
@@ -551,7 +558,9 @@ export function ResourceListPage({ config }: { config: ScreenConfig }) {
   };
 
   const renderRowAction = (label: string, row: Record<string, unknown>) => {
-    if (label === 'edit' || label === '编辑' || label === '修改') {
+    // Generated configs carry emoji prefixes (e.g. "📝 统一" → handled as 修改).
+    const clean = stripIconPrefix(label);
+    if (clean === 'edit' || clean === '编辑' || clean === '修改') {
       return (
         <Button
           type="link"
@@ -560,21 +569,21 @@ export function ResourceListPage({ config }: { config: ScreenConfig }) {
           style={{ color: '#fa8c16' }}
           onClick={() => void openEdit(row)}
         >
-          {label === 'edit' ? '编辑' : label}
+          {clean === 'edit' ? '编辑' : clean}
         </Button>
       );
     }
-    if (label === 'delete' || label === '删除') {
+    if (clean === 'delete' || clean === '删除') {
       return (
         <Button type="link" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(row)}>
           删除
         </Button>
       );
     }
-    if (label === '🙈 隐藏' || label === '隐藏') {
+    if (clean === '隐藏') {
       return (
         <Button type="link" size="small" onClick={() => handleHideReview(row)}>
-          {label}
+          隐藏
         </Button>
       );
     }
@@ -582,17 +591,18 @@ export function ResourceListPage({ config }: { config: ScreenConfig }) {
       <Button
         type="link"
         size="small"
-        danger={label === '取消'}
+        danger={clean === '取消'}
         style={
-          label === '已就诊'
+          clean === '已就诊'
             ? { color: '#52c41a' }
-            : label === '退款' || label === '🔓 解禁'
+            : clean === '退款' || clean === '解禁'
               ? { color: '#fa8c16' }
               : undefined
         }
-        onClick={() => message.info(`「${label}」操作已按原型配置，交互待完善`)}
+        onClick={() => message.info(`「${clean}」操作已按原型配置，交互待完善`)}
       >
-        {label}
+        <ActionIcon label={clean} />
+        {clean}
       </Button>
     );
   };
@@ -791,14 +801,18 @@ export function ResourceListPage({ config }: { config: ScreenConfig }) {
                     )),
                 ]
               : null}
-            {secondaryActions.map((action) => (
-              <Button
-                key={action.label}
-                onClick={() => message.info(`「${action.label}」操作已按原型配置`)}
-              >
-                {action.label}
-              </Button>
-            ))}
+            {secondaryActions.map((action) => {
+              const cleanLabel = stripIconPrefix(action.label);
+              return (
+                <Button
+                  key={action.label}
+                  icon={<ActionIcon label={cleanLabel} />}
+                  onClick={() => message.info(`「${cleanLabel}」操作已按原型配置`)}
+                >
+                  {cleanLabel}
+                </Button>
+              );
+            })}
             {config.readOnly || !createAction ? null : (
               <Button type="primary" icon={<PlusOutlined />} onClick={() => void openCreate()}>
                 {createLabel}

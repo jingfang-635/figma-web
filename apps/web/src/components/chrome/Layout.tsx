@@ -3,7 +3,7 @@ import type { MenuProps } from 'antd';
 import { useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
-import { BrandMark, NavIcon } from '../../config/navIcons';
+import { BrandMark, GroupIcon, NavIcon } from '../../config/navIcons';
 import { screenConfigs, sidebarChrome } from '../../generated/screenConfigs';
 import { StatsProvider, useStats } from './StatsContext';
 
@@ -113,7 +113,7 @@ function AppSider() {
         const navIdx = children!.findIndex((c) => c && 'key' in c && c.key === '导航栏管理');
         const newsItem = {
           key: '新闻管理',
-          icon: <span className="nav-emoji">📰</span>,
+          icon: <GroupIcon id="新闻管理" />,
           label: '新闻管理',
           children: newsChildren,
         };
@@ -123,7 +123,7 @@ function AppSider() {
         result!.push({ type: 'divider', key: `div-${group.id}` });
         result!.push({
           key: group.id,
-          icon: <span className="nav-emoji">📊</span>,
+          icon: <GroupIcon id={group.id} />,
           label: group.label,
           children,
         });
@@ -133,7 +133,7 @@ function AppSider() {
       result!.push({ type: 'divider', key: `div-${group.id}` });
       result!.push({
         key: group.id,
-        icon: group.id === 'ops' ? <span className="nav-emoji">📊</span> : <span className="nav-emoji">⚙️</span>,
+        icon: <GroupIcon id={group.id} />,
         label: group.label,
         children: group.items
           .map((name) => {

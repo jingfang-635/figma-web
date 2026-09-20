@@ -8,7 +8,7 @@
     "w": 1440,
     "h": 1068
   },
-  "extractedAt": "2026-09-14T13:35:21.998Z",
+  "extractedAt": "2026-09-20T14:29:02.870Z",
   "fileKey": "KLYzRbufrish4gmY4jpUS0",
   "regions": [
     {
@@ -39,65 +39,307 @@
       }
     }
   ],
-  "exportables": [],
+  "exportables": [
+    {
+      "nodeId": "272:132",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "首页",
+      "w": 24,
+      "h": 23
+    },
+    {
+      "nodeId": "272:134",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "机构信息",
+      "w": 21,
+      "h": 21
+    },
+    {
+      "nodeId": "272:136",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "科室管理",
+      "w": 22,
+      "h": 21
+    },
+    {
+      "nodeId": "272:138",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "医生管理",
+      "w": 20,
+      "h": 21
+    },
+    {
+      "nodeId": "272:140",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "排班管理",
+      "w": 21,
+      "h": 21
+    },
+    {
+      "nodeId": "272:142",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "预约记录",
+      "w": 20,
+      "h": 23
+    },
+    {
+      "nodeId": "272:144",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "患者管理",
+      "w": 21,
+      "h": 21
+    },
+    {
+      "nodeId": "272:146",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "订单管理",
+      "w": 21,
+      "h": 16
+    },
+    {
+      "nodeId": "272:148",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "评价管理",
+      "w": 23,
+      "h": 22
+    },
+    {
+      "nodeId": "272:154",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "地址管理",
+      "w": 17,
+      "h": 21
+    },
+    {
+      "nodeId": "272:156",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "广告图管理",
+      "w": 21,
+      "h": 17
+    },
+    {
+      "nodeId": "272:158",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "公告管理",
+      "w": 19,
+      "h": 19
+    },
+    {
+      "nodeId": "272:164",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "导航栏",
+      "w": 17,
+      "h": 17
+    },
+    {
+      "nodeId": "272:167",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "意见反馈",
+      "w": 21,
+      "h": 19
+    },
+    {
+      "nodeId": "272:170",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "预约规则",
+      "w": 21,
+      "h": 17
+    },
+    {
+      "nodeId": "272:172",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "消息通知",
+      "w": 16,
+      "h": 21
+    },
+    {
+      "nodeId": "272:178",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "用户管理",
+      "w": 18,
+      "h": 19
+    },
+    {
+      "nodeId": "272:180",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "角色管理",
+      "w": 17,
+      "h": 22
+    },
+    {
+      "nodeId": "272:182",
+      "name": "Vector",
+      "kind": "nav",
+      "label": "操作日志",
+      "w": 18,
+      "h": 20
+    }
+  ],
   "icons": {
-    "nav": {},
+    "nav": {
+      "首页": {
+        "nodeId": "272:132",
+        "w": 24,
+        "h": 23,
+        "name": "Vector"
+      },
+      "机构信息": {
+        "nodeId": "272:134",
+        "w": 21,
+        "h": 21,
+        "name": "Vector"
+      },
+      "科室管理": {
+        "nodeId": "272:136",
+        "w": 22,
+        "h": 21,
+        "name": "Vector"
+      },
+      "医生管理": {
+        "nodeId": "272:138",
+        "w": 20,
+        "h": 21,
+        "name": "Vector"
+      },
+      "排班管理": {
+        "nodeId": "272:140",
+        "w": 21,
+        "h": 21,
+        "name": "Vector"
+      },
+      "预约记录": {
+        "nodeId": "272:142",
+        "w": 20,
+        "h": 23,
+        "name": "Vector"
+      },
+      "患者管理": {
+        "nodeId": "272:144",
+        "w": 21,
+        "h": 21,
+        "name": "Vector"
+      },
+      "订单管理": {
+        "nodeId": "272:146",
+        "w": 21,
+        "h": 16,
+        "name": "Vector"
+      },
+      "评价管理": {
+        "nodeId": "272:148",
+        "w": 23,
+        "h": 22,
+        "name": "Vector"
+      },
+      "地址管理": {
+        "nodeId": "272:154",
+        "w": 17,
+        "h": 21,
+        "name": "Vector"
+      },
+      "广告图管理": {
+        "nodeId": "272:156",
+        "w": 21,
+        "h": 17,
+        "name": "Vector"
+      },
+      "公告管理": {
+        "nodeId": "272:158",
+        "w": 19,
+        "h": 19,
+        "name": "Vector"
+      },
+      "导航栏": {
+        "nodeId": "272:164",
+        "w": 17,
+        "h": 17,
+        "name": "Vector"
+      },
+      "意见反馈": {
+        "nodeId": "272:167",
+        "w": 21,
+        "h": 19,
+        "name": "Vector"
+      },
+      "预约规则": {
+        "nodeId": "272:170",
+        "w": 21,
+        "h": 17,
+        "name": "Vector"
+      },
+      "消息通知": {
+        "nodeId": "272:172",
+        "w": 16,
+        "h": 21,
+        "name": "Vector"
+      },
+      "用户管理": {
+        "nodeId": "272:178",
+        "w": 18,
+        "h": 19,
+        "name": "Vector"
+      },
+      "角色管理": {
+        "nodeId": "272:180",
+        "w": 17,
+        "h": 22,
+        "name": "Vector"
+      },
+      "操作日志": {
+        "nodeId": "272:182",
+        "w": 18,
+        "h": 20,
+        "name": "Vector"
+      }
+    },
     "depts": {}
   },
   "texts": [
-    "＋",
     "阳光医疗门诊",
     "预约挂号管理后台",
     "首页",
-    "🏠",
     "机构信息",
-    "🏥",
     "科室管理",
-    "🏷️",
     "医生管理",
-    "👨‍⚕️",
     "排班管理",
-    "📅",
     "预约记录",
-    "📋",
     "3",
     "患者管理",
-    "👥",
     "订单管理",
-    "💰",
     "评价管理",
-    "⭐",
-    "📊",
     "系统运营",
-    "▶",
     "地址管理",
-    "📍",
     "广告图管理",
-    "🖼️",
     "公告管理",
-    "📢",
     "新闻管理",
-    "📰",
-    "▶",
     "新闻列表",
     "新闻分类",
     "导航栏",
-    "🧭",
     "意见反馈",
-    "💬",
     "预约规则",
-    "📏",
     "消息通知",
-    "🔔",
-    "⚙️",
     "系统管理",
-    "▶",
     "用户管理",
-    "👤",
     "角色管理",
-    "🔐",
     "操作日志",
-    "📝",
     "A",
     "admin",
     "系统管理员",
@@ -124,7 +366,11 @@
     "以患者为中心 · 专业守护健康",
     "营业时间",
     "周一至周日 08:00-17:30",
-    "机构地址"
+    "机构地址",
+    "北京市示范区健康路 88 号",
+    "机构简介",
+    "正规医疗机构，拥有专业医疗团队，为患者提供贴心、便捷的门诊服务。",
+    "32 / 1000"
   ],
   "tree": {
     "id": "157:203",
@@ -188,25 +434,41 @@
         "radius": 8
       },
       {
-        "id": "157:208",
-        "name": "＋",
-        "type": "TEXT",
+        "id": "272:128",
+        "name": "PlusOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1548,
-          "y": 21,
-          "w": 20,
-          "h": 28
+          "y": 23,
+          "w": 24,
+          "h": 24
         },
-        "fill": "#FFFFFF",
-        "text": "＋",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 20,
-          "weight": 500,
-          "lineHeight": 28,
-          "letterSpacing": 0,
-          "color": "#FFFFFF"
-        }
+        "children": [
+          {
+            "id": "272:129",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1559,
+              "y": 25,
+              "w": 2,
+              "h": 19
+            },
+            "fill": "#FFFFFF"
+          },
+          {
+            "id": "272:130",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1550,
+              "y": 34,
+              "w": 19,
+              "h": 2
+            },
+            "fill": "#FFFFFF"
+          }
+        ]
       },
       {
         "id": "157:209",
@@ -272,25 +534,29 @@
         }
       },
       {
-        "id": "157:212",
-        "name": "🏠",
-        "type": "TEXT",
+        "id": "272:131",
+        "name": "HomeOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1547,
           "y": 83,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "🏠",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:132",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1546,
+              "y": 83,
+              "w": 24,
+              "h": 23
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:213",
@@ -339,25 +605,29 @@
         }
       },
       {
-        "id": "157:216",
-        "name": "🏥",
-        "type": "TEXT",
+        "id": "272:133",
+        "name": "MedicineBoxOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1546,
           "y": 127,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#1890FF",
-        "text": "🏥",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 500,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#1890FF"
-        }
+        "children": [
+          {
+            "id": "272:134",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1547,
+              "y": 128,
+              "w": 21,
+              "h": 21
+            },
+            "fill": "#1890FF"
+          }
+        ]
       },
       {
         "id": "157:217",
@@ -381,25 +651,29 @@
         }
       },
       {
-        "id": "157:218",
-        "name": "🏷️",
-        "type": "TEXT",
+        "id": "272:135",
+        "name": "SkinOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1545,
           "y": 171,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "🏷️",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:136",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1547,
+              "y": 172,
+              "w": 22,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:219",
@@ -423,25 +697,29 @@
         }
       },
       {
-        "id": "157:220",
-        "name": "👨‍⚕️",
-        "type": "TEXT",
+        "id": "272:137",
+        "name": "UserOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1547,
           "y": 215,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "👨‍⚕️",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:138",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1549,
+              "y": 216,
+              "w": 20,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:221",
@@ -465,25 +743,29 @@
         }
       },
       {
-        "id": "157:222",
-        "name": "📅",
-        "type": "TEXT",
+        "id": "272:139",
+        "name": "CalendarOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1546,
           "y": 259,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "📅",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:140",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1547,
+              "y": 260,
+              "w": 21,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:223",
@@ -507,25 +789,29 @@
         }
       },
       {
-        "id": "157:224",
-        "name": "📋",
-        "type": "TEXT",
+        "id": "272:141",
+        "name": "FileDoneOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1547,
           "y": 303,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "📋",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:142",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1549,
+              "y": 303,
+              "w": 20,
+              "h": 23
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:225",
@@ -583,25 +869,29 @@
         }
       },
       {
-        "id": "157:228",
-        "name": "👥",
-        "type": "TEXT",
+        "id": "272:143",
+        "name": "TeamOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1545,
           "y": 347,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "👥",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:144",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1547,
+              "y": 348,
+              "w": 21,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:229",
@@ -625,25 +915,29 @@
         }
       },
       {
-        "id": "157:230",
-        "name": "💰",
-        "type": "TEXT",
+        "id": "272:145",
+        "name": "GoldOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1547,
           "y": 391,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "💰",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:146",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1549,
+              "y": 395,
+              "w": 21,
+              "h": 16
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:231",
@@ -667,25 +961,29 @@
         }
       },
       {
-        "id": "157:232",
-        "name": "⭐",
-        "type": "TEXT",
+        "id": "272:147",
+        "name": "StarOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1545,
           "y": 435,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#595959",
-        "text": "⭐",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 400,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:148",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1546,
+              "y": 435,
+              "w": 23,
+              "h": 22
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:233",
@@ -700,25 +998,29 @@
         "fill": "#F0F0F0"
       },
       {
-        "id": "157:234",
-        "name": "📊",
-        "type": "TEXT",
+        "id": "272:149",
+        "name": "BarChartOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1544,
           "y": 494,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#8C8C8C",
-        "text": "📊",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 500,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#8C8C8C"
-        }
+        "children": [
+          {
+            "id": "272:150",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1546,
+              "y": 496,
+              "w": 21,
+              "h": 19
+            },
+            "fill": "#8C8C8C"
+          }
+        ]
       },
       {
         "id": "157:235",
@@ -742,25 +1044,29 @@
         }
       },
       {
-        "id": "157:236",
-        "name": "▶",
-        "type": "TEXT",
+        "id": "272:151",
+        "name": "RightOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1704,
           "y": 500,
-          "w": 10,
+          "w": 14,
           "h": 14
         },
-        "fill": "#BFBFBF",
-        "text": "▶",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 10,
-          "weight": 500,
-          "lineHeight": 14,
-          "letterSpacing": 0,
-          "color": "#BFBFBF"
-        }
+        "children": [
+          {
+            "id": "272:152",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1707,
+              "y": 502,
+              "w": 7,
+              "h": 12
+            },
+            "fill": "#BFBFBF"
+          }
+        ]
       },
       {
         "id": "157:237",
@@ -784,25 +1090,29 @@
         }
       },
       {
-        "id": "157:238",
-        "name": "📍",
-        "type": "TEXT",
+        "id": "272:153",
+        "name": "EnvironmentOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 534,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "📍",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:154",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1561,
+              "y": 534,
+              "w": 17,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:239",
@@ -826,25 +1136,29 @@
         }
       },
       {
-        "id": "157:240",
-        "name": "🖼️",
-        "type": "TEXT",
+        "id": "272:155",
+        "name": "PictureOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 572,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "🖼️",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:156",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1559,
+              "y": 574,
+              "w": 21,
+              "h": 17
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:241",
@@ -868,25 +1182,29 @@
         }
       },
       {
-        "id": "157:242",
-        "name": "📢",
-        "type": "TEXT",
+        "id": "272:157",
+        "name": "NotificationOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 610,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "📢",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:158",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1560,
+              "y": 611,
+              "w": 19,
+              "h": 19
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:243",
@@ -910,46 +1228,54 @@
         }
       },
       {
-        "id": "157:244",
-        "name": "📰",
-        "type": "TEXT",
+        "id": "272:159",
+        "name": "ReadOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1556,
           "y": 648,
-          "w": 14,
+          "w": 20,
           "h": 20
         },
-        "fill": "#595959",
-        "text": "📰",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 14,
-          "weight": 400,
-          "lineHeight": 19.600000381469727,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:160",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1556,
+              "y": 650,
+              "w": 20,
+              "h": 16
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
-        "id": "157:245",
-        "name": "▶",
-        "type": "TEXT",
+        "id": "272:161",
+        "name": "RightOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1704,
           "y": 653,
-          "w": 10,
+          "w": 14,
           "h": 14
         },
-        "fill": "#BFBFBF",
-        "text": "▶",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 10,
-          "weight": 400,
-          "lineHeight": 14,
-          "letterSpacing": 0,
-          "color": "#BFBFBF"
-        }
+        "children": [
+          {
+            "id": "272:162",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1707,
+              "y": 654,
+              "w": 7,
+              "h": 12
+            },
+            "fill": "#BFBFBF"
+          }
+        ]
       },
       {
         "id": "157:246",
@@ -1015,25 +1341,29 @@
         }
       },
       {
-        "id": "157:249",
-        "name": "🧭",
-        "type": "TEXT",
+        "id": "272:163",
+        "name": "AppstoreOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 745,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "🧭",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:164",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1561,
+              "y": 747,
+              "w": 17,
+              "h": 17
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:250",
@@ -1057,25 +1387,53 @@
         }
       },
       {
-        "id": "157:251",
-        "name": "💬",
-        "type": "TEXT",
+        "id": "272:165",
+        "name": "CommentOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 783,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "💬",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:166",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1563,
+              "y": 791,
+              "w": 8,
+              "h": 2
+            },
+            "fill": "#595959"
+          },
+          {
+            "id": "272:167",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1559,
+              "y": 783,
+              "w": 21,
+              "h": 19
+            },
+            "fill": "#595959"
+          },
+          {
+            "id": "272:168",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1567,
+              "y": 791,
+              "w": 2,
+              "h": 2
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:252",
@@ -1099,25 +1457,29 @@
         }
       },
       {
-        "id": "157:253",
-        "name": "📏",
-        "type": "TEXT",
+        "id": "272:169",
+        "name": "HighlightOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 821,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "📏",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:170",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1559,
+              "y": 823,
+              "w": 21,
+              "h": 17
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:254",
@@ -1141,25 +1503,29 @@
         }
       },
       {
-        "id": "157:255",
-        "name": "🔔",
-        "type": "TEXT",
+        "id": "272:171",
+        "name": "BellOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 859,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "🔔",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:172",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1562,
+              "y": 859,
+              "w": 16,
+              "h": 21
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:256",
@@ -1174,25 +1540,29 @@
         "fill": "#F0F0F0"
       },
       {
-        "id": "157:257",
-        "name": "⚙️",
-        "type": "TEXT",
+        "id": "272:173",
+        "name": "SettingOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1544,
           "y": 914,
-          "w": 17,
+          "w": 24,
           "h": 24
         },
-        "fill": "#8C8C8C",
-        "text": "⚙️",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 17,
-          "weight": 500,
-          "lineHeight": 23.799999237060547,
-          "letterSpacing": 0,
-          "color": "#8C8C8C"
-        }
+        "children": [
+          {
+            "id": "272:174",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1545,
+              "y": 914,
+              "w": 23,
+              "h": 24
+            },
+            "fill": "#8C8C8C"
+          }
+        ]
       },
       {
         "id": "157:258",
@@ -1216,25 +1586,29 @@
         }
       },
       {
-        "id": "157:259",
-        "name": "▶",
-        "type": "TEXT",
+        "id": "272:175",
+        "name": "RightOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1704,
           "y": 920,
-          "w": 10,
+          "w": 14,
           "h": 14
         },
-        "fill": "#BFBFBF",
-        "text": "▶",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 10,
-          "weight": 500,
-          "lineHeight": 14,
-          "letterSpacing": 0,
-          "color": "#BFBFBF"
-        }
+        "children": [
+          {
+            "id": "272:176",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1707,
+              "y": 922,
+              "w": 7,
+              "h": 12
+            },
+            "fill": "#BFBFBF"
+          }
+        ]
       },
       {
         "id": "157:260",
@@ -1258,25 +1632,29 @@
         }
       },
       {
-        "id": "157:261",
-        "name": "👤",
-        "type": "TEXT",
+        "id": "272:177",
+        "name": "UserOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 954,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "👤",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:178",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1561,
+              "y": 955,
+              "w": 18,
+              "h": 19
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:262",
@@ -1300,25 +1678,29 @@
         }
       },
       {
-        "id": "157:263",
-        "name": "🔐",
-        "type": "TEXT",
+        "id": "272:179",
+        "name": "SafetyCertificateOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 992,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "🔐",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:180",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1561,
+              "y": 992,
+              "w": 17,
+              "h": 22
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:264",
@@ -1342,25 +1724,29 @@
         }
       },
       {
-        "id": "157:265",
-        "name": "📝",
-        "type": "TEXT",
+        "id": "272:181",
+        "name": "AuditOutlined",
+        "type": "FRAME",
         "box": {
           "x": 1559,
           "y": 1030,
-          "w": 15,
+          "w": 21,
           "h": 21
         },
-        "fill": "#595959",
-        "text": "📝",
-        "font": {
-          "family": "Noto Sans SC",
-          "size": 15,
-          "weight": 400,
-          "lineHeight": 21,
-          "letterSpacing": 0,
-          "color": "#595959"
-        }
+        "children": [
+          {
+            "id": "272:182",
+            "name": "Vector",
+            "type": "VECTOR",
+            "box": {
+              "x": 1561,
+              "y": 1030,
+              "w": 18,
+              "h": 20
+            },
+            "fill": "#595959"
+          }
+        ]
       },
       {
         "id": "157:266",
