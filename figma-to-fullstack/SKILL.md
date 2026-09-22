@@ -50,11 +50,11 @@ Figma URL
 
 1. **Figma 来源**：URL/fileKey（必填）
 2. **后端语言**（必选）：Node（默认）/ Java
-3. **栈组合**（见 reference.md 矩阵，默认 A：React + NestJS + PG + Prisma）
+3. **栈逐层选择**（不打包成组合再选）：后端语言 → 前端框架 → 后端框架 → 数据库 → ORM，**各层单独一问**；选项随语言联动过滤——**选 Java 时 ORM 只列 JPA / MyBatis，不得出现 Prisma**（Prisma 仅支持 Node 系）；合法性以 reference.md 矩阵校验
 4. **页面范围**：只做已画屏 / 导航全做（缺屏灰显或二期）
 5. **鉴权**：JWT（默认）/ 无
 6. **产出路径**：`apps/web`+`apps/api` / `output/<runId>/`
-7. **数据库运行时**：Docker PG（默认）/ 本机 PG / SQLite
+7. **数据库运行时**：Docker（默认，随数据库类型）/ 本机已有服务 / SQLite（仅 Node 系）
 8. **标杆屏选择**（必选，覆盖 5 种模式：列表/表单/详情/弹窗/图表；缺的说明）
 
 > 前端还原度默认为「高还原且可维护」（visual-fidelity 方案），**不作为可选项**。

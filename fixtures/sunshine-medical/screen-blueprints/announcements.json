@@ -1,0 +1,19 @@
+{
+  "id": "announcements",
+  "route": "/announcements",
+  "refShot": "imports/figma/screens/公告管理.png",
+  "pageHeader": {
+    "title": "公告管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "3",
+      "4",
+      "3",
+      "2",
+      "1"
+    ]
+  }
+}

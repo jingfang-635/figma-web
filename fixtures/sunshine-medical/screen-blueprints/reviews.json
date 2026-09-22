@@ -1,0 +1,14 @@
+{
+  "id": "reviews",
+  "route": "/reviews",
+  "refShot": "imports/figma/screens/评价管理.png",
+  "pageHeader": {
+    "title": "评价管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3"
+    ]
+  }
+}

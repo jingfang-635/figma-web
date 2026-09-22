@@ -1,0 +1,14 @@
+{
+  "id": "users",
+  "route": "/users",
+  "refShot": "imports/figma/screens/用户管理.png",
+  "pageHeader": {
+    "title": "用户管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3"
+    ]
+  }
+}

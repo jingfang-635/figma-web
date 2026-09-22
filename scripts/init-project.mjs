@@ -63,6 +63,10 @@ for (const page of data.document?.children || []) {
           name: n.name,
           w: Math.round(n.absoluteBoundingBox?.width || 0),
           h: Math.round(n.absoluteBoundingBox?.height || 0),
+          size: {
+            w: Math.round(n.absoluteBoundingBox?.width || 0),
+            h: Math.round(n.absoluteBoundingBox?.height || 0),
+          },
         });
       }
       if (n.children && depth < 2) walk(n.children, depth + 1);

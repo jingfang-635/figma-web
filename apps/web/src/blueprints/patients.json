@@ -1,0 +1,25 @@
+{
+  "id": "patients",
+  "route": "/patients",
+  "refShot": "imports/figma/screens/患者管理.png",
+  "pageHeader": {
+    "title": "患者管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "286",
+      "5",
+      "106",
+      "2",
+      "32",
+      "5",
+      "45",
+      "12",
+      "19",
+      "6",
+      "1"
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "name": "阳光医疗-调优版",
+  "figma": {
+    "fileKey": "KLYzRbufrish4gmY4jpUS0",
+    "url": "https://www.figma.com/design/KLYzRbufrish4gmY4jpUS0"
+  },
+  "slug": "sunshine-medical",
+  "stack": {
+    "id": "C",
+    "language": "java",
+    "frontend": "react-vite",
+    "backend": "spring-boot",
+    "database": "mysql",
+    "orm": "jpa"
+  },
+  "auth": {
+    "mode": "jwt",
+    "storageKey": "auth_token"
+  },
+  "brand": {
+    "title": "阳光医疗",
+    "subtitle": "门诊管理平台"
+  },
+  "entities": [
+    "User",
+    "Role",
+    "Department",
+    "Doctor",
+    "Schedule",
+    "Appointment",
+    "Patient",
+    "Order",
+    "Notification",
+    "Address",
+    "Banner",
+    "Announcement",
+    "News",
+    "NewsCategory",
+    "NavItem",
+    "Feedback",
+    "Review",
+    "AppointmentRule",
+    "OperationLog"
+  ],
+  "apis": [
+    "POST /api/auth/login",
+    "GET /api/dashboard/stats",
+    "CRUD /api/users",
+    "CRUD /api/roles",
+    "CRUD /api/departments",
+    "CRUD /api/doctors",
+    "CRUD /api/schedules",
+    "CRUD /api/appointments",
+    "CRUD /api/patients",
+    "CRUD /api/orders",
+    "CRUD /api/notifications",
+    "CRUD /api/addresses",
+    "CRUD /api/banners",
+    "CRUD /api/announcements",
+    "CRUD /api/news",
+    "CRUD /api/news-categories",
+    "CRUD /api/nav-items",
+    "CRUD /api/feedbacks",
+    "CRUD /api/reviews",
+    "GET/PUT /api/appointment-rules",
+    "CRUD /api/operation-logs",
+    "GET/PUT /api/organization"
+  ],
+  "screens": [
+    { "id": "home", "name": "首页", "route": "/", "type": "dashboard", "entity": "dashboard", "needsReview": true },
+    { "id": "organization", "name": "机构信息", "route": "/organization", "type": "form", "entity": "organization", "needsReview": true },
+    { "id": "departments", "name": "科室管理", "route": "/departments", "type": "list", "entity": "departments", "needsReview": true },
+    { "id": "doctors", "name": "医生管理", "route": "/doctors", "type": "list", "entity": "doctors", "needsReview": true },
+    { "id": "schedules", "name": "排班管理", "route": "/schedules", "type": "schedule", "entity": "schedules", "needsReview": true },
+    { "id": "appointments", "name": "预约记录", "route": "/appointments", "type": "list", "entity": "appointments", "needsReview": true },
+    { "id": "patients", "name": "患者管理", "route": "/patients", "type": "list", "entity": "patients", "needsReview": true },
+    { "id": "orders", "name": "订单管理", "route": "/orders", "type": "list", "entity": "orders", "needsReview": true },
+    { "id": "notifications", "name": "消息通知", "route": "/notifications", "type": "list", "entity": "notifications", "needsReview": true },
+    { "id": "addresses", "name": "地址管理", "route": "/addresses", "type": "list", "entity": "addresses", "needsReview": true },
+    { "id": "banners", "name": "广告图管理", "route": "/banners", "type": "list", "entity": "banners", "needsReview": true },
+    { "id": "announcements", "name": "公告管理", "route": "/announcements", "type": "list", "entity": "announcements", "needsReview": true },
+    { "id": "news", "name": "新闻列表", "route": "/news", "type": "list", "entity": "news", "needsReview": true },
+    { "id": "news-categories", "name": "新闻分类", "route": "/news-categories", "type": "list", "entity": "newsCategories", "needsReview": true },
+    { "id": "nav-items", "name": "导航栏", "route": "/nav-items", "type": "list", "entity": "navItems", "needsReview": true },
+    { "id": "feedbacks", "name": "意见反馈", "route": "/feedbacks", "type": "list", "entity": "feedbacks", "needsReview": true },
+    { "id": "users", "name": "用户管理", "route": "/users", "type": "list", "entity": "users", "needsReview": true },
+    { "id": "roles", "name": "角色管理", "route": "/roles", "type": "list", "entity": "roles", "needsReview": true },
+    { "id": "appointment-rules", "name": "预约规则", "route": "/appointment-rules", "type": "form", "entity": "appointmentRules", "needsReview": true },
+    { "id": "operation-logs", "name": "操作日志", "route": "/operation-logs", "type": "list", "entity": "operationLogs", "needsReview": true },
+    { "id": "reviews", "name": "评价管理", "route": "/reviews", "type": "list", "entity": "reviews", "needsReview": true },
+    { "id": "modal-create-dept", "name": "新增科室弹窗", "route": "/departments", "type": "modal", "entity": "departments", "needsReview": true, "modal": { "trigger": "新增" } },
+    { "id": "modal-create-doctor", "name": "新增医生弹窗", "route": "/doctors", "type": "modal", "entity": "doctors", "needsReview": true, "modal": { "trigger": "新增" } },
+    { "id": "modal-create-schedule", "name": "新增排班弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": true, "modal": { "trigger": "新增" } },
+    { "id": "modal-batch-schedule", "name": "批量排班弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": true, "modal": { "trigger": "批量" } },
+    { "id": "modal-create-news", "name": "新增新闻弹窗", "route": "/news", "type": "modal", "entity": "news", "needsReview": true, "modal": { "trigger": "新增" } },
+    { "id": "modal-confirm-delete", "name": "确认删除弹窗", "route": "/departments", "type": "modal", "entity": "departments", "needsReview": true, "modal": { "trigger": "删除" } },
+    { "id": "modal-delete-conflict", "name": "确认删除（有冲突）弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": true, "modal": { "trigger": "删除" } }
+  ],
+  "benchmarkScreens": [
+    { "id": "home", "type": "chart", "route": "/", "name": "首页" },
+    { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
+    { "id": "organization", "type": "form", "route": "/organization", "name": "机构信息" },
+    { "id": "modal-create-dept", "type": "modal", "route": "/departments", "name": "新增科室弹窗", "modal": { "trigger": "新增" } },
+    { "id": "sidebar", "type": "chrome", "name": "sidebar" }
+  ],
+  "seedAdmin": {
+    "email": "admin@sunshine.com",
+    "password": "Admin@123456"
+  },
+  "notes": [
+    "detail 型标杆屏缺失：原型未画详情屏，以 modal 型补足第 4 种模式（chart/list/form/modal + chrome）",
+    "栈 C：Java + Spring Boot + MySQL + JPA；数据库运行时 Docker MySQL",
+    "页面范围：只做已画屏（20 业务屏 + 7 弹窗）；sidebar 为 chrome 组件不单独成页"
+  ]
+}

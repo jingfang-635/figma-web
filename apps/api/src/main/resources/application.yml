@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/sunshine_medical?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: fsg
+    password: fsg
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  jwt:
+    secret: change-me-in-dev-sunshine-medical-please-rotate
+    expires-in: 7d
+  seed-admin:
+    email: admin@sunshine.com
+    password: Admin@123456
+    name: 系统管理员
+
+server:
+  port: 3001

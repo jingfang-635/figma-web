@@ -1,0 +1,25 @@
+{
+  "id": "nav-items",
+  "route": "/nav-items",
+  "refShot": "imports/figma/screens/导航栏.png",
+  "pageHeader": {
+    "title": "导航栏",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "1",
+      "72",
+      "1",
+      "3",
+      "2",
+      "6",
+      "3",
+      "2",
+      "4",
+      "4",
+      "5"
+    ]
+  }
+}

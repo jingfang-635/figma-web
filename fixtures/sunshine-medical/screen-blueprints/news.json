@@ -1,0 +1,20 @@
+{
+  "id": "news",
+  "route": "/news",
+  "refShot": "imports/figma/screens/新闻列表.png",
+  "pageHeader": {
+    "title": "新闻列表",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "28",
+      "27",
+      "26",
+      "25",
+      "24",
+      "23"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "doctors",
+  "route": "/doctors",
+  "refShot": "imports/figma/screens/医生管理.png",
+  "pageHeader": {
+    "title": "医生管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "6",
+      "6",
+      "0",
+      "0",
+      "¥30",
+      "¥30",
+      "¥25",
+      "¥35",
+      "1"
+    ]
+  }
+}

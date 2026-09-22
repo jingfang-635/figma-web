@@ -29,7 +29,7 @@ const SKIP = new Set(["icon", "svg-icon", "激活页面"]);
 const frames = (summary?.pages?.[0]?.frames || []).filter((f) => {
   if (SKIP.has(f.name)) return false;
   if (f.name === "sidebar" && f.type !== "COMPONENT") return false;
-  return Boolean(f.size?.w >= 400 || f.name === "sidebar");
+  return Boolean((f.size?.w ?? f.w) >= 400 || f.name === "sidebar");
 });
 
 if (!frames.length) {

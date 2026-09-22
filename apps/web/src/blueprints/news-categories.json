@@ -1,0 +1,18 @@
+{
+  "id": "news-categories",
+  "route": "/news-categories",
+  "refShot": "imports/figma/screens/新闻分类.png",
+  "pageHeader": {
+    "title": "新闻分类",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "4",
+      "3",
+      "2",
+      "1"
+    ]
+  }
+}

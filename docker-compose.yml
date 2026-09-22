@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: sunshine-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: fsg
+      MYSQL_DATABASE: sunshine_medical
+      MYSQL_USER: fsg
+      MYSQL_PASSWORD: fsg
+    ports:
+      - "3307:3306"
+    volumes:
+      - sunshine-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ufsg", "-pfsg"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  sunshine-mysql-data:

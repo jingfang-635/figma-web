@@ -26,7 +26,7 @@ const SKIP = /^(icon|svg-icon|激活页面)$/;
 const frames = (summary?.pages?.[0]?.frames || []).filter((f) => {
   if (SKIP.test(f.name)) return false;
   if (f.name === "sidebar" && f.type !== "COMPONENT") return false;
-  if (f.size?.w >= 400) return true;
+  if ((f.size?.w ?? f.w) >= 400) return true;
   return f.name === "sidebar";
 });
 

@@ -1,0 +1,24 @@
+{
+  "id": "addresses",
+  "route": "/addresses",
+  "refShot": "imports/figma/screens/地址管理.png",
+  "pageHeader": {
+    "title": "地址管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "10",
+      "9",
+      "8",
+      "7",
+      "6",
+      "5",
+      "4",
+      "3",
+      "2",
+      "1"
+    ]
+  }
+}

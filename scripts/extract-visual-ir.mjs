@@ -173,8 +173,8 @@ const chromeNames = new Set(
 );
 const screenFrames = frames.filter(
   (f) =>
-    f.size?.w >= 1200 &&
-    f.size?.h >= 900 &&
+    (f.size?.w ?? f.w) >= 1200 &&
+    (f.size?.h ?? f.h) >= 900 &&
     !String(f.name).includes("弹窗") &&
     !chromeNames.has(f.name) &&
     f.name !== "激活页面" &&

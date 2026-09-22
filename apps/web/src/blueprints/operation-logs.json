@@ -1,0 +1,14 @@
+{
+  "id": "operation-logs",
+  "route": "/operation-logs",
+  "refShot": "imports/figma/screens/操作日志.png",
+  "pageHeader": {
+    "title": "操作日志",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3"
+    ]
+  }
+}

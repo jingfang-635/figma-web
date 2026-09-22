@@ -4,6 +4,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveProject } from "./lib/project.mjs";
 
 const root = resolve(process.cwd());
 const { slug } = resolveProject(root);
@@ -54,7 +55,6 @@ console.log("Wrote", out);
 const primary = color.primary || "#1677FF";
 const themeSrc = `/* Generated from Visual IR / Layout IR. Re-run: node scripts/generate-tokens-css.mjs */
 import type { ThemeConfig } from 'antd';
-import { resolveProject } from "./lib/project.mjs";
 
 export const antdTheme: ThemeConfig = {
   token: {

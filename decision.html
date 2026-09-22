@@ -341,14 +341,14 @@
           </div>
           <div class="options" role="radiogroup" aria-label="后端语言">
             <label class="opt">
-              <input type="radio" name="language" value="Node" checked />
+              <input type="radio" name="language" value="node" checked />
               <div class="opt-card">
                 <strong>Node <span class="badge">默认</span></strong>
                 <span>NestJS / Express · Prisma</span>
               </div>
             </label>
             <label class="opt">
-              <input type="radio" name="language" value="Java" />
+              <input type="radio" name="language" value="java" />
               <div class="opt-card">
                 <strong>Java</strong>
                 <span>Spring Boot · JPA / MyBatis</span>
@@ -362,17 +362,53 @@
           <div class="step-head">
             <div class="step-num">3</div>
             <div>
-              <h2 class="step-title">栈组合</h2>
-              <p class="step-hint">按后端语言筛选；默认推荐 A</p>
+              <h2 class="step-title">前端框架</h2>
+              <p class="step-hint">随栈类型联动</p>
             </div>
           </div>
-          <div class="options" id="stackOptions" role="radiogroup" aria-label="栈组合"></div>
+          <div class="options" id="frontendOptions" role="radiogroup" aria-label="前端框架"></div>
         </section>
 
         <!-- 4 -->
         <section class="step" data-step="4">
           <div class="step-head">
             <div class="step-num">4</div>
+            <div>
+              <h2 class="step-title">后端框架</h2>
+              <p class="step-hint">随语言联动</p>
+            </div>
+          </div>
+          <div class="options" id="backendOptions" role="radiogroup" aria-label="后端框架"></div>
+        </section>
+
+        <!-- 5 -->
+        <section class="step" data-step="5">
+          <div class="step-head">
+            <div class="step-num">5</div>
+            <div>
+              <h2 class="step-title">数据库</h2>
+              <p class="step-hint">随语言联动</p>
+            </div>
+          </div>
+          <div class="options" id="databaseOptions" role="radiogroup" aria-label="数据库"></div>
+        </section>
+
+        <!-- 6 -->
+        <section class="step" data-step="6">
+          <div class="step-head">
+            <div class="step-num">6</div>
+            <div>
+              <h2 class="step-title">ORM</h2>
+              <p class="step-hint">选 Java 时不显示 Prisma</p>
+            </div>
+          </div>
+          <div class="options" id="ormOptions" role="radiogroup" aria-label="ORM"></div>
+        </section>
+
+        <!-- 7 -->
+        <section class="step" data-step="7">
+          <div class="step-head">
+            <div class="step-num">7</div>
             <div>
               <h2 class="step-title">页面范围</h2>
               <p class="step-hint">一期实现范围</p>
@@ -396,10 +432,10 @@
           </div>
         </section>
 
-        <!-- 5 -->
-        <section class="step" data-step="5">
+        <!-- 8 -->
+        <section class="step" data-step="8">
           <div class="step-head">
-            <div class="step-num">5</div>
+            <div class="step-num">8</div>
             <div>
               <h2 class="step-title">鉴权</h2>
               <p class="step-hint">API / 页面访问控制</p>
@@ -423,10 +459,10 @@
           </div>
         </section>
 
-        <!-- 6 -->
-        <section class="step" data-step="6">
+        <!-- 9 -->
+        <section class="step" data-step="9">
           <div class="step-head">
-            <div class="step-num">6</div>
+            <div class="step-num">9</div>
             <div>
               <h2 class="step-title">产出路径</h2>
               <p class="step-hint">代码落盘位置</p>
@@ -450,10 +486,10 @@
           </div>
         </section>
 
-        <!-- 7 -->
-        <section class="step" data-step="7">
+        <!-- 10 -->
+        <section class="step" data-step="10">
           <div class="step-head">
-            <div class="step-num">7</div>
+            <div class="step-num">10</div>
             <div>
               <h2 class="step-title">数据库运行时</h2>
               <p class="step-hint">随后端语言变化</p>
@@ -479,66 +515,75 @@
   <div class="toast" id="toast" role="status">已复制到剪贴板</div>
 
   <script>
-    const STACKS = {
-      Node: [
-        {
-          id: "A",
-          title: "A · React + NestJS + PostgreSQL + Prisma",
-          desc: "默认推荐",
-          badge: "默认",
-        },
-        {
-          id: "A2",
-          title: "A2 · React + Express + PostgreSQL + Prisma",
-          desc: "更轻量的 Node API",
-        },
-        {
-          id: "B",
-          title: "B · Vue3 + NestJS + PostgreSQL + Prisma",
-          desc: "Vue 前端 + Nest 后端",
-        },
-      ],
-      Java: [
-        {
-          id: "C",
-          title: "C · React + Spring Boot + MySQL + JPA",
-          desc: "Java 主推组合",
-        },
-        {
-          id: "D",
-          title: "D · Vue3 + Spring Boot + MySQL + MyBatis",
-          desc: "二期支持",
-          badge: "二期",
-          badgeClass: "phase2",
-        },
-      ],
+    // 合法栈矩阵（reference.md）逐层展开；选 Java 时 ORM 不含 Prisma
+    const LAYERS = {
+      node: {
+        frontend: [
+          { id: "react-vite", title: "React + Vite", desc: "默认前端", badge: "默认" },
+          { id: "vue-vite", title: "Vue3 + Vite", desc: "备选前端" },
+        ],
+        backend: [
+          { id: "nestjs", title: "NestJS", desc: "默认后端", badge: "默认" },
+          { id: "express", title: "Express", desc: "更轻量的 Node API" },
+        ],
+        database: [
+          { id: "postgresql", title: "PostgreSQL", desc: "默认数据库", badge: "默认" },
+          { id: "sqlite", title: "SQLite", desc: "临时 SQLite，免 Docker 试跑" },
+        ],
+        // 仅 Node 系支持 Prisma
+        orm: [
+          { id: "prisma", title: "Prisma", desc: "Node 系默认 ORM", badge: "默认" },
+        ],
+      },
+      java: {
+        frontend: [
+          { id: "react-vite", title: "React + Vite", desc: "默认前端", badge: "默认" },
+          { id: "vue-vite", title: "Vue3 + Vite", desc: "二期支持", badge: "二期", badgeClass: "phase2" },
+        ],
+        backend: [
+          { id: "spring-boot", title: "Spring Boot", desc: "Java 主推后端", badge: "默认" },
+        ],
+        database: [
+          { id: "mysql", title: "MySQL", desc: "Java 栈默认数据库", badge: "默认" },
+        ],
+        // Java 不支持 Prisma，只列 JPA / MyBatis
+        orm: [
+          { id: "jpa", title: "JPA", desc: "一期可用", badge: "默认" },
+          { id: "mybatis", title: "MyBatis", desc: "二期支持", badge: "二期", badgeClass: "phase2" },
+        ],
+      },
     };
 
-    const DBS = {
-      Node: [
-        { id: "Docker", title: "Docker PostgreSQL", desc: "默认；docker compose 拉起", badge: "默认" },
-        { id: "本机PG", title: "本机已有 PG", desc: "使用本机 PostgreSQL" },
-        { id: "SQLite", title: "临时 SQLite", desc: "免 Docker，适合快速试跑" },
+    const DB_RUNTIMES = {
+      node: [
+        { id: "docker-pg", title: "Docker PostgreSQL", desc: "默认；docker compose 拉起", badge: "默认" },
+        { id: "local-pg", title: "本机已有 PG", desc: "使用本机 PostgreSQL" },
       ],
-      Java: [
-        { id: "DockerMySQL", title: "Docker MySQL", desc: "默认；docker compose 拉起", badge: "默认" },
-        { id: "本机MySQL", title: "本机已有 MySQL", desc: "使用本机 MySQL" },
+      java: [
+        { id: "docker-mysql", title: "Docker MySQL", desc: "默认；docker compose 拉起", badge: "默认" },
+        { id: "local-mysql", title: "本机已有 MySQL", desc: "使用本机 MySQL" },
       ],
     };
 
     const DEFAULTS = {
       figma: "https://www.figma.com/design/WZR7JiF1Q8GOaxOheQV8Ur/Untitled?node-id=0-1",
-      language: "Node",
-      stack: "A",
+      language: "node",
+      frontend: "react-vite",
+      backend: "nestjs",
+      database: "postgresql",
+      orm: "prisma",
+      dbRuntime: "docker-pg",
       pages: "只做已画屏",
       auth: "JWT",
       output: "apps",
-      db: "SQLite",
     };
 
     const form = document.getElementById("decisionForm");
-    const stackOptions = document.getElementById("stackOptions");
-    const dbOptions = document.getElementById("dbOptions");
+    const frontendOptions = document.getElementById("frontendOptions");
+    const backendOptions = document.getElementById("backendOptions");
+    const databaseOptions = document.getElementById("databaseOptions");
+    const ormOptions = document.getElementById("ormOptions");
+    const dbRuntimeOptions = document.getElementById("dbOptions");
     const summaryEl = document.getElementById("summary");
     const figmaError = document.getElementById("figmaError");
     const toast = document.getElementById("toast");
@@ -549,7 +594,11 @@
     }
 
     function renderRadios(container, name, items, preferred) {
-      const keep = preferred || selected(name) || items[0]?.id;
+      const cur = selected(name);
+      // 旧选中值若不在当前语言的可选列表里（如 Java 下无 Prisma），回退到首选或第一项
+      const keep =
+        preferred ||
+        (items.some((item) => item.id === cur) ? cur : items[0]?.id);
       container.innerHTML = items
         .map((item) => {
           const checked = item.id === keep ? "checked" : "";
@@ -569,10 +618,15 @@
         .join("");
     }
 
-    function syncLanguageDependent(preferredStack, preferredDb) {
-      const lang = selected("language") || "Node";
-      renderRadios(stackOptions, "stack", STACKS[lang], preferredStack);
-      renderRadios(dbOptions, "db", DBS[lang], preferredDb);
+    function syncLanguageDependent(preferred) {
+      const lang = selected("language") || "node";
+      const layers = LAYERS[lang];
+      const pref = preferred || {};
+      renderRadios(frontendOptions, "frontend", layers.frontend, pref.frontend);
+      renderRadios(backendOptions, "backend", layers.backend, pref.backend);
+      renderRadios(databaseOptions, "database", layers.database, pref.database);
+      renderRadios(ormOptions, "orm", layers.orm, pref.orm);
+      renderRadios(dbRuntimeOptions, "dbRuntime", DB_RUNTIMES[lang], pref.dbRuntime);
       updateSummary();
     }
 
@@ -583,12 +637,15 @@
       document.getElementById("copyBtn").disabled = !ok;
 
       const line = [
-        selected("language"),
-        selected("stack"),
-        selected("pages"),
-        selected("auth"),
-        selected("output"),
-        selected("db"),
+        `lang=${selected("language")}`,
+        `frontend=${selected("frontend")}`,
+        `backend=${selected("backend")}`,
+        `database=${selected("database")}`,
+        `orm=${selected("orm")}`,
+        `dbRuntime=${selected("dbRuntime")}`,
+        `pages=${selected("pages")}`,
+        `auth=${selected("auth")}`,
+        `output=${selected("output")}`,
       ].join(" / ");
 
       summaryEl.textContent = ok
@@ -602,11 +659,18 @@
       form.querySelector(`input[name="pages"][value="${DEFAULTS.pages}"]`).checked = true;
       form.querySelector(`input[name="auth"][value="${DEFAULTS.auth}"]`).checked = true;
       form.querySelector(`input[name="output"][value="${DEFAULTS.output}"]`).checked = true;
-      syncLanguageDependent(DEFAULTS.stack, DEFAULTS.db);
+      syncLanguageDependent({
+        frontend: DEFAULTS.frontend,
+        backend: DEFAULTS.backend,
+        database: DEFAULTS.database,
+        orm: DEFAULTS.orm,
+        dbRuntime: DEFAULTS.dbRuntime,
+      });
     }
 
     form.addEventListener("change", (e) => {
       if (e.target.name === "language") {
+        // 切语言后逐层联动重渲染（含 ORM 过滤：Java 无 Prisma）
         syncLanguageDependent();
       } else {
         updateSummary();

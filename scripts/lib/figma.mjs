@@ -60,8 +60,10 @@ export function benchmarkFramesFor(root, summary) {
   const specs = benchmarkFrames(root);
   if (specs?.length) return specs;
   const frames = summary?.pages?.[0]?.frames || [];
-  const candidates = frames.filter((f) => f.size?.w >= 1200 && f.size?.h >= 900);
-  const largest = candidates.sort((a, b) => b.size.w * b.size.h - a.size.w * a.size.h)[0];
+  const candidates = frames.filter((f) => (f.size?.w ?? f.w) >= 1200 && (f.size?.h ?? f.h) >= 900);
+  const pickW = (f) => f.size?.w ?? f.w ?? 0;
+  const pickH = (f) => f.size?.h ?? f.h ?? 0;
+  const largest = candidates.sort((a, b) => pickW(b) * pickH(b) - pickW(a) * pickH(a))[0];
   if (!largest) return [];
   console.warn(
     `No benchmarkScreens in app-spec.json; falling back to largest frame: ${largest.name}. ` +
