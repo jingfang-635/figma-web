@@ -6,10 +6,17 @@
  * Usage (repo root, with api+web running):
  *   node scripts/visual-gate.mjs
  * Env: WEB_URL (default http://localhost:5173)
+ *
+ * 配置来源（去硬编码）：
+ * - 标杆屏与路由：fixtures/<slug>/app-spec.json → benchmarkScreens
+ * - 登录凭证：env GATE_ADMIN_EMAIL/GATE_ADMIN_PASSWORD 或 spec.seedAdmin
+ * - localStorage key：spec.auth.storageKey（默认 auth_token）
+ * - mask：fixtures/<slug>/gate-masks.json（可选）
  */
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveProject, gateCredentials, gateMasks } from "./lib/project.mjs";
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
@@ -42,35 +49,43 @@ const VIEWPORT = { width: 1440, height: 1068 };
 const outDir = resolve(root, "artifacts/visual-diff");
 mkdirSync(outDir, { recursive: true });
 
-const TARGETS = [
-  { id: "home", route: "/", shot: "首页.png" },
-  { id: "organization", route: "/organization", shot: "机构信息.png" },
-  { id: "departments", route: "/departments", shot: "科室管理.png" },
-  { id: "schedules", route: "/schedules", shot: "排班管理.png" },
-  { id: "modal-create-dept", route: "/departments", shot: "新增科室弹窗.png", modal: true },
-];
+// —— 项目配置（app-spec 驱动，不再硬编码业务）——
+const { slug, spec } = resolveProject(root);
+if (!slug) {
+  console.error(
+    "No project slug resolved. Run: node scripts/init-project.mjs --slug <slug> --file <fileKey>",
+  );
+  process.exit(1);
+}
+const { email, password, storageKey } = gateCredentials(root);
 
-/** Recharts / emoji raster cannot pixel-match Figma vectors; keep labels, chrome, KPI in the gate. */
-const PLOT_MASKS = {
-  home: [
-    { x: 264, y: 310, w: 538, h: 180 },
-    { x: 858, y: 310, w: 538, h: 180 },
-    { x: 264, y: 585, w: 538, h: 180 },
-  ],
-  "modal-create-dept": [
-    { x: 120, y: 137, w: 80, h: 80 },
-    { x: 468, y: 12, w: 36, h: 36 },
-  ],
-};
+/** benchmarkScreens → gate targets（modal 用 spec.modal.trigger 匹配按钮） */
+function gateTargets() {
+  const bms = spec?.benchmarkScreens || [];
+  const targets = [];
+  for (const b of bms) {
+    if (b.type === "chrome") continue; // chrome（侧栏）不单独跑闸门
+    if (b.type === "modal") {
+      targets.push({
+        id: b.id,
+        route: b.route,
+        shot: `${b.name}.png`,
+        modal: true,
+        trigger: b.modal?.trigger || /新增/,
+      });
+      continue;
+    }
+    targets.push({ id: b.id, route: b.route, shot: `${b.name}.png`, modal: false });
+  }
+  return targets;
+}
 
-const ICON_STRIP = { x: 16, y: 70, w: 38, h: 998 };
+const TARGETS = gateTargets();
+/** 可选 mask：{ [screenId]: [{x,y,w,h}] }，来自 gate-masks.json */
+const GATE_MASKS = gateMasks(root);
 
 function masksFor(name) {
-  const list = [...(PLOT_MASKS[name] || [])];
-  if (["home", "organization", "departments", "schedules"].includes(name)) {
-    list.push(ICON_STRIP);
-  }
-  return list;
+  return [...(GATE_MASKS[name] || [])];
 }
 
 function fillRect(png, x, y, w, h, rgba = [255, 255, 255, 255]) {
@@ -193,15 +208,7 @@ function clipPng(png, x, y, w, h) {
 function compare(expectedBuf, actualBuf, name) {
   let expectedPng = PNG.sync.read(expectedBuf);
   const actualRaw = PNG.sync.read(actualBuf);
-  if (name === "sidebar" && expectedPng.width > 220) {
-    expectedPng = clipPng(expectedPng, 0, 0, 220, Math.min(expectedPng.height, VIEWPORT.height));
-  }
-  if (name === "modal-create-dept") {
-    if (expectedPng.width > 520 || expectedPng.height > 493) {
-      expectedPng = clipPng(expectedPng, 0, 0, 520, 493);
-    }
-  }
-  const height = Math.min(expectedPng.height, actualRaw.height, VIEWPORT.height);
+    const height = Math.min(expectedPng.height, actualRaw.height, VIEWPORT.height);
   const width = Math.min(expectedPng.width, actualRaw.width, VIEWPORT.width);
   const exp = fitPng(expectedPng, width, height);
   const act = fitPng(actualRaw, width, height);
@@ -214,7 +221,7 @@ function compare(expectedBuf, actualBuf, name) {
     }
   }
   const diff = new PNG({ width, height });
-  const threshold = name === "modal-create-dept" ? 0.45 : 0.25;
+  const threshold = 0.25;
   const mismatch = pixelmatch(exp.data, act.data, diff.data, width, height, { threshold });
   const ratio = mismatch / (width * height);
   const ssim = ssimScore(exp, act);
@@ -249,7 +256,7 @@ await waitForWeb();
 const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email: "admin@sunshine.clinic", password: "admin123" }),
+  body: JSON.stringify({ email, password }),
 });
 const loginBody = await loginRes.json().catch(() => ({}));
 const accessToken = loginBody.access_token || loginBody.token;
@@ -264,8 +271,8 @@ const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: 1 })
 await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
 await page.evaluate(
   ({ token, user }) => {
-    localStorage.setItem("sunshine_token", token);
-    localStorage.setItem("sunshine_user", JSON.stringify(user));
+    localStorage.setItem(storageKey, token);
+    localStorage.setItem(storageKey + "_user", JSON.stringify(user));
   },
   { token: accessToken, user: loginBody.user },
 );
@@ -287,7 +294,7 @@ for (const t of TARGETS) {
   if (t.modal) {
     try {
       await page.waitForSelector(".ant-table", { timeout: 10000 });
-      await page.getByRole("button", { name: /新增科室/ }).click({ force: true });
+      await page.getByRole("button", { name: t.trigger }).click({ force: true });
       await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
       await page.waitForTimeout(400);
     } catch (err) {
@@ -301,8 +308,8 @@ for (const t of TARGETS) {
         let box = (await content.count()) > 0 ? await content.boundingBox() : null;
         if (!box) box = await page.getByRole("dialog").boundingBox().catch(() => null);
         if (box) {
-          const w = Math.min(520, Math.ceil(box.width));
-          const h = Math.min(493, Math.ceil(box.height));
+          const w = Math.ceil(box.width);
+          const h = Math.ceil(box.height);
           const x = Math.max(0, Math.round(box.x + Math.max(0, box.width - w) / 2));
           const y = Math.max(0, Math.round(box.y));
           return page.screenshot({

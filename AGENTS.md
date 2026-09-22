@@ -8,22 +8,28 @@
 - **Skill**：[`figma-to-fullstack/SKILL.md`](figma-to-fullstack/SKILL.md)
 - **默认前端还原方案**：[`figma-to-fullstack/visual-fidelity.md`](figma-to-fullstack/visual-fidelity.md)
 
-### 默认行为
+### 流水线（spec 驱动，脚本零业务硬编码）
 
-1. Design IR → App Spec（人工闸门）
-2. Visual IR + 截图 + Screen Blueprint（**必做**）
-3. DB / API / **antd 前端**（标杆页 + list 模板）
-4. 功能冒烟 + **视觉闸门**（对照 `imports/figma/screens/`）
-5. **字段还原 + 页面还原轮次**：Playwright 逐页截图对比 → 列差异修代码 → 询问是否下一轮，直至用户选择不进入
-
-前端还原度默认为「高还原且可维护」，见 `.cursor/rules/figma-visual-fidelity.mdc`。
+```
+npm run init:project -- --slug <slug> --file <key>   # 拉结构 + app-spec 骨架
+→ App Spec 人工闸门（实体/路由/benchmarkScreens/seedAdmin）
+→ visual:layout / extract / shots(:all) / assets      # Layout IR / Visual IR / 对照 PNG
+→ 字段回填（figma-fields → spec，needsReview 清零）
+→ visual:gen                                          # tokens/antdTheme/blueprints/screenConfigs
+→ DB + API + antd 前端（标杆页 + list 模板）
+→ 冒烟 + 双闸门（visual:fields + visual:gate）
+→ 还原轮次（visual:round 逐页对比 → 列差异 → 修代码 → 问是否下一轮）
+→ GENERATED.md
+```
 
 ### 快速命令
 
 ```bash
-npm run visual:all   # Layout IR + Visual IR + shots + gen + assets + SSIM gate
+npm run visual:all   # layout / extract / shots / gen / assets / fields / gate
 npm run api
 npm run web
 ```
+
+项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动（标杆屏/路由/闸门账号/品牌），脚本不含业务硬编码。
 
 用户级副本（跨项目）：`~/.cursor/skills/figma-to-fullstack/`、`~/.cursor/agents/figma-to-fullstack.md`

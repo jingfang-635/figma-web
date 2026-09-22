@@ -7,7 +7,8 @@
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { initFigma, resolveFileKey, figmaGet, BENCHMARK_FRAMES, pickFrame } from "./lib/figma.mjs";
+import { initFigma, resolveFileKey, figmaGet, benchmarkFramesFor, pickFrame } from "./lib/figma.mjs";
+import { resolveProject } from "./lib/project.mjs";
 import {
   simplifyNode,
   associateIcons,
@@ -33,7 +34,7 @@ if (!token) {
 }
 
 const frames = summary?.pages?.[0]?.frames || [];
-const targets = BENCHMARK_FRAMES.map((spec) => {
+const targets = benchmarkFramesFor(root, summary).map((spec) => {
   const frame = pickFrame(frames, spec);
   return frame ? { ...spec, frame } : { ...spec, frame: null };
 });
@@ -52,7 +53,13 @@ if (!ready.length) {
   process.exit(1);
 }
 
-const slug = "sunshine-medical";
+const { slug } = resolveProject(root);
+if (!slug) {
+  console.error(
+    "No project slug resolved (no fixtures/<slug>/app-spec.json). Run: node scripts/init-project.mjs --slug <slug> --file <fileKey>",
+  );
+  process.exit(1);
+}
 const outDir = resolve(root, "fixtures", slug, "layout-ir");
 mkdirSync(outDir, { recursive: true });
 
@@ -115,10 +122,14 @@ for (const t of targets) {
   console.log("Wrote", dest, `regions=${regions.length} exportables=${exportables.length}`);
 }
 
-const pages = ["home", "organization", "departments", "schedules", "modal-create-dept"]
-  .map((id) => simplified[id])
+// token 提取页 = 全部非 chrome 页面（不再写死 home/organization/departments/schedules/modal）
+const pages = targets
+  .map((t) => (t.type === "chrome" ? null : simplified[t.id]))
   .filter(Boolean);
-const tokens = tokensFromNamedNodes(simplified.sidebar, pages);
+const tokens = tokensFromNamedNodes(
+  simplified.sidebar || null,
+  pages.length ? pages : Object.values(simplified).filter((n) => n && n.box?.w >= 1200),
+);
 writeFileSync(resolve(outDir, "tokens.json"), JSON.stringify(tokens, null, 2), "utf8");
 
 const index = {

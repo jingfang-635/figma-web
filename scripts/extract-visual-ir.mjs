@@ -8,7 +8,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { solidFillHex, walk } from "./lib/env.mjs";
-import { initFigma, resolveFileKey } from "./lib/figma.mjs";
+import { initFigma, resolveFileKey, figmaGet } from "./lib/figma.mjs";
+import { resolveProject } from "./lib/project.mjs";
 import { SCREEN_CATALOG, MODAL_CATALOG, SIDEBAR_GROUPS, classifyTemplate } from "./lib/screen-catalog.mjs";
 
 const root = resolve(process.cwd());
@@ -80,18 +81,6 @@ function luminance(hex) {
   return (r + g + b) / 3;
 }
 
-async function figmaGet(path, token) {
-  const res = await fetch(`https://api.figma.com/v1${path}`, {
-    headers: { "X-Figma-Token": token },
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    const msg = data?.err || data?.message || JSON.stringify(data).slice(0, 400);
-    throw new Error(`Figma ${res.status}: ${msg}`);
-  }
-  return data;
-}
-
 function analyzeNode(document) {
   const fills = new Map();
   const fonts = new Map();
@@ -154,12 +143,12 @@ function tokensFromAnalysis(sidebar, pages) {
 
 function inferSidebarGroups(texts) {
   const labels = new Set(texts.filter((t) => t && t.length < 12));
-  const groups = SIDEBAR_GROUPS.map((g) => ({
+  const groups = SIDEBAR_GROUPS().map((g) => ({
     id: g.id,
     label: g.label,
     items: g.items.filter((name) => labels.size === 0 || labels.has(name) || SCREEN_CATALOG[name]),
   })).filter((g) => g.items.length);
-  return groups.length ? groups : SIDEBAR_GROUPS;
+  return groups.length ? groups : SIDEBAR_GROUPS();
 }
 
 const { summary, fileKey } = resolveFileKey(root, process.argv[2]);
@@ -168,24 +157,39 @@ if (!summary?.fileKey || !fileKey) {
   process.exit(1);
 }
 
+const { slug, spec } = resolveProject(root);
+if (!slug) {
+  console.error(
+    "No project slug resolved (no fixtures/<slug>/app-spec.json). Run: node scripts/init-project.mjs --slug <slug> --file <fileKey>",
+  );
+  process.exit(1);
+}
+
 const token = process.env.FIGMA_ACCESS_TOKEN;
 const frames = summary.pages?.[0]?.frames || [];
 
+const chromeNames = new Set(
+  (spec?.benchmarkScreens || []).filter((b) => b.type === "chrome").map((b) => b.name),
+);
 const screenFrames = frames.filter(
   (f) =>
     f.size?.w >= 1200 &&
     f.size?.h >= 900 &&
     !String(f.name).includes("弹窗") &&
+    !chromeNames.has(f.name) &&
     f.name !== "激活页面" &&
     f.name !== "sidebar",
 );
 const modalFrames = frames.filter((f) => String(f.name).includes("弹窗"));
-const sidebarFrame = frames.find((f) => f.name === "sidebar" && f.type === "COMPONENT") || frames.find((f) => f.name === "sidebar");
+const sidebarFrame =
+  frames.find((f) => f.name === "sidebar" && f.type === "COMPONENT") ||
+  frames.find((f) => chromeNames.has(f.name));
 
 const notes = [];
 let tokens = fallbackTokens();
 
-const layoutTokensPath = resolve(root, "fixtures/sunshine-medical/layout-ir/tokens.json");
+const layoutDir = resolve(root, "fixtures", slug, "layout-ir");
+const layoutTokensPath = resolve(layoutDir, "tokens.json");
 if (existsSync(layoutTokensPath)) {
   tokens = JSON.parse(readFileSync(layoutTokensPath, "utf8"));
   notes.push("tokens from Layout IR named nodes");
@@ -193,7 +197,7 @@ if (existsSync(layoutTokensPath)) {
   notes.push("Layout IR tokens.json missing; using fallback until visual:layout runs");
 }
 let sidebarTexts = [];
-const sidebarLayoutPath = resolve(root, "fixtures/sunshine-medical/layout-ir/sidebar.json");
+const sidebarLayoutPath = resolve(layoutDir, "sidebar.json");
 if (existsSync(sidebarLayoutPath)) {
   sidebarTexts = JSON.parse(readFileSync(sidebarLayoutPath, "utf8")).texts || [];
 }
@@ -202,8 +206,8 @@ const chrome = {
   sidebar: {
     nodeId: sidebarFrame?.id || "4:63",
     width: tokens.space?.sidebar || sidebarFrame?.size?.w || 220,
-    brandTitle: "阳光医疗门诊",
-    brandSubtitle: "预约挂号管理后台",
+    brandTitle: spec?.brand?.title || summary.name || "",
+    brandSubtitle: spec?.brand?.subtitle || "",
     groups: inferSidebarGroups(sidebarTexts),
   },
   header: {
@@ -214,7 +218,7 @@ const chrome = {
 
 const screens = [];
 for (const frame of screenFrames) {
-  const catalog = SCREEN_CATALOG[frame.name];
+  const catalog = SCREEN_CATALOG()[frame.name];
   const template = catalog?.template || classifyTemplate(frame.name);
   if (!template) continue;
   const regions = catalog?.regions ? { ...catalog.regions } : {};
@@ -230,7 +234,7 @@ for (const frame of screenFrames) {
   });
 }
 
-const modals = MODAL_CATALOG.map((m) => {
+const modals = MODAL_CATALOG().map((m) => {
   const hit = modalFrames.find((f) => f.name === m.name);
   const screen = screens.find((s) => s.name === m.screen);
   return {
@@ -242,7 +246,7 @@ const modals = MODAL_CATALOG.map((m) => {
 
 const ir = {
   version: "1.0",
-  name: summary.name || "阳光医疗",
+  name: summary.name || spec?.name || "",
   figma: {
     fileKey,
     url: `https://www.figma.com/design/${fileKey}`,
@@ -255,7 +259,6 @@ const ir = {
   notes,
 };
 
-const slug = "sunshine-medical";
 const outDir = resolve(root, "fixtures", slug);
 mkdirSync(outDir, { recursive: true });
 const outPath = resolve(outDir, "visual-ir.json");

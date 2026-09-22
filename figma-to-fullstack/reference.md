@@ -1,300 +1,147 @@
 # Figma → 全栈 · 参考
 
-
-
-用户级 Skill 配套说明。脚本与文档位于：`~/.cursor/skills/figma-to-fullstack/`。
-
-
+Skill 配套说明：栈矩阵、环境变量、命令速查。
 
 ## 默认前端还原
 
-
-
 **所有新项目默认启用** [visual-fidelity.md](visual-fidelity.md)，无需用户勾选。
 
-
-
 - UI 栈：`antd` + `@ant-design/icons` + `recharts` + `dayjs`
-
-- 中间层：Visual IR → Screen Blueprint → `screenConfigs.ts` / `blueprints/`
-
+- 中间层：Layout IR → Visual IR → Screen Blueprint → `screenConfigs.ts` / `blueprints/`
 - 禁止：通用 ResourcePage、自制 UI 组件库
-
-- 验收：对照 `imports/figma/screens/*.png` 过视觉闸门
-
-
+- 验收：双闸门（`visual:fields` + `visual:gate`）+ 还原轮次
 
 ## 合法栈矩阵
 
-
-
 先选 **后端语言**（`node` / `java`），再选栈 ID。语言与框架必须一致。
 
-
-
 | ID | 语言 | 前端 | 后端框架 | DB | ORM |
-
 |---|---|---|---|---|---|
-
 | A（默认） | node | react-vite | nestjs | postgresql | prisma |
-
 | A2 | node | react-vite | express | postgresql | prisma |
-
 | B | node | vue-vite | nestjs | postgresql | prisma |
-
 | C | java | react-vite | spring-boot | mysql | jpa |
-
 | D（二期） | java | vue-vite | spring-boot | mysql | mybatis |
 
-
-
-非法组合必须拒绝并提示矩阵，例如：
-
-- Node 语言却选 Spring Boot / JPA / MyBatis
-
-- Java 语言却选 NestJS / Express / Prisma
-
-- Express + JPA、Nest + MyBatis 等跨语言混用
-
-
-
-App Spec 的 `stack` 须含：`id`、`language`（`node`|`java`）、`frontend`、`backend`、`database`、`orm`。
-
-
+非法组合必须拒绝并提示矩阵。App Spec 的 `stack` 须含：`id`、`language`、`frontend`、`backend`、`database`、`orm`（**不要**带 `label`/`description`）。
 
 ## 环境变量（仓库根 `.env`）
 
-
-
 ```bash
-
 FIGMA_ACCESS_TOKEN=
-
 FIGMA_API_BASE=https://api.figma.com
 
-LLM_PROVIDER=deepseek
+# 闸门凭证（或写 app-spec.seedAdmin）
+GATE_ADMIN_EMAIL=
+GATE_ADMIN_PASSWORD=
 
-LLM_API_KEY=
-
-LLM_BASE_URL=https://api.deepseek.com
-
-LLM_MODEL=deepseek-chat
+# 闸门参数（可选覆盖）
+WEB_URL=http://localhost:5173
+VISUAL_SSIM_MIN=0.97
+VISUAL_MISMATCH_MAX=0.02
+FIGMA_SLUG=
 
 DEFAULT_STACK_ID=A
-
 JWT_SECRET=change-me-in-dev
-
 JWT_EXPIRES_IN=7d
-
-FIGMA_MCP_ENABLED=true
-
-FIGMA_PLUGIN_EXPORT_DIR=./imports/plugin
-
 ```
-
-
 
 API 本地另需 `apps/api/.env`：
 
-
-
 ```bash
-
 DATABASE_URL=postgresql://fsg:fsg@localhost:5432/<db_name>?schema=public
-
 JWT_SECRET=...
-
 API_PORT=3001
-
 ```
 
-
-
-## Figma REST 要点
-
-
-
-- `GET /v1/files/:key?depth=3` — 结构概览
-
-- 全量 `GET /v1/files/:key` — 抽 TEXT / 大 FRAME
-
-- `GET /v1/images/:key?ids=...` — 截图与图标导出
-
-- Header：`X-Figma-Token: <token>`
-
-- 通道优先级：**REST（主）** → Plugin 导出 → MCP 辅助（`get_design_context` 可选增强，非替代 Visual IR）
-
-
-
-## Visual IR 与 Blueprint
-
-
-
-| 产物 | 路径 |
-
-|---|---|
-
-| Visual IR | `fixtures/<slug>/visual-ir.json` |
-
-| Schema | `docs/schemas/visual-ir.schema.json` |
-
-| Screen Blueprint | `fixtures/<slug>/screen-blueprints/*.json` |
-
-| 生成 TS/CSS | `apps/web/src/generated/screenConfigs.ts`、`styles/tokens.css` |
-
-| 对照截图 | `imports/figma/screens/*.png` |
-
-
-
-视觉脚本（仓库根）：
-
-
+## 命令速查
 
 ```bash
+# 0. 初始化（拉结构 + app-spec 骨架）
+npm run init:project -- --slug <slug> --file <fileKey或URL>
 
-npm run visual:extract
+# 1. 视觉抽取
+npm run visual:layout / extract / shots / shots:all / assets
 
-npm run visual:shots
-
+# 2. 生成前端资产
 npm run visual:gen
 
-npm run visual:assets
+# 3. 字段提取与校验
+node scripts/extract-figma-texts.mjs
+npm run visual:fields
 
+# 4. 双闸门 + 轮次（gate 需 api+web 已启动）
+npm run visual:gate
+npm run visual:round            # capture-screens + visual-compare
+npm run visual:all              # 全链路（init 外）
+
+# 5. 服务
+npm run api
+npm run web
 ```
-
-
-
-Screen catalog（区域/侧栏/弹窗模板）：`scripts/lib/screen-catalog.mjs`
-
-
 
 ## App Spec 最小字段
 
+`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], benchmarkScreens[], seedAdmin{email,password}, notes[]`
 
-
-`version, name, stack, auth, entities[], apis[], screens[], benchmarkScreens[]`  
-
-若仓库有 Schema：`docs/schemas/app-spec.schema.json`  
-
-`stack` 对象**不要**带 `label`/`description`（仅 id/language/frontend/backend/database/orm）。
-
-**新增 `benchmarkScreens` 字段**（必选，覆盖 5 种模式）：
+**`benchmarkScreens`**（标杆屏，覆盖 5 种模式）：
 
 ```json
 {
   "benchmarkScreens": [
-    {
-      "id": "home",
-      "type": "chart",
-      "route": "/",
-      "name": "首页",
-      "description": "数据看板（图表页）"
-    },
-    {
-      "id": "departments",
-      "type": "list",
-      "route": "/departments",
-      "name": "科室管理",
-      "description": "科室列表（列表页）"
-    },
-    {
-      "id": "appointment-form",
-      "type": "form",
-      "route": "/appointments/new",
-      "name": "新增预约",
-      "description": "预约表单（表单页）"
-    },
-    {
-      "id": "doctor-detail",
-      "type": "detail",
-      "route": "/doctors/1",
-      "name": "医生详情",
-      "description": "医生详细信息（详情页）"
-    },
-    {
-      "id": "modal-create-dept",
-      "type": "modal",
-      "route": "/departments",
-      "name": "新增科室弹窗",
-      "description": "新增科室模态框（弹窗）"
-    }
+    { "id": "home", "type": "chart", "route": "/", "name": "首页" },
+    { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
+    { "id": "appointment-form", "type": "form", "route": "/appointments/new", "name": "新增预约" },
+    { "id": "doctor-detail", "type": "detail", "route": "/doctors/1", "name": "医生详情" },
+    { "id": "modal-create-dept", "type": "modal", "route": "/departments", "name": "新增科室弹窗",
+      "modal": { "trigger": "新增" } },
+    { "id": "sidebar", "type": "chrome", "name": "sidebar" }
   ]
 }
 ```
 
-**字段说明**：
-- `id` - 标杆屏唯一标识（用于截图和对比）
-- `type` - 屏类型：`chart` | `list` | `form` | `detail` | `modal`
-- `route` - 前端路由
-- `name` - 屏名称（与 Figma 截图文件名对应）
-- `description` - 描述（可选）
+- `type`: `chart | list | form | detail | modal | chrome`
+- `name` 与 Figma Frame 名一致（截图文件名 = `<name>.png`）
+- `modal.trigger`：打开弹窗的按钮文案（正则或字符串）
+- `chrome`：侧栏等 chrome 组件（不单独跑闸门，参与 token 提取）
 
+**`screens[]`** 每屏字段（字段级还原的载体，闸门后回填、`needsReview: false`）：
 
-
-## 评估权重（可选报告）
-
-
-
-`Score = 0.35×功能 + 0.35×视觉还原 + 0.20×可维护 + 0.10×性能`；及格 ≥70。
-
-
-
-- 功能：CRUD / 业务主路径冒烟通过率 ≥80%
-
-- 视觉：标杆屏视觉闸门项通过率 ≥80%（见 visual-fidelity.md）
-
-
-
-## 案例：阳光医疗门诊
-
-
-
-- fileKey：`WZR7JiF1Q8GOaxOheQV8Ur`
-
-- 还原：Screen Blueprint + antd + recharts
-
-- 产出：`apps/web`、`apps/api`、`fixtures/sunshine-medical/`
-
-- 账号：`admin@sunshine.clinic` / `admin123`
-
-- 说明：`apps/GENERATED.md`
-
-
-
-## 常用命令
-
-
-
-```bash
-
-node ~/.cursor/skills/figma-to-fullstack/scripts/fetch-overview.mjs <fileKey>
-
-npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets
-
-pnpm agent stacks
-
-pnpm agent generate --file <key> --stack A --yes --dry-run
-
-docker compose up -d
-
-pnpm --filter @fsg/api prisma:seed
-
-pnpm api
-
-pnpm web
-
+```json
+{
+  "id": "departments",
+  "name": "科室管理",
+  "route": "/departments",
+  "type": "list",
+  "resource": "departments",
+  "subtitle": "管理门诊基础资料、排班与预约信息",
+  "stats": [{ "key": "departments", "label": "启用科室" }],
+  "filters": [{ "key": "search", "type": "search", "placeholder": "搜索科室" }],
+  "actions": [{ "label": "＋ 新增科室", "variant": "primary" }],
+  "table": { "columns": [{ "key": "name", "label": "科室" }], "rowActions": ["edit", "delete"] },
+  "formFields": [{ "key": "name", "label": "科室名称", "type": "text", "required": true }],
+  "statusMap": { "active": { "label": "启用", "color": "success" } },
+  "needsReview": false
+}
 ```
-
-
 
 ## Windows / PowerShell 注意
 
+- 链式命令用 `;`（旧版 PowerShell 不支持 `&&`）
+- 写含密钥的 `.env` 优先用小脚本 `node *.mjs`
+- `git show HEAD:<path> > file` 导出的文件可能是 UTF-16LE，读取时先转码
 
+## Figma REST 要点
 
-- 链式命令用 `;`，不用 `&&`（旧版 PowerShell）
+- `GET /v1/files/:key?depth=3` — 结构概览
+- 全量 `GET /v1/files/:key` — 抽 TEXT / 大 FRAME
+- `GET /v1/images/:key?ids=...` — 截图与图标导出
+- Header：`X-Figma-Token: <token>`
+- 通道优先级：**REST（主）** → Plugin 导出 → MCP 辅助（可选增强，非替代 Visual IR）
 
-- `Set-Content -Encoding utf8` 即可；避免不存在的 `utf8NoBOM` 枚举
+## 评估权重（可选报告）
 
-- 写含密钥的 `.env` 优先用小脚本 `node *.mjs`，避免 shell 转义弄丢内容
+`Score = 0.35×功能 + 0.35×视觉还原 + 0.20×可维护 + 0.10×性能`；及格 ≥70。
 
-
+- 功能：CRUD / 业务主路径冒烟通过率 ≥80%
+- 视觉：标杆屏视觉闸门项通过率 ≥80%（见 visual-fidelity.md）

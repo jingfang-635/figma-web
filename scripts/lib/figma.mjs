@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadEnv, parseFileKey } from "./env.mjs";
+import { benchmarkFrames, resolveProject } from "./project.mjs";
 
 export function initFigma(root) {
   loadEnv(resolve(root, ".env"));
@@ -21,14 +22,8 @@ export function findSummary(root, fileKey) {
 export function resolveFileKey(root, arg) {
   let requested = arg ? parseFileKey(arg) : undefined;
   if (!requested) {
-    const specPath = resolve(root, "fixtures/sunshine-medical/app-spec.json");
-    if (existsSync(specPath)) {
-      try {
-        requested = JSON.parse(readFileSync(specPath, "utf8"))?.figma?.fileKey;
-      } catch {
-        requested = undefined;
-      }
-    }
+    const { spec } = resolveProject(root);
+    requested = spec?.figma?.fileKey;
   }
   const summary = findSummary(root, requested);
   const fileKey = requested || summary?.fileKey;
@@ -57,14 +52,25 @@ export async function figmaGet(path, token, { retries = 6 } = {}) {
   throw lastErr;
 }
 
-export const BENCHMARK_FRAMES = [
-  { id: "sidebar", names: ["sidebar"], preferType: "COMPONENT" },
-  { id: "home", names: ["首页"], preferType: "FRAME" },
-  { id: "organization", names: ["机构信息"], preferType: "FRAME" },
-  { id: "departments", names: ["科室管理"], preferType: "FRAME" },
-  { id: "schedules", names: ["排班管理"], preferType: "FRAME" },
-  { id: "modal-create-dept", names: ["新增科室弹窗"], preferType: "FRAME" },
-];
+/**
+ * 标杆屏 specs：优先 spec.benchmarkScreens；无 spec 时回退 summary 中最大的画板。
+ * 形状与旧 BENCHMARK_FRAMES 兼容：{ id, names, preferType, route?, shot?, type, modal? }
+ */
+export function benchmarkFramesFor(root, summary) {
+  const specs = benchmarkFrames(root);
+  if (specs?.length) return specs;
+  const frames = summary?.pages?.[0]?.frames || [];
+  const candidates = frames.filter((f) => f.size?.w >= 1200 && f.size?.h >= 900);
+  const largest = candidates.sort((a, b) => b.size.w * b.size.h - a.size.w * a.size.h)[0];
+  if (!largest) return [];
+  console.warn(
+    `No benchmarkScreens in app-spec.json; falling back to largest frame: ${largest.name}. ` +
+      `Run init-project.mjs / fill spec.benchmarkScreens for full coverage.`,
+  );
+  return [
+    { id: "home", names: [largest.name], preferType: "FRAME", route: "/", shot: `${largest.name}.png`, type: "list", modal: null },
+  ];
+}
 
 export function pickFrame(frames, spec) {
   const hits = (frames || []).filter((f) => spec.names.includes(f.name));

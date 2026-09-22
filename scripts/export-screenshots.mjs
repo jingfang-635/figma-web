@@ -6,7 +6,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { initFigma, resolveFileKey, figmaGet, BENCHMARK_FRAMES, pickFrame } from "./lib/figma.mjs";
+import { initFigma, resolveFileKey, figmaGet, benchmarkFramesFor, pickFrame } from "./lib/figma.mjs";
 
 const root = resolve(process.cwd());
 initFigma(root);
@@ -26,7 +26,7 @@ if (!token) {
 const frames = summary?.pages?.[0]?.frames || [];
 const unique = [];
 const seen = new Set();
-for (const spec of BENCHMARK_FRAMES) {
+for (const spec of benchmarkFramesFor(root, summary)) {
   const frame = pickFrame(frames, spec);
   if (!frame || seen.has(frame.name)) continue;
   seen.add(frame.name);

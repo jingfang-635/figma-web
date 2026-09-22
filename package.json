@@ -17,12 +17,10 @@
     "visual:compare": "node scripts/visual-compare.mjs",
     "visual:gate": "node scripts/visual-gate.mjs",
     "visual:stats": "node scripts/field-stats.mjs",
-    "visual:all": "npm run visual:layout && npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets && npm run visual:gate",
-    "perf:test": "node scripts/perf-test.mjs",
-    "perf:web": "node scripts/perf-web.mjs",
-    "perf:api": "node scripts/perf-api.mjs",
-    "perf:db-index": "node scripts/check-db-index.mjs",
-    "a11y:check": "node scripts/a11y-check.mjs"
+    "visual:all": "npm run visual:layout && npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets && npm run visual:fields && npm run visual:gate",
+    "init:project": "node scripts/init-project.mjs",
+    "visual:fields": "node scripts/check-field-consistency.mjs",
+    "visual:round": "node scripts/capture-screens.mjs && node scripts/visual-compare.mjs"
   },
   "devDependencies": {
     "pixelmatch": "^5.3.0",

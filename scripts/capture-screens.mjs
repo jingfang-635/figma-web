@@ -12,6 +12,7 @@
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveProject, gateCredentials } from "./lib/project.mjs";
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
@@ -25,6 +26,8 @@ const round = roundArg ? roundArg.split('=')[1] : '1';
 const targetScreens = screensArg ? screensArg.split('=')[1].split(',') : null;
 
 const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
+const { slug } = resolveProject(root);
+const { email, password, storageKey } = gateCredentials(root);
 
 // 从 screenConfigs 读取路由列表
 function loadScreenConfigs() {
@@ -52,7 +55,7 @@ function loadScreenConfigs() {
 
 // 从 Layout IR 读取视口配置
 function loadViewport(screenName) {
-  const layoutIRPath = resolve(root, `fixtures/sunshine-medical/layout-ir/${screenName}.json`);
+  const layoutIRPath = resolve(root, `fixtures/${slug}/layout-ir/${screenName}.json`);
   
   if (existsSync(layoutIRPath)) {
     const layoutIR = JSON.parse(readFileSync(layoutIRPath, "utf-8"));
@@ -100,10 +103,7 @@ async function main() {
     const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        email: "admin@sunshine.clinic", 
-        password: "admin123" 
-      }),
+      body: JSON.stringify({ email, password }),
     });
     const loginBody = await loginRes.json().catch(() => ({}));
     const accessToken = loginBody.access_token || loginBody.token;
@@ -119,8 +119,8 @@ async function main() {
     await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
     await page.evaluate(
       ({ token, user }) => {
-        localStorage.setItem("sunshine_token", token);
-        localStorage.setItem("sunshine_user", JSON.stringify(user));
+        localStorage.setItem(storageKey, token);
+        localStorage.setItem(storageKey + "_user", JSON.stringify(user));
       },
       { token: accessToken, user: loginBody.user }
     );

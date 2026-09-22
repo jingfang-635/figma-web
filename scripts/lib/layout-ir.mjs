@@ -9,35 +9,6 @@ const LEAF_TYPES = new Set([
   "ELLIPSE",
 ]);
 
-export const NAV_LABELS = [
-  "首页",
-  "机构信息",
-  "科室管理",
-  "医生管理",
-  "排班管理",
-  "预约记录",
-  "患者管理",
-  "订单管理",
-  "评价管理",
-  "地址管理",
-  "广告位管理",
-  "广告图管理",
-  "公告管理",
-  "新闻列表",
-  "新闻分类",
-  "导航栏管理",
-  "导航栏",
-  "意见反馈",
-  "预约规则",
-  "通知管理",
-  "消息通知",
-  "用户管理",
-  "角色管理",
-  "操作日志",
-];
-
-export const DEPT_LABELS = ["内科", "儿科", "妇科", "口腔科", "皮肤科"];
-
 function round(n) {
   return Math.round(Number(n) || 0);
 }
@@ -170,23 +141,22 @@ function nearestLeftGraphic(text, graphics) {
   return best;
 }
 
+/**
+ * 图标关联（文本驱动，跨项目通用）：
+ * 对所有短文本（≤12 字符，视为导航/列表 label）尝试关联其左侧最近的图形节点。
+ * 不再依赖预置的 NAV_LABELS / DEPT_LABELS 业务列表。
+ */
 export function associateIcons(root) {
   const { texts, graphics } = collectByType(root);
-  const nav = {};
-  const depts = {};
-  for (const label of NAV_LABELS) {
-    const t = texts.find((n) => n.text.trim() === label);
-    if (!t) continue;
+  const icons = {};
+  for (const t of texts) {
+    const label = t.text.trim();
+    if (!label || label.length > 12) continue;
+    if (icons[label]) continue;
     const g = nearestLeftGraphic(t, graphics);
-    if (g) nav[label] = { nodeId: g.id, w: g.box.w, h: g.box.h, name: g.name };
+    if (g) icons[label] = { nodeId: g.id, w: g.box.w, h: g.box.h, name: g.name };
   }
-  for (const label of DEPT_LABELS) {
-    const t = texts.find((n) => n.text.trim() === label);
-    if (!t) continue;
-    const g = nearestLeftGraphic(t, graphics);
-    if (g) depts[label] = { nodeId: g.id, w: g.box.w, h: g.box.h, name: g.name };
-  }
-  return { nav, depts };
+  return { nav: icons, depts: {} };
 }
 
 function luminance(hex) {
@@ -278,22 +248,29 @@ export function tokensFromNamedNodes(sidebar, pages) {
     if (sidebar.box) tokens.space.sidebar = sidebar.box.w;
     const { texts } = collectByType(sidebar);
     const parents = parentMapOf(sidebar);
-    const home = texts.find((t) => t.text.trim() === "首页");
-    if (home) {
-      if (home.font?.color) tokens.color.sidebarActiveText = home.font.color.slice(0, 7);
-      const item = findAncestorWithFill(home, parents);
+    // 激活项 = 侧栏中带彩色填充祖先的第一个短文本项（不再写死「首页」）
+    const navItems = texts.filter((t) => t.text.trim().length > 0 && t.text.trim().length <= 12);
+    const firstActive = navItems.find((t) => {
+      const item = findAncestorWithFill(t, parents);
+      return item?.fill && !isNearWhite(item.fill);
+    });
+    const first = firstActive || navItems[0];
+    if (first) {
+      if (first.font?.color) tokens.color.sidebarActiveText = first.font.color.slice(0, 7);
+      const item = findAncestorWithFill(first, parents);
       if (item?.fill) tokens.color.sidebarActiveBg = item.fill.slice(0, 7);
       if (item?.box) tokens.space.navItemHeight = item.box.h;
     }
-    const other = texts.find((t) => NAV_LABELS.includes(t.text.trim()) && t.text.trim() !== "首页");
+    const other = navItems.find((t) => t !== first);
     if (other?.font?.color) tokens.color.sidebarText = other.font.color.slice(0, 7);
-    const brand = texts.find((t) => /门诊|医疗/.test(t.text) && t.font?.size >= 14);
+    // 品牌色 = 侧栏中字号最大的文本
+    const brand = [...navItems].sort((a, b) => (b.font?.size || 0) - (a.font?.size || 0))[0];
     if (brand?.font?.color) tokens.color.sidebarBrand = brand.font.color.slice(0, 7);
     if (brand?.font?.family) {
       tokens.font.family = `"${brand.font.family}", "PingFang SC", "Microsoft YaHei", sans-serif`;
     }
-    const icon = associateIcons(sidebar).nav["首页"];
-    if (icon) tokens.space.navIcon = Math.max(icon.w, icon.h);
+    const firstIcon = first ? associateIcons(sidebar).nav[first.text.trim()] : null;
+    if (firstIcon) tokens.space.navIcon = Math.max(firstIcon.w, firstIcon.h);
   }
 
   for (const page of pages || []) {
@@ -360,6 +337,7 @@ export function tokensFromNamedNodes(sidebar, pages) {
   return tokens;
 }
 
+/** 通用区域推断（不再按 home/departments/organization/schedules 特判） */
 export function inferRegions(id, root) {
   const { texts, frames } = collectByType(root);
   const regions = [];
@@ -388,45 +366,12 @@ export function inferRegions(id, root) {
       height: first.box.h,
     });
   }
-  if (id === "home") {
-    for (const t of texts.filter((n) => /近7天|关键指标/.test(n.text))) {
-      regions.push({
-        id: "chart",
-        nodeId: t.id,
-        name: t.text.trim(),
-        box: t.box,
-        font: { size: t.font?.size, color: t.font?.color },
-      });
-    }
-  }
-  if (id === "departments") {
-    const listTitle = texts.find((t) => t.text.includes("科室列表"));
-    if (listTitle) {
-      regions.push({ id: "listCard", nodeId: listTitle.id, name: listTitle.text.trim(), box: listTitle.box });
-    }
-  }
-  if (id === "organization") {
-    const formTitle = texts.find((t) => /机构基础|诊所资料/.test(t.text));
-    if (formTitle) {
-      regions.push({ id: "formCard", nodeId: formTitle.id, name: formTitle.text.trim(), box: formTitle.box });
-    }
-  }
-  if (id === "schedules") {
-    const cal = texts.find((t) => /排班日历|日历视图/.test(t.text));
-    if (cal) regions.push({ id: "calendar", nodeId: cal.id, name: cal.text.trim(), box: cal.box });
-  }
-  if (id === "modal-create-dept") {
-    const modalTitle = texts.find((t) => t.text.includes("新增科室"));
-    if (modalTitle) regions.push({ id: "modal", nodeId: modalTitle.id, name: modalTitle.text.trim(), box: modalTitle.box });
-  }
-  if (id === "sidebar") {
-    regions.push({
-      id: "sidebar",
-      nodeId: root.id,
-      box: root.box,
-      fill: root.fill,
-      width: root.box?.w,
-    });
+  // 主内容卡 = 页面内最大的浅色 frame
+  const mainCard = frames
+    .filter((f) => f.fill && isNearWhite(f.fill) && f.box && f.box.w > 400 && f.box.h > 200)
+    .sort((a, b) => b.box.w * b.box.h - a.box.w * a.box.h)[0];
+  if (mainCard) {
+    regions.push({ id: "mainCard", nodeId: mainCard.id, box: mainCard.box, fill: mainCard.fill });
   }
   return regions;
 }

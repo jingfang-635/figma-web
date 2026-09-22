@@ -5,13 +5,15 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { initFigma, resolveFileKey, figmaGet } from "./lib/figma.mjs";
+import { resolveProject } from "./lib/project.mjs";
 
 const root = resolve(process.cwd());
+const { slug } = resolveProject(root);
 initFigma(root);
 
 const { summary, fileKey } = resolveFileKey(root, process.argv[2]);
 const token = process.env.FIGMA_ACCESS_TOKEN;
-const layoutDir = resolve(root, "fixtures/sunshine-medical/layout-ir");
+const layoutDir = resolve(root, "fixtures", slug, "layout-ir");
 const outDir = resolve(root, "apps/web/public/assets");
 mkdirSync(resolve(outDir, "nav"), { recursive: true });
 mkdirSync(resolve(outDir, "depts"), { recursive: true });

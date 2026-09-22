@@ -2,11 +2,13 @@
 /** Generate apps/web/src/generated/screenConfigs.ts from Visual IR. */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { resolveProject } from "./lib/project.mjs";
 
 const root = resolve(process.cwd());
+const { slug } = resolveProject(root);
 const irPath = existsSync(resolve(root, "apps/web/src/generated/visual-ir.json"))
   ? resolve(root, "apps/web/src/generated/visual-ir.json")
-  : resolve(root, "fixtures/sunshine-medical/visual-ir.json");
+  : resolve(root, "fixtures", slug, "visual-ir.json");
 
 const ir = JSON.parse(readFileSync(irPath, "utf8"));
 

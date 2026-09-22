@@ -1,5 +1,5 @@
 ---
-description: Figma 全栈生成默认启用 antd + Layout IR + Screen Blueprint + SSIM 视觉闸门
+description: Figma 全栈生成默认启用 antd + Layout IR + Screen Blueprint + 双闸门（字段 + SSIM）
 alwaysApply: true
 ---
 
@@ -9,16 +9,18 @@ alwaysApply: true
 
 ## 流水线
 
-Design IR → App Spec → **Layout IR → Visual IR → Screen Blueprint** → codegen → **SSIM 视觉闸门**
+init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Screen Blueprint** → codegen → **双闸门（字段一致性 + SSIM 视觉闸门）** → 还原轮次
 
 ## 必须遵守
 
 - 前端：**antd + @ant-design/icons + recharts + dayjs**，`ConfigProvider` 主题由脚本生成
 - **禁止**通用 `ResourcePage` 或自制 Button/Table/Modal 覆盖全部业务屏
-- 必跑：`npm run visual:all`（layout / extract / shots / gen / assets / gate）
-- 标杆页：首页、科室、机构、排班、新增科室弹窗；SSIM ≥ 0.97 或 mismatch < 2%
+- 项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动（标杆屏 `benchmarkScreens` / 路由 / 闸门账号 / 品牌）；**脚本与流程禁止业务硬编码**
+- 必跑：`npm run visual:all`（layout / extract / shots / gen / assets / fields / gate）
+- 标杆屏由 `benchmarkScreens` 声明（覆盖图表/列表/表单/详情/弹窗 5 种模式）；SSIM ≥ 0.97 或 mismatch < 2%
+- 字段一致性：`screenConfigs.ts` 中 `needsReview: true` 数量 = 0，且逐屏字段与 `fixtures/figma-fields.json` 逐字一致
 - **第一版全栈之后**必须进入字段还原 + 页面还原轮次：Playwright 逐页截图对比，列出差异并修代码；每轮结束询问是否下一轮，直至用户选择不进入
-- Blueprint：`fixtures/*/screen-blueprints/` → `apps/web/src/blueprints/`
+- Blueprint：`fixtures/<slug>/screen-blueprints/` → `apps/web/src/blueprints/`
 - 图标必须来自 Layout IR 导出的 `public/assets`，禁止 emoji 冒充
 
 ## 文档
@@ -30,4 +32,4 @@ Design IR → App Spec → **Layout IR → Visual IR → Screen Blueprint** → 
 
 ## 验收
 
-未跑 `visual:gate` 或分数不达标不得宣称生成完成。第一版全栈后须跑还原轮次（见 visual-fidelity.md「还原轮次」），用户未明确停止前不得收尾。
+未过双闸门（`visual:fields` + `visual:gate`）不得宣称生成完成。第一版全栈后须跑还原轮次（见 visual-fidelity.md「还原轮次」），用户未明确停止前不得收尾。

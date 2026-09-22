@@ -6,12 +6,13 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(process.cwd());
+const { slug } = resolveProject(root);
 const irPath = existsSync(resolve(root, "apps/web/src/generated/visual-ir.json"))
   ? resolve(root, "apps/web/src/generated/visual-ir.json")
-  : resolve(root, "fixtures/sunshine-medical/visual-ir.json");
+  : resolve(root, "fixtures", slug, "visual-ir.json");
 
 const ir = JSON.parse(readFileSync(irPath, "utf8"));
-const layoutTokensPath = resolve(root, "fixtures/sunshine-medical/layout-ir/tokens.json");
+const layoutTokensPath = resolve(root, "fixtures", slug, "layout-ir", "tokens.json");
 const tokens = existsSync(layoutTokensPath)
   ? JSON.parse(readFileSync(layoutTokensPath, "utf8"))
   : ir.tokens;
@@ -53,6 +54,7 @@ console.log("Wrote", out);
 const primary = color.primary || "#1677FF";
 const themeSrc = `/* Generated from Visual IR / Layout IR. Re-run: node scripts/generate-tokens-css.mjs */
 import type { ThemeConfig } from 'antd';
+import { resolveProject } from "./lib/project.mjs";
 
 export const antdTheme: ThemeConfig = {
   token: {
