@@ -40,14 +40,15 @@ function loadScreenConfigs() {
   const content = readFileSync(configPath, "utf-8");
   const routes = [];
   
-  // 解析 routeConfig 数组
-  const routeRegex = /route:\s*['"]([^'"]+)['"].*?name:\s*['"]([^'"]+)['"]/g;
+  // 解析 routeConfig 数组（JSON 键序：name 在 route 前，支持两种顺序）
+  const routeRegex = /route:\s*['"]([^'"]+)['"][\s\S]{0,120}?name:\s*['"]([^'"]+)['"]|name:\s*['"]([^'"]+)['"][\s\S]{0,120}?route:\s*['"]([^'"]+)['"]/g;
   let match;
   while ((match = routeRegex.exec(content)) !== null) {
-    routes.push({
-      route: match[1],
-      name: match[2]
-    });
+    if (match[1] !== undefined) {
+      routes.push({ route: match[1], name: match[2] });
+    } else {
+      routes.push({ route: match[4], name: match[3] });
+    }
   }
   
   return routes;
@@ -103,7 +104,7 @@ async function main() {
     const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username: gateCredentials(root).username, password }),
     });
     const loginBody = await loginRes.json().catch(() => ({}));
     const accessToken = loginBody.access_token || loginBody.token;

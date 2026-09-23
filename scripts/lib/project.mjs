@@ -70,14 +70,15 @@ export function benchmarkFrames(root) {
 export function gateCredentials(root) {
   const { spec } = resolveProject(root);
   const email = process.env.GATE_ADMIN_EMAIL || spec?.seedAdmin?.email;
+  const username = process.env.GATE_ADMIN_USERNAME || spec?.seedAdmin?.username || email;
   const password = process.env.GATE_ADMIN_PASSWORD || spec?.seedAdmin?.password;
   const storageKey = spec?.auth?.storageKey || "auth_token";
-  if (!email || !password) {
+  if (!username || !password) {
     throw new Error(
-      "Missing gate credentials. Set GATE_ADMIN_EMAIL/GATE_ADMIN_PASSWORD in .env, or seedAdmin{email,password} in app-spec.json.",
+      "Missing gate credentials. Set GATE_ADMIN_USERNAME/GATE_ADMIN_PASSWORD in .env, or seedAdmin{username,password} in app-spec.json.",
     );
   }
-  return { email, password, storageKey };
+  return { email, username, password, storageKey };
 }
 
 /** 可选的闸门 mask 配置：fixtures/<slug>/gate-masks.json → { [screenId]: [{x,y,w,h}] } */
