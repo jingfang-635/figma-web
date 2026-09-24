@@ -1,0 +1,3697 @@
+[
+  {
+    "name": "sidebar",
+    "id": "280:2024",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 2,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 2,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 2,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 2,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 2,
+        "fontSize": 14
+      }
+    ]
+  },
+  {
+    "name": "首页",
+    "id": "157:2",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 3,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "A",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "admin",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理员",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "退出",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "首页",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "预约数据、就诊数据与收入的运营分析",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "本月预约量",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "106",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "就诊率",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "96.2%",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "爽约率",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "3.8%",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "本月收入",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "¥5,280",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "近7天预约量趋势",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "5",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "12",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "18",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "22",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "5",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "近7天各科室预约量",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "0",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "30",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "40",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "内科",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "儿科",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "口腔科",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "皮肤科",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "38",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "近7天挂号收入",
+        "depth": 2,
+        "fontSize": 14
+      },
+      {
+        "text": "150",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "300",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "450",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "600",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "750",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥360",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥240",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥450",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥300",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥540",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥660",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "¥150",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "关键指标",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "96.2%",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "就诊率",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "3.8%",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "爽约率",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "¥5,280",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "本月收入",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "106",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "本月预约量",
+        "depth": 1,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "Chart",
+    "id": "280:1908",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天预约量趋势",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "5",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "12",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "18",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "22",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "5",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "Chart",
+    "id": "280:1947",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天各科室预约量",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "0",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "30",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "40",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "内科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "儿科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "口腔科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "皮肤科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "38",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "Chart",
+    "id": "280:1978",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天挂号收入",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "150",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "300",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "450",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "600",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "750",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥360",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥240",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥450",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥300",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥540",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥660",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥150",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "机构信息",
+    "id": "157:203",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 3,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "A",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "admin",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理员",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "退出",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "机构信息",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "管理门诊基础资料、排班与预约信息",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用科室",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "在诊医生",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "待就诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "今日订单",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "机构基础信息",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "小程序首页、预约详情和后台使用同一份机构资料",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "保存机构信息",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "机构名称",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "阳光医疗门诊",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "联系电话",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "010-8888 8888",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "机构副标题",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "以患者为中心 · 专业守护健康",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "营业时间",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周一至周日 08:00-17:30",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "机构地址",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "北京市示范区健康路 88 号",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "机构简介",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "正规医疗机构，拥有专业医疗团队，为患者提供贴心、便捷的门诊服务。",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "32 / 1000",
+        "depth": 1,
+        "fontSize": 11
+      }
+    ]
+  },
+  {
+    "name": "科室管理",
+    "id": "157:312",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 3,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "A",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "admin",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理员",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "退出",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "科室管理",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "管理门诊基础资料、排班与预约信息",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用科室",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "在诊医生",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "待就诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "今日订单",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "科室列表",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "维护小程序展示的科室名称、说明和图标",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "新增科室",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "科室",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "医生数量",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "排序",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "状态",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "操作",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "内科",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "重症、发热、咳嗽等",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "儿科",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "儿童保健、常见疾病",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "2",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "妇科炎症、月经不调",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "3",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "口腔科",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "牙痛、龋齿、牙周炎",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "4",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "皮肤科",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "皮炎、湿疹、过敏等",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "5",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "共 5 条记录",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "‹",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "›",
+        "depth": 1,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "医生管理",
+    "id": "157:523",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 3,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "A",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "admin",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理员",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "退出",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "医生管理",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "管理门诊基础资料、排班与预约信息",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用科室",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "在诊医生",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "待就诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "今日订单",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "0",
+        "depth": 1,
+        "fontSize": 28
+      },
+      {
+        "text": "医生列表",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "挂号费按医生配置，医生停用后用户端不再展示",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "新增医生",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "搜索医生、科室或擅长",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "全部科室",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "医生",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "科室",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "擅长",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "经验/好评",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "挂号费",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "状态",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "操作",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "张",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "张伟",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "副主任医师",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "内科",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "高血压、糖尿病、冠心病等慢性病...",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "15年 / 99%",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "¥30",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "在诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "编辑",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "删除",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "李",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "李娜",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "主任医师 副教授",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科炎症、月经不调、宫颈疾病、...",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "16年 / 99%",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "¥30",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "在诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "王",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "王磊",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "主治医师",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "儿科",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "儿童感冒、咳嗽、发热等常见病",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "10年 / 98%",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "¥25",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "在诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "王",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "王磊",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "主治医师",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "口腔科",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "牙体牙髓、牙周疾病",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "9年 / 98%",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "¥35",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "在诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "共 4 条记录",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "‹",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "›",
+        "depth": 1,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "排班管理",
+    "id": "157:756",
+    "size": {
+      "w": 1440,
+      "h": 1068
+    },
+    "texts": [
+      {
+        "text": "阳光医疗门诊",
+        "depth": 3,
+        "fontSize": 16
+      },
+      {
+        "text": "预约挂号管理后台",
+        "depth": 3,
+        "fontSize": 12
+      },
+      {
+        "text": "首页",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "机构信息",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "科室管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "医生管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "排班管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "预约记录",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "3",
+        "depth": 3,
+        "fontSize": 11
+      },
+      {
+        "text": "患者管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "订单管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "评价管理",
+        "depth": 3,
+        "fontSize": 15
+      },
+      {
+        "text": "系统运营",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "地址管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "广告图管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "公告管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "新闻列表",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "新闻分类",
+        "depth": 3,
+        "fontSize": 13
+      },
+      {
+        "text": "导航栏",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "意见反馈",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "预约规则",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "消息通知",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "用户管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "角色管理",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "操作日志",
+        "depth": 3,
+        "fontSize": 14
+      },
+      {
+        "text": "A",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "admin",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "系统管理员",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "退出",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "排班管理",
+        "depth": 1,
+        "fontSize": 22
+      },
+      {
+        "text": "管理医生出诊时间表，支持单日/批量排班，用户端根据排班展示可预约时段",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "筛选：",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "全部科室",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "全部医生",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "日期：",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "◀",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026年8月",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "今天",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "日历视图",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "列表视图",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "批量排班",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "新增排班",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "可预约",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "已约满",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "停诊",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "上午",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "下午",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "日",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "一",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "二",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "三",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "四",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "五",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "六",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "26",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "27",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "28",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "29",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "30",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "31",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "2",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "3",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "4",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "5",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "6",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "7",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "8",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "9",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "10",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "张伟",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "12/30",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "张伟",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "20/20",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "李娜",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "15/40",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "+ 4 更多...",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "11",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "王磊",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "5/25",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "李娜",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "8/20",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "陈静",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "10/30",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "12",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "刘洋",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "0/20",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "赵强",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "7/15",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "13",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "14",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "张伟",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "30/50",
+        "depth": 1,
+        "fontSize": 10
+      },
+      {
+        "text": "15",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "16",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "17",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "18",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "19",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "20",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "21",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "22",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "23",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "24",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "25",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "26",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "27",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "28",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "29",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "30",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "31",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "2",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "3",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "4",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "5",
+        "depth": 1,
+        "fontSize": 13
+      }
+    ]
+  },
+  {
+    "name": "新增科室弹窗",
+    "id": "157:4177",
+    "size": {
+      "w": 520,
+      "h": 493
+    },
+    "texts": [
+      {
+        "text": "新增科室",
+        "depth": 1,
+        "fontSize": 16
+      },
+      {
+        "text": "科室名称",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "请输入科室名称",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "科室图标",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "上传图标",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "建议尺寸 200×200px",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "支持 PNG / JPG / SVG，不超过 2MB",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "用于小程序科室列表展示",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "科室描述",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "请输入科室描述",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "排序",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "1",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "状态",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "启用",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "取消",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "确定",
+        "depth": 1,
+        "fontSize": 13
+      }
+    ]
+  },
+  {
+    "name": "新增医生弹窗",
+    "id": "157:4212",
+    "size": {
+      "w": 520,
+      "h": 717
+    },
+    "texts": [
+      {
+        "text": "新增医生",
+        "depth": 1,
+        "fontSize": 16
+      },
+      {
+        "text": "医生头像",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "上传头像",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "建议尺寸 200×200px",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "支持 JPG、PNG，最大 2MB",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "医生姓名",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "请输入姓名",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "职称",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "主任医师",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "所属科室",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "内科",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "挂号费(¥)",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "30",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "从业年限",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "10",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "好评率(%)",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "98",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "擅长领域",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "请输入擅长领域",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "状态",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "在诊",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "取消",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "确定",
+        "depth": 1,
+        "fontSize": 13
+      }
+    ]
+  },
+  {
+    "name": "新增排班弹窗",
+    "id": "176:4",
+    "size": {
+      "w": 520,
+      "h": 489
+    },
+    "texts": [
+      {
+        "text": "新增排班",
+        "depth": 1,
+        "fontSize": 16
+      },
+      {
+        "text": "选择医生",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "请选择医生",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "排班日期",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "2026-08-10",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "时段",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "上午 (08:00 - 12:00)",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "可预约号源",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "20",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "设置该时段可供患者预约的号源\n数量（1-200）",
+        "depth": 1,
+        "fontSize": 11
+      },
+      {
+        "text": "排班状态",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "可预约",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "备注",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "如：仅限复诊患者、专家门诊等",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "取消",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "确定",
+        "depth": 1,
+        "fontSize": 13
+      }
+    ]
+  },
+  {
+    "name": "批量排班弹窗",
+    "id": "176:46",
+    "size": {
+      "w": 520,
+      "h": 739
+    },
+    "texts": [
+      {
+        "text": "批量排班",
+        "depth": 1,
+        "fontSize": 16
+      },
+      {
+        "text": "模板类型",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "按周模板（本周/下周）",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "选择医生",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "全部科室",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "全部医生",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "选择排班日期",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周一",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周二",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周三",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周四",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周五",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周六",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "周日",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "生效周范围",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "本周（8月10日 - 8月16日）",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "时段",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "上午 (08:00 - 12:00)",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "可预约号源",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "*",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "20",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "排班状态",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "可预约",
+        "depth": 1,
+        "fontSize": 15
+      },
+      {
+        "text": "生成预览：",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026-08-09 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026-08-10 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026-08-11 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026-08-12 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "2026-08-13 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "预计生成 30 条排班记录（6 位医生 × 5 天）",
+        "depth": 1,
+        "fontSize": 12
+      },
+      {
+        "text": "取消",
+        "depth": 1,
+        "fontSize": 13
+      },
+      {
+        "text": "确认生成",
+        "depth": 1,
+        "fontSize": 13
+      }
+    ]
+  },
+  {
+    "name": "Type=Trend",
+    "id": "280:1834",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天预约量趋势",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "5",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "12",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "18",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "22",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "5",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "Type=DeptBars",
+    "id": "280:1866",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天各科室预约量",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "0",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "10",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "30",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "40",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "内科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "妇科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "儿科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "口腔科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "皮肤科",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "38",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "25",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "20",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "15",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  },
+  {
+    "name": "Type=Income",
+    "id": "280:1906",
+    "size": {
+      "w": 578,
+      "h": 259
+    },
+    "texts": [
+      {
+        "text": "近7天挂号收入",
+        "depth": 1,
+        "fontSize": 14
+      },
+      {
+        "text": "150",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "300",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "450",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "600",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "750",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "8/1",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/2",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/3",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/4",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/5",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "8/6",
+        "depth": 2,
+        "fontSize": 11
+      },
+      {
+        "text": "今日",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥360",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥240",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥450",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥300",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥540",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥660",
+        "depth": 2,
+        "fontSize": 12
+      },
+      {
+        "text": "¥150",
+        "depth": 2,
+        "fontSize": 12
+      }
+    ]
+  }
+]

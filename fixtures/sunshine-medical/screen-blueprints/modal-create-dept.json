@@ -1,0 +1,21 @@
+{
+  "id": "modal-create-dept",
+  "route": "/departments",
+  "refShot": "imports/figma/screens/新增科室弹窗.png",
+  "pageHeader": {
+    "title": "新增科室弹窗",
+    "subtitle": ""
+  },
+  "viewport": {
+    "x": -20,
+    "y": 3259,
+    "w": 520,
+    "h": 493
+  },
+  "regions": [],
+  "sample": {
+    "figmaTexts": [
+      "1"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "modal-create-doctor",
+  "route": "/doctors",
+  "refShot": "imports/figma/screens/新增医生弹窗.png",
+  "pageHeader": {
+    "title": "新增医生弹窗",
+    "subtitle": ""
+  },
+  "viewport": {
+    "x": 580,
+    "y": 3259,
+    "w": 520,
+    "h": 717
+  },
+  "regions": [],
+  "sample": {
+    "figmaTexts": [
+      "30",
+      "10",
+      "98"
+    ]
+  }
+}

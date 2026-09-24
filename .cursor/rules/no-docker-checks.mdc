@@ -1,0 +1,17 @@
+---
+description: 不使用 Docker（用户长期偏好）
+alwaysApply: true
+---
+
+# 不使用 Docker
+
+用户明确要求：**以后都不再使用 Docker**。
+
+- 不要运行 `docker info` / `docker ps` / `docker version` 等任何探测 Docker daemon 状态的命令
+- 不要运行任何 docker 命令（构建/运行/停止/清理均不需要）
+- 不要尝试启动 Docker Desktop 或任何 Docker 相关进程
+- 不要创建 Dockerfile / docker-compose.yml / .dockerignore 等 Docker 配置文件
+- 不要在环境检查清单中包含 Docker 可用性判断
+- 数据库运行时需要用户决策时，直接询问用户（如本机已有数据库 / SQLite 等），不要默认 Docker
+- 数据库连接一律取仓库根 `.env` 预置的连接串（`MYSQL_URL` / `POSTGRES_URL`），或 SQLite `file:./dev.db`
+- 例外：用户**明确要求**执行 docker 命令时，按用户指示执行

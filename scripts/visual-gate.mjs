@@ -270,11 +270,11 @@ const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: 1 })
 
 await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
 await page.evaluate(
-  ({ token, user }) => {
+  ({ token, user, storageKey }) => {
     localStorage.setItem(storageKey, token);
     localStorage.setItem(storageKey + "_user", JSON.stringify(user));
   },
-  { token: accessToken, user: loginBody.user },
+  { token: accessToken, user: loginBody.user, storageKey },
 );
 await page.goto(`${WEB_URL}/?visualGate=1`, { waitUntil: "networkidle" });
 await page.waitForSelector(".app-sider", { timeout: 20000 });
@@ -309,7 +309,8 @@ for (const t of TARGETS) {
         if (!box) box = await page.getByRole("dialog").boundingBox().catch(() => null);
         if (box) {
           const w = Math.ceil(box.width);
-          const h = Math.ceil(box.height);
+          // Figma 弹窗导出含底部投影溢出（frame 高 + 阴影 ~24px），截图须同几何
+          const h = Math.ceil(box.height) + 24;
           const x = Math.max(0, Math.round(box.x + Math.max(0, box.width - w) / 2));
           const y = Math.max(0, Math.round(box.y));
           return page.screenshot({

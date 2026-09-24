@@ -1,0 +1,25 @@
+{
+  "id": "schedules",
+  "route": "/schedules",
+  "refShot": "imports/figma/screens/排班管理.png",
+  "pageHeader": {
+    "title": "排班管理",
+    "subtitle": ""
+  },
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30",
+      "31",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ]
+  }
+}

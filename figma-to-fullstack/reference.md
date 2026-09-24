@@ -2,11 +2,11 @@
 
 Skill 配套说明：栈矩阵、环境变量、命令速查。
 
-## 默认前端还原
+## 前端还原
 
-**所有新项目默认启用** [visual-fidelity.md](visual-fidelity.md)，无需用户勾选。
+**所有新项目启用** [visual-fidelity.md](visual-fidelity.md) 的验收标准（高还原 + 双闸门），无需用户勾选；但 UI 技术栈由用户逐层选择，无默认。
 
-- UI 栈：`antd` + `@ant-design/icons` + `recharts` + `dayjs`
+- UI 组件库/图表/日期库：**由用户在栈闸门逐层选定，无默认**（React 可选 antd/MUI/Mantine 等；Vue 可选 Element Plus 等）
 - 中间层：Layout IR → Visual IR → Screen Blueprint → `screenConfigs.ts` / `blueprints/`
 - 禁止：通用 ResourcePage、自制 UI 组件库
 - 验收：双闸门（`visual:fields` + `visual:gate`）+ 还原轮次
@@ -17,7 +17,7 @@ Skill 配套说明：栈矩阵、环境变量、命令速查。
 
 | ID | 语言 | 前端 | 后端框架 | DB | ORM |
 |---|---|---|---|---|---|
-| A（默认） | node | react-vite | nestjs | postgresql | prisma |
+| A | node | react-vite | nestjs | postgresql | prisma |
 | A2 | node | react-vite | express | postgresql | prisma |
 | B | node | vue-vite | nestjs | postgresql | prisma |
 | C | java | react-vite | spring-boot | mysql | jpa |
@@ -49,10 +49,12 @@ JWT_EXPIRES_IN=7d
 API 本地另需 `apps/api/.env`：
 
 ```bash
-DATABASE_URL=postgresql://fsg:fsg@localhost:5432/<db_name>?schema=public
+DATABASE_URL=<从仓库根 .env 预置的 MYSQL_URL / POSTGRES_URL 中按所选数据库复制；SQLite 则 file:./dev.db>
 JWT_SECRET=...
 API_PORT=3001
 ```
+
+> 数据库连接信息预置在仓库根 `.env`（`MYSQL_URL` / `MYSQL_JDBC_URL` / `POSTGRES_URL`），生成时只选择数据库类型，不使用 Docker（用户偏好）。
 
 ## 命令速查
 
@@ -65,6 +67,11 @@ npm run visual:layout / extract / shots / shots:all / assets
 
 # 2. 生成前端资产
 npm run visual:gen
+
+# 2.5 后端 codegen（按 spec.stack 分发：node→Nest+Prisma / java→Spring+JPA）
+npm run gen:backend
+npm run gen:backend -- --stack C         # 显式指定栈（须与 spec.stack 一致或 spec 未填）
+npm run gen:backend -- --out output/run1 # 产出路径重定向（默认 apps/）
 
 # 3. 字段提取与校验
 node scripts/extract-figma-texts.mjs
@@ -82,7 +89,32 @@ npm run web
 
 ## App Spec 最小字段
 
-`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], benchmarkScreens[], seedAdmin{email,password}, notes[]`
+`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], benchmarkScreens[], seedAdmin{email,username,password}, notes[]`
+
+**`entities[]`**（gen:backend 的数据源，闸门环节回填；`fields[].type` 合法值 `String|Integer|Float|Decimal|Boolean|DateTime`）：
+
+```json
+{
+  "entities": [
+    {
+      "name": "Department",
+      "table": "departments",
+      "route": "departments",
+      "fields": [
+        { "name": "name", "type": "String" },
+        { "name": "sort", "type": "Integer" },
+        { "name": "status", "type": "String" }
+      ],
+      "seedRows": [{ "name": "内科", "sort": 1, "status": "active" }],
+      "seedCount": 6
+    }
+  ]
+}
+```
+
+- `table`/`route` 省略时按 `snake/kebab` 自动推导（`NewsCategory → news_categories / news-categories`）
+- `seedRows`：逐字种子数据（字段值来自原型）；省略则生成 `<Entity>示例N` 占位
+- `seedCount`：无 seedRows 时的占位行数（默认 6）
 
 **`benchmarkScreens`**（标杆屏，覆盖 5 种模式）：
 

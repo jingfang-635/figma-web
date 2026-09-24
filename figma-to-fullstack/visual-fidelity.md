@@ -1,6 +1,6 @@
-# 前端视觉还原方案（默认）
+# 前端视觉还原方案
 
-**所有从 Figma 生成的项目默认启用本方案**，无需用户额外选择。目标：视觉不可分辨且可维护——antd + Layout IR 精确几何 + 自动双闸门，而不是手写 CSS 或通用 CRUD 壳。
+**所有从 Figma 生成的项目启用本方案**（高还原 + 双闸门是验收标准，但 UI 技术栈不是）。目标：视觉不可分辨且可维护——用户选定框架的组件库 + Layout IR 精确几何 + 自动双闸门，而不是手写 CSS 或通用 CRUD 壳。技术栈由用户逐层选择，**无默认**（见 `.cursor/rules/figma-visual-fidelity.mdc`）。
 
 ## 架构：四层 IR + 双闸门
 
@@ -15,7 +15,7 @@ Visual IR（token、chrome、screens、modals）← token 从 Layout IR 命名�
     ↓
 Screen Blueprint（构图 + layout.regions + sample）← 由 App Spec + Layout IR 生成
     ↓
-Codegen（antd 页面 + 生成的 tokens.css / antdTheme.ts + Figma 原图）
+Codegen（按用户选定框架的页面 + 生成的 tokens.css / 主题文件 + Figma 原图）
     ↓
 双闸门（字段一致性 visual:fields + SSIM 视觉闸门 visual:gate）
     ↓
@@ -28,7 +28,7 @@ Codegen（antd 页面 + 生成的 tokens.css / antdTheme.ts + Figma 原图）
 | **Layout IR** | 标杆 Frame 几何、资源 nodeId | `fixtures/<slug>/layout-ir/*.json` |
 | **Visual IR** | 设计 token、侧栏/顶栏 chrome、屏模板分类、弹窗 | `fixtures/<slug>/visual-ir.json` |
 | **Screen Blueprint** | 每屏 KPI/列表/图表/弹窗 + `layout.regions` | `fixtures/<slug>/screen-blueprints/*.json` → `apps/web/src/blueprints/` |
-| **生成物** | 可运行前端 | `tokens.css`、`antdTheme.ts`、`screenConfigs.ts`、标杆页、assets |
+| **生成物** | 可运行前端 | `tokens.css`、主题文件（如 `antdTheme.ts` / `theme.ts`）、`screenConfigs.ts`、标杆页、assets |
 
 **项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动**：标杆屏（`benchmarkScreens`：type = chart/list/form/detail/modal/chrome）、路由、闸门账号（`seedAdmin`）、localStorage key（`auth.storageKey`）、品牌（`brand.title/subtitle`）。脚本与流程不含业务硬编码。
 
@@ -75,16 +75,18 @@ Codegen（antd 页面 + 生成的 tokens.css / antdTheme.ts + Figma 原图）
 - 数据层配套：原型列引用的字段若 schema 缺失，同步扩展 `schema.prisma` + DTO + seed
 - `tsc --noEmit`（web + api）通过、`prisma db push` + seed 可跑
 
-## 默认前端技术栈
+## 前端技术栈（按用户选择适配，无硬性默认）
 
-| 包 | 用途 |
-|---|---|
-| `antd` | Layout、Menu、Table、Form、Modal、Card、Tag… |
-| `@ant-design/icons` | 仅当 Layout IR 未导出对应资源时的回退 |
-| `recharts` | 图表页折线/柱状/饼图 |
-| `dayjs` | 日历、日期选择 |
+| React 生态常用 | Vue 生态常用 | 用途 |
+|---|---|---|
+| `antd` / MUI / Mantine | Element Plus / Ant Design Vue | Layout、Menu、Table、Form、Modal、Card、Tag… |
+| `@ant-design/icons`（或所选组件库图标） | 组件库自带图标包 | 仅当 Layout IR 未导出对应资源时的回退 |
+| `recharts` / `echarts` | `echarts` | 图表页折线/柱状/饼图 |
+| `dayjs` | `dayjs` | 日历、日期选择 |
 
-入口：`main.tsx` 包 `ConfigProvider`（`zh_CN`）+ **生成的** `theme/antdTheme.ts`。
+> 组件库与图表/日期库由用户在栈闸门中确定；生成脚本按 `spec.stack.frontend` + `spec.stack.ui` 输出对应主题与页面，不以任何一家作为硬性默认。
+
+入口：按所选组件库配置主题（React antd 为 `ConfigProvider` + 生成的 `theme/antdTheme.ts`；其余框架以对应机制接入）。
 
 ## 视觉流水线（必做）
 
@@ -94,7 +96,7 @@ npm run visual:layout      # Layout IR（标杆 Frame 完整子树）
 npm run visual:extract     # Visual IR（token 优先读 Layout IR）
 npm run visual:shots       # 标杆屏对照 PNG → imports/figma/screens/
 npm run visual:shots:all   # 全量屏 + 弹窗 PNG
-npm run visual:gen         # tokens.css + antdTheme.ts + Blueprint + screenConfigs
+npm run visual:gen         # tokens.css + 主题文件 + Blueprint + screenConfigs
 npm run visual:assets      # 按 Layout IR nodeId 导出原图
 npm run visual:fields      # 字段一致性校验
 npm run visual:gate        # Playwright SSIM（需 api + web 已启动）
@@ -110,7 +112,7 @@ npm run visual:all         # layout/extract/shots/gen/assets/fields/gate
 
 ```
 apps/web/src/
-├── theme/antdTheme.ts          # 由 generate-tokens-css 生成
+├── theme/                      # 由 generate-tokens-css 生成（React antd 为 antdTheme.ts，其余按框架）
 ├── styles/tokens.css           # 由 Layout IR / Visual IR 生成
 ├── styles/app.css              # region 级微调（非替代 antd）
 ├── visual/gate.ts              # isVisualGate()
@@ -164,7 +166,7 @@ apps/web/src/
 
 ## 反模式（禁止）
 
-- 自制 `components/ui/Button|Table|Modal` 替代 antd
+- 自制 `components/ui/Button|Table|Modal` 替代用户所选组件库
 - 把 MCP/Figma 吐出的绝对定位 Tailwind 当最终代码
 - 面积启发式取色作为 token 主路径（必须走命名节点 / Layout IR）
 - 用 ant icons / emoji 顶替已导出的 Figma 资源

@@ -156,12 +156,12 @@ const spec = {
   figma: { fileKey, url: `https://www.figma.com/design/${fileKey}` },
   slug,
   stack: {
-    id: process.env.DEFAULT_STACK_ID || "A",
-    language: "node",
-    frontend: "react-vite",
-    backend: "nestjs",
-    database: "postgresql",
-    orm: "prisma",
+    id: "", // 必填：闸门环节由用户逐层选择后填写（A/A2/B/C/D），无默认
+    language: "",
+    frontend: "",
+    backend: "",
+    database: "",
+    orm: "",
   },
   auth: { mode: "jwt", storageKey: "auth_token" },
   brand: { title: data.name, subtitle: "" },
@@ -187,6 +187,6 @@ writeFileSync(specPath, JSON.stringify(spec, null, 2), "utf8");
 console.log("Wrote", specPath);
 console.log(`screens=${screens.length} modals=${modalFrames.length} benchmark=${benchmarkScreens.length}`);
 console.log("\n下一步：");
-console.log("1. 人工确认 fixtures/" + slug + "/app-spec.json（实体/路由/benchmarkScreens/seedAdmin）");
+console.log("1. 人工确认 fixtures/" + slug + "/app-spec.json（stack 必填 + 实体/路由/benchmarkScreens/seedAdmin）");
 console.log("2. npm run visual:layout && npm run visual:extract && npm run visual:shots");
 console.log("3. 回填 scripts 回 catalog 后 npm run visual:gen");

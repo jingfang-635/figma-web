@@ -2,11 +2,11 @@
 
 ## figma-to-fullstack
 
-从 Figma 原型生成可运行全栈（React + NestJS + Prisma 默认）。
+从 Figma 原型生成可运行全栈（技术栈由用户逐层选择，无默认）。
 
 - **智能体定义**：[`figma-to-fullstack/figma-to-fullstack.md`](figma-to-fullstack/figma-to-fullstack.md)
 - **Skill**：[`figma-to-fullstack/SKILL.md`](figma-to-fullstack/SKILL.md)
-- **默认前端还原方案**：[`figma-to-fullstack/visual-fidelity.md`](figma-to-fullstack/visual-fidelity.md)
+- **前端还原方案**：[`figma-to-fullstack/visual-fidelity.md`](figma-to-fullstack/visual-fidelity.md)（技术栈由用户逐层选择，无默认）
 
 ### 流水线（spec 驱动，脚本零业务硬编码）
 
@@ -15,8 +15,9 @@ npm run init:project -- --slug <slug> --file <key>   # 拉结构 + app-spec 骨�
 → App Spec 人工闸门（实体/路由/benchmarkScreens/seedAdmin）
 → visual:layout / extract / shots(:all) / assets      # Layout IR / Visual IR / 对照 PNG
 → 字段回填（figma-fields → spec，needsReview 清零）
-→ visual:gen                                          # tokens/antdTheme/blueprints/screenConfigs
-→ DB + API + antd 前端（标杆页 + list 模板）
+→ visual:gen                                          # tokens/主题文件/blueprints/screenConfigs（按选定框架）
+→ gen:backend                                         # spec.stack 分发 adapter：DB schema/seed + auth + CRUD + dashboard
+→ 前端（按用户选定框架与组件库：标杆页 + list 模板）
 → 冒烟 + 双闸门（visual:fields + visual:gate）
 → 还原轮次（visual:round 逐页对比 → 列差异 → 修代码 → 问是否下一轮）
 → GENERATED.md
@@ -26,6 +27,7 @@ npm run init:project -- --slug <slug> --file <key>   # 拉结构 + app-spec 骨�
 
 ```bash
 npm run visual:all   # layout / extract / shots / gen / assets / fields / gate
+npm run gen:backend  # 后端 codegen（node→Nest+Prisma / java→Spring+JPA，按 spec.stack）
 npm run api
 npm run web
 ```

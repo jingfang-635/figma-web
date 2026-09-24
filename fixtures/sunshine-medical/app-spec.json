@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "name": "阳光医疗",
+  "figma": {
+    "fileKey": "KLYzRbufrish4gmY4jpUS0",
+    "url": "https://www.figma.com/design/KLYzRbufrish4gmY4jpUS0"
+  },
+  "slug": "sunshine-medical",
+  "stack": {
+    "id": "C",
+    "language": "java",
+    "frontend": "react-vite",
+    "backend": "spring-boot",
+    "database": "mysql",
+    "orm": "jpa"
+  },
+  "auth": {
+    "mode": "jwt",
+    "storageKey": "auth_token"
+  },
+  "brand": {
+    "title": "阳光医疗门诊",
+    "subtitle": "预约挂号管理后台"
+  },
+  "entities": [
+    {
+      "name": "Department",
+      "table": "departments",
+      "route": "departments",
+      "fields": [
+        { "name": "name", "type": "String" },
+        { "name": "icon", "type": "String" },
+        { "name": "description", "type": "String" },
+        { "name": "sort", "type": "Integer" },
+        { "name": "status", "type": "String" }
+      ],
+      "seedRows": [
+        { "name": "内科", "icon": "", "description": "重症、发热、咳嗽等", "sort": 1, "status": "active" },
+        { "name": "儿科", "icon": "", "description": "儿童保健、常见疾病", "sort": 2, "status": "active" },
+        { "name": "妇科", "icon": "", "description": "妇科炎症、月经不调", "sort": 3, "status": "active" },
+        { "name": "口腔科", "icon": "", "description": "牙痛、龋齿、牙周炎", "sort": 4, "status": "active" },
+        { "name": "皮肤科", "icon": "", "description": "皮炎、湿疹、过敏等", "sort": 5, "status": "active" }
+      ]
+    },
+    {
+      "name": "Doctor",
+      "table": "doctors",
+      "route": "doctors",
+      "fields": [
+        { "name": "name", "type": "String" },
+        { "name": "avatar", "type": "String" },
+        { "name": "title", "type": "String" },
+        { "name": "deptId", "type": "String" },
+        { "name": "specialty", "type": "String" },
+        { "name": "years", "type": "Integer" },
+        { "name": "goodRate", "type": "Integer" },
+        { "name": "fee", "type": "Integer" },
+        { "name": "status", "type": "String" }
+      ],
+      "seedRows": [
+        { "name": "张伟", "avatar": "", "title": "副主任医师", "deptId": "1", "specialty": "高血压、糖尿病、冠心病等慢性病...", "years": 15, "goodRate": 99, "fee": 30, "status": "active" },
+        { "name": "李娜", "avatar": "", "title": "主任医师 副教授", "deptId": "3", "specialty": "妇科炎症、月经不调、宫颈疾病、...", "years": 16, "goodRate": 99, "fee": 30, "status": "active" },
+        { "name": "王磊", "avatar": "", "title": "主治医师", "deptId": "2", "specialty": "儿童感冒、咳嗽、发热等常见病", "years": 10, "goodRate": 98, "fee": 25, "status": "active" },
+        { "name": "王磊", "avatar": "", "title": "主治医师", "deptId": "4", "specialty": "牙体牙髓、牙周疾病", "years": 9, "goodRate": 98, "fee": 35, "status": "active" }
+      ]
+    },
+    {
+      "name": "Schedule",
+      "table": "schedules",
+      "route": "schedules",
+      "fields": [
+        { "name": "doctorId", "type": "String" },
+        { "name": "workDate", "type": "String" },
+        { "name": "slot", "type": "String" },
+        { "name": "quota", "type": "Integer" },
+        { "name": "booked", "type": "Integer" },
+        { "name": "status", "type": "String" },
+        { "name": "remark", "type": "String" }
+      ],
+      "seedRows": [
+        { "doctorId": "1", "workDate": "2026-08-10", "slot": "am", "quota": 30, "booked": 12, "status": "open", "remark": "" },
+        { "doctorId": "1", "workDate": "2026-08-11", "slot": "am", "quota": 20, "booked": 20, "status": "open", "remark": "" },
+        { "doctorId": "2", "workDate": "2026-08-10", "slot": "pm", "quota": 40, "booked": 15, "status": "open", "remark": "" },
+        { "doctorId": "3", "workDate": "2026-08-11", "slot": "am", "quota": 25, "booked": 5, "status": "open", "remark": "" },
+        { "doctorId": "2", "workDate": "2026-08-11", "slot": "pm", "quota": 20, "booked": 8, "status": "open", "remark": "" },
+        { "doctorId": "3", "workDate": "2026-08-12", "slot": "am", "quota": 30, "booked": 10, "status": "open", "remark": "" },
+        { "doctorId": "4", "workDate": "2026-08-12", "slot": "pm", "quota": 20, "booked": 0, "status": "closed", "remark": "" },
+        { "doctorId": "4", "workDate": "2026-08-13", "slot": "am", "quota": 15, "booked": 7, "status": "open", "remark": "" },
+        { "doctorId": "1", "workDate": "2026-08-14", "slot": "am", "quota": 50, "booked": 30, "status": "open", "remark": "" }
+      ]
+    },
+    {
+      "name": "Organization",
+      "table": "organizations",
+      "route": "organization",
+      "fields": [
+        { "name": "name", "type": "String" },
+        { "name": "phone", "type": "String" },
+        { "name": "subtitle", "type": "String" },
+        { "name": "hours", "type": "String" },
+        { "name": "address", "type": "String" },
+        { "name": "intro", "type": "String" }
+      ],
+      "seedRows": [
+        { "name": "阳光医疗门诊", "phone": "010-8888 8888", "subtitle": "以患者为中心 · 专业守护健康", "hours": "周一至周日 08:00-17:30", "address": "北京市示范区健康路 88 号", "intro": "正规医疗机构，拥有专业医疗团队，为患者提供贴心、便捷的门诊服务。" }
+      ]
+    }
+  ],
+  "apis": [
+    "POST /api/auth/login",
+    "GET /api/dashboard/stats",
+    "GET /api/dashboard/charts",
+    "CRUD /api/departments",
+    "CRUD /api/doctors",
+    "CRUD /api/schedules",
+    "GET/PUT /api/organization"
+  ],
+  "screens": [
+    { "id": "home", "name": "首页", "route": "/", "type": "dashboard", "entity": "dashboard", "needsReview": false },
+    { "id": "organization", "name": "机构信息", "route": "/organization", "type": "form", "entity": "organization", "needsReview": false },
+    { "id": "departments", "name": "科室管理", "route": "/departments", "type": "list", "entity": "departments", "needsReview": false },
+    { "id": "doctors", "name": "医生管理", "route": "/doctors", "type": "list", "entity": "doctors", "needsReview": false },
+    { "id": "schedules", "name": "排班管理", "route": "/schedules", "type": "schedule", "entity": "schedules", "needsReview": false },
+    { "id": "modal-create-dept", "name": "新增科室弹窗", "route": "/departments", "type": "modal", "entity": "departments", "needsReview": false, "modal": { "trigger": "新增科室" } },
+    { "id": "modal-create-doctor", "name": "新增医生弹窗", "route": "/doctors", "type": "modal", "entity": "doctors", "needsReview": false, "modal": { "trigger": "新增医生" } },
+    { "id": "modal-create-schedule", "name": "新增排班弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": false, "modal": { "trigger": "新增排班" } },
+    { "id": "modal-batch-schedule", "name": "批量排班弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": false, "modal": { "trigger": "批量排班" } },
+    { "id": "sidebar", "name": "sidebar", "type": "chrome", "needsReview": false }
+  ],
+  "benchmarkScreens": [
+    { "id": "home", "type": "chart", "route": "/", "name": "首页" },
+    { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
+    { "id": "organization", "type": "form", "route": "/organization", "name": "机构信息" },
+    { "id": "modal-create-dept", "type": "modal", "route": "/departments", "name": "新增科室弹窗", "modal": { "trigger": "新增科室" } },
+    { "id": "modal-create-doctor", "type": "modal", "route": "/doctors", "name": "新增医生弹窗", "modal": { "trigger": "新增医生" } },
+    { "id": "sidebar", "type": "chrome", "name": "sidebar" }
+  ],
+  "seedAdmin": {
+    "email": "admin@sunshine.com",
+    "username": "admin",
+    "password": "Admin@123456"
+  },
+  "notes": [
+    "栈 C：Java + Spring Boot + MySQL + JPA；数据库用仓库根 .env 预置 MYSQL_URL（不使用 Docker）",
+    "页面范围：只做已画屏（5 业务屏 + 4 弹窗）；sidebar 为 chrome 组件不单独成屏",
+    "detail 型标杆屏缺失：原型未画详情屏，以双 modal 型补足模式覆盖（chart/list/form/modal + chrome）",
+    "实体字段与种子数据均来自 Figma 逐字文本（figma-fields.json），needsReview 已清零",
+    "闸门账号：admin@sunshine.com / Admin@123456（username: admin）"
+  ]
+}

@@ -3,7 +3,7 @@ name: figma-to-fullstack
 description: >-
   Figma→全栈生成专家。从 Figma URL/fileKey 经 init-project → App Spec（人工闸门）→
   Layout IR / Visual IR / Blueprint → codegen → 双闸门（字段一致性 + SSIM 视觉闸门）→
-  还原轮次。默认 antd 高还原前端。用户给出 Figma 链接、要求从原型生成 web/api/db、
+  还原轮次。高还原前端，技术栈由用户逐层选择（无默认）。用户给出 Figma 链接、要求从原型生成 web/api/db、
   或说 从Figma生成全栈 / 换了figma重新搭建 / figma-to-fullstack 时主动使用。
   禁止从 Figma 节点直接吐最终代码。
 ---
@@ -33,9 +33,9 @@ Figma URL
   ↓
 3. 字段回填                 # figma-fields.json → screen-catalog（needsReview→false）
   ↓
-4. visual:gen               # tokens.css + antdTheme.ts + Blueprint + screenConfigs
+4. visual:gen               # tokens.css + 主题文件 + Blueprint + screenConfigs
   ↓
-5. codegen：DB + API + antd 前端（标杆页 + list 模板）
+5. codegen：DB + API + 前端（按用户选定框架与组件库；标杆页 + list 模板）
   ↓
 6. 冒烟 + 双闸门             # 字段一致性 + SSIM 视觉闸门（标杆屏）
   ↓
@@ -49,15 +49,15 @@ Figma URL
 若仓库根有 `decision.html` 优先用页勾选；否则对话里简短提问（缺一项就停，不要猜）：
 
 1. **Figma 来源**：URL/fileKey（必填）
-2. **后端语言**（必选）：Node（默认）/ Java
+2. **后端语言**（必选）：Node / Java（无默认）
 3. **栈逐层选择**（不打包成组合再选）：后端语言 → 前端框架 → 后端框架 → 数据库 → ORM，**各层单独一问**；选项随语言联动过滤——**选 Java 时 ORM 只列 JPA / MyBatis，不得出现 Prisma**（Prisma 仅支持 Node 系）；合法性以 reference.md 矩阵校验
 4. **页面范围**：只做已画屏 / 导航全做（缺屏灰显或二期）
-5. **鉴权**：JWT（默认）/ 无
+5. **鉴权**：JWT / 无（无默认）
 6. **产出路径**：`apps/web`+`apps/api` / `output/<runId>/`
-7. **数据库运行时**：Docker（默认，随数据库类型）/ 本机已有服务 / SQLite（仅 Node 系）
+7. **数据库类型**（从仓库根 .env 预置连接中选择，不使用 Docker）：mysql（MYSQL_URL / MYSQL_JDBC_URL）/ postgresql（POSTGRES_URL）/ sqlite（仅 Node 系，file:./dev.db）
 8. **标杆屏选择**（必选，覆盖 5 种模式：列表/表单/详情/弹窗/图表；缺的说明）
 
-> 前端还原度默认为「高还原且可维护」（visual-fidelity 方案），**不作为可选项**。
+> 前端还原度按 visual-fidelity 方案（高还原 + 双闸门）验收；但 **UI 技术栈（框架/组件库/图表/日期库）由用户逐层选定，无默认**。
 
 凭证：确认仓库根 `.env` 有 `FIGMA_ACCESS_TOKEN`。**密钥只写 `.env`，永不写入 `.env.example` 或提交内容。**
 
@@ -69,9 +69,9 @@ Figma URL
 - [ ] 2. App Spec 人工闸门（实体/路由/benchmarkScreens/seedAdmin）
 - [ ] 3. visual:layout / extract / shots(:all) / assets
 - [ ] 4. 字段回填（figma-fields → catalog/spec，needsReview 清零）
-- [ ] 5. visual:gen（tokens.css / antdTheme / blueprints / screenConfigs）
-- [ ] 6. DB + Seed + Backend API + JWT + antd 前端
-- [ ] 7. docker/migrate/seed + 冒烟
+- [ ] 5. visual:gen（tokens.css / 主题文件 / blueprints / screenConfigs）
+- [ ] 6. DB + Seed + Backend API + JWT + 前端（按选定框架）
+- [ ] 7. migrate/seed + 冒烟（数据库连接来自 .env 预置）
 - [ ] 8. 双闸门：visual:fields + visual:gate
 - [ ] 9. 还原轮次（Playwright 逐页对比 → 修 → 问是否下一轮）
 - [ ] 10. GENERATED.md
@@ -83,10 +83,11 @@ Figma URL
 
 ```bash
 # 仓库根
-cp .env.example .env   # 仅当不存在；再填 FIGMA_ACCESS_TOKEN
+cp .env.example .env   # 仅当不存在；再填 FIGMA_ACCESS_TOKEN（数据库连接信息已预置，生成时只选数据库类型）
 npm install            # 根依赖（playwright/pixelmatch/pngjs）
-docker compose up -d   # 栈 A/B 需要
 ```
+
+> 不使用 Docker（用户偏好，见 `.cursor/rules/no-docker-checks.mdc`）；数据库连接取 `.env` 预置的 `MYSQL_URL` / `POSTGRES_URL`，SQLite 直接 `file:./dev.db`。
 
 ### 1. 项目初始化（一键）
 
@@ -130,16 +131,28 @@ node scripts/extract-figma-texts.mjs   # → fixtures/figma-fields.json
 ### 5. 生成前端资产
 
 ```bash
-npm run visual:gen        # tokens.css + antdTheme.ts + blueprints + screenConfigs
+npm run visual:gen        # tokens.css + 主题文件 + blueprints + screenConfigs
 ```
 
 ### 6. Codegen（DB + API + Web）
 
-| 层 | 目录 | 要求 |
+后端由 `gen:backend` 脚本按 App Spec 生成（**禁止业务硬编码**，栈矩阵见 `scripts/lib/codegen/stacks.mjs`）：
+
+```bash
+npm run gen:backend                      # 按 spec.stack 分发 adapter
+npm run gen:backend -- --stack C         # 显式指定栈（须与 spec.stack 一致或 spec 未填）
+npm run gen:backend -- --out output/run1 # 产出路径重定向（默认 apps/）
+```
+
+| 层 | 生成方式 | 产物 |
 |---|---|---|
-| DB | `apps/api/prisma/schema.prisma` | 实体 + 迁移；`prisma/seed.ts`（含 seedAdmin） |
-| API | `apps/api/src/*` | Nest 模块：auth(JWT)、各资源 CRUD、dashboard stats |
-| Web | `apps/web/src/*` | antd + ConfigProvider(生成的 antdTheme) + Blueprint 标杆页 + `templates/ResourceListPage` 其余 list 屏 |
+| DB | `gen:backend`（node 栈） | `apps/api/prisma/schema.prisma` + `prisma/seed.ts`（含 seedAdmin） |
+| DB | `gen:backend`（java 栈） | JPA entity（`ddl-auto: update` 建表）+ `config/SeedConfig.java` |
+| API | `gen:backend`（node 栈） | Nest 模块：auth(JWT) + 每资源 CRUD + dashboard（有 dashboard 屏时） |
+| API | `gen:backend`（java 栈） | Spring Boot：CrudController 基类 + 每实体 controller/repository + Auth/Dashboard |
+| Web | 人工 + Blueprint | 按用户选定组件库渲染 + 生成的主题 + Blueprint 标杆页 + `templates/ResourceListPage` 其余 list 屏 |
+
+生成后允许（且应当）人工增强：关联字段展开、dashboard 聚合查询、业务校验；但 CRUD 骨架与 seed 不要手写。
 
 Web 实现顺序：`main.tsx` → chrome/Layout → 标杆页 → ResourceListPage → 对照截图微调 app.css。
 
@@ -191,6 +204,6 @@ npm run visual:gate       # SSIM ≥ 0.97 或 mismatch < 2%（1440×1068）
 
 ## 参考
 
-- [visual-fidelity.md](visual-fidelity.md) — 默认前端还原方案（必读）
+- [visual-fidelity.md](visual-fidelity.md) — 前端还原方案（必读）
 - [reference.md](reference.md) — 栈矩阵、环境变量、命令速查
 - [figma-to-fullstack.md](figma-to-fullstack.md) — 智能体定义

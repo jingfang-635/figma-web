@@ -12,6 +12,7 @@
     "visual:shots": "node scripts/export-screenshots.mjs",
     "visual:shots:all": "node scripts/export-all-screens.mjs",
     "visual:gen": "node scripts/generate-tokens-css.mjs && node scripts/generate-blueprints.mjs && node scripts/generate-screen-configs.mjs",
+    "gen:backend": "node scripts/gen-backend.mjs",
     "visual:assets": "node scripts/export-assets.mjs",
     "visual:capture": "node scripts/capture-screens.mjs",
     "visual:compare": "node scripts/visual-compare.mjs",

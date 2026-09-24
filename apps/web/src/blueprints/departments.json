@@ -1,0 +1,52 @@
+{
+  "id": "departments",
+  "route": "/departments",
+  "refShot": "imports/figma/screens/科室管理.png",
+  "pageHeader": {
+    "title": "科室管理",
+    "subtitle": ""
+  },
+  "viewport": {
+    "x": 3040,
+    "y": 0,
+    "w": 1440,
+    "h": 1068
+  },
+  "regions": [
+    {
+      "id": "pageHeader",
+      "nodeId": "I281:4493;280:2023;157:4538",
+      "width": 60,
+      "height": 21,
+      "font": {
+        "title": 15,
+        "weight": 400,
+        "color": "#595959"
+      },
+      "color": "#595959"
+    },
+    {
+      "id": "mainCard",
+      "nodeId": "157:312",
+      "width": 1440,
+      "height": 1068,
+      "fill": "#F5F7FA"
+    }
+  ],
+  "sample": {
+    "figmaTexts": [
+      "3",
+      "6",
+      "6",
+      "0",
+      "0",
+      "2",
+      "1",
+      "10",
+      "2",
+      "6",
+      "3",
+      "1"
+    ]
+  }
+}
