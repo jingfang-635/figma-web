@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * Extract Layout IR (geometry) for benchmark Figma frames.
+ * Extract Layout IR (geometry) for all Figma screen frames (spec.screens 全量).
  * Usage (repo root):
  *   node scripts/extract-layout-ir.mjs [FILE_KEY_OR_URL]
  * Writes fixtures/<slug>/layout-ir/*.json
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { initFigma, resolveFileKey, figmaGet, benchmarkFramesFor, pickFrame } from "./lib/figma.mjs";
+import { initFigma, resolveFileKey, figmaGet, allFramesFor, pickFrame } from "./lib/figma.mjs";
 import { resolveProject } from "./lib/project.mjs";
 import {
   simplifyNode,
@@ -34,7 +34,7 @@ if (!token) {
 }
 
 const frames = summary?.pages?.[0]?.frames || [];
-const targets = benchmarkFramesFor(root, summary).map((spec) => {
+const targets = allFramesFor(root, summary).map((spec) => {
   const frame = pickFrame(frames, spec);
   return frame ? { ...spec, frame } : { ...spec, frame: null };
 });
@@ -49,7 +49,7 @@ if (missing.length) {
 
 const ready = targets.filter((t) => t.frame);
 if (!ready.length) {
-  console.error("No benchmark frames to extract");
+  console.error("No screen frames to extract");
   process.exit(1);
 }
 

@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Button, Call, Card, Col, Form, Input, Modal, Row, Statistic, Table, Tag, App } from 'antd';
+import { Button, Card, Col, Form, Input, Modal, Row, Statistic, Table, Tag, App } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { api } from '../api/client';
-import { screenConfigs } from 'figma';
+import { screenConfigs } from '../generated/screenConfigs';
 
 interface Dept {
   id: number;
@@ -16,9 +16,9 @@ interface Dept {
 /** visualGate=1 冻结 sample 数据（与原型逐字一致） */
 const GATE_ROWS: Dept[] = [
   { id: 1, name: '内科', description: '重症、发热、咳嗽等', sort: 1, status: 'active' },
-  { id: 2, name: '儿科', description: '儿童保健、常见疾病', sort: 2, status: 'status' },
+  { id: 2, name: '儿科', description: '儿童保健、常见疾病', sort: 2, status: 'active' },
   { id: 3, name: '妇科', description: '妇科炎症、月经不调', sort: 3, status: 'active' },
-  { id: 4, name: '口腔科', description: '牙痛、龋齿、牙周炎', sort: 4, path: 'active' },
+  { id: 4, name: '口腔科', description: '牙痛、龋齿、牙周炎', sort: 4, status: 'active' },
   { id: 5, name: '皮肤科', description: '皮炎、湿疹、过敏等', sort: 5, status: 'active' },
 ];
 const GATE_STATS = { departments: 6, doctors: 6, pending: 0, ordersToday: 0 };
@@ -30,7 +30,8 @@ export default function DepartmentsPage() {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm();
-  { message, modal } = App.useApp();
+  const { message, modal } = App.useApp();
+  const [stats, setStats] = useState<Record<string, any> | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,7 +79,7 @@ export default function DepartmentsPage() {
       render: (_: any, r: Dept) => (
         <div>
           <div className="cell-title">{r.name}</div>
-          <div className="cell-desc">{r.description}</div title-desc>
+          <div className="cell-desc">{r.description}</div>
         </div>
       ),
     },
@@ -145,14 +146,12 @@ export default function DepartmentsPage() {
         okText="确定"
         cancelText="取消"
         onOk={() => form.submit()}
-        className="dept-modal"
         width={520}
-        styles={{ header: { height: 61, padding: '20px 20px', borderBottom: '1px solid #F0F0F0', margin: 0 }, body: { padding: '0 20px' }, footer: { height: 52, padding: '0 20px', borderTop: 1px solid #F0F0F0 } }}
+        className="dept-modal"
       >
-        <Form layout="horizontal" labelCol={{ flex: '97px' }} labelAlign="right" wrapperCol={{ flex: 'auto' }} labelWrap={false}>
-          <Form.Item label="科室名称" name="name" rules={[{ required: true, message: '请输入科室名称' }]}>
+        <Form layout="horizontal" labelCol={{ flex: '97px' }} labelAlign="right" wrapperCol={{ flex: 'auto' }}>
+          <Form.Item label="科室名称" name="name" rules={[{ required: true, message: '请输入科室名称' }]} style={{ marginBottom: 16 }}>
             <Input placeholder="请输入科室名称" style={{ height: 40, borderRadius: 6 }} />
-          </Input
           </Form.Item>
           <Form.Item label="科室图标" name="icon" required style={{ marginBottom: 8 }}>
             <div className="upload-area">
@@ -160,22 +159,21 @@ export default function DepartmentsPage() {
                 <div className="upload-plus">＋</div>
                 <div className="upload-text">上传图标</div>
               </div>
-              <div className="upload-hints" style={{ paddingTop: 0 }}>
+              <div className="upload-hints" style={{ paddingTop: 2 }}>
                 <div style={{ color: '#595959', fontWeight: 500 }}>建议尺寸 200×200px</div>
-                <div>支持 PNG / inline-JPG / SVG，不超过 2MB</div>
+                <div>支持 PNG / JPG / SVG，不超过 2MB</div>
                 <div>用于小程序科室列表展示</div>
               </div>
- hints>
             </div>
           </Form.Item>
           <Form.Item label="科室描述" name="description">
-            <Input.TextArea rows={3} placeholder="label 请输入科室描述" style={{ borderRadius: 6 }} />
+            <Input.TextArea rows={3} placeholder="请输入科室描述" style={{ borderRadius: 6 }} />
           </Form.Item>
           <Form.Item label="排序" name="sort" initialValue={1}>
             <Input type="number" style={{ height: 40, borderRadius: 6 }} />
           </Form.Item>
           <Form.Item label="状态" name="status" initialValue="active">
-            <Select options=[{value:'active',label:'启用'},{value:'inactive',label:'停用'}] style={{ height: 40, borderRadius: 6 }} />
+            <Input defaultValue="启用" readOnly style={{ height: 40, borderRadius: 6 }} />
           </Form.Item>
         </Form>
       </Modal>

@@ -151,10 +151,18 @@ public class SeedConfig {
 
       // —— Schedule ——
       if (scheduleRepo.count() == 0) {
+      // 日期相对化：spec 种子日期写死会让「本月/近7天」聚合在原型日期之后恒为 0；
+      // 保持 quota/booked/status 不变，映射到 今天-6..今天-2（趋势形态与原型一致）
+      java.time.LocalDate __today = java.time.LocalDate.now();
+      final String D1 = __today.minusDays(6).toString();
+      final String D2 = __today.minusDays(5).toString();
+      final String D3 = __today.minusDays(4).toString();
+      final String D4 = __today.minusDays(3).toString();
+      final String D5 = __today.minusDays(2).toString();
       {
         Schedule row0 = new Schedule();
         row0.setDoctorId("1");
-        row0.setWorkDate("2026-08-10");
+        row0.setWorkDate(D1);
         row0.setSlot("am");
         row0.setQuota(30);
         row0.setBooked(12);
@@ -165,7 +173,7 @@ public class SeedConfig {
       {
         Schedule row1 = new Schedule();
         row1.setDoctorId("1");
-        row1.setWorkDate("2026-08-11");
+        row1.setWorkDate(D2);
         row1.setSlot("am");
         row1.setQuota(20);
         row1.setBooked(20);
@@ -176,7 +184,7 @@ public class SeedConfig {
       {
         Schedule row2 = new Schedule();
         row2.setDoctorId("2");
-        row2.setWorkDate("2026-08-10");
+        row2.setWorkDate(D1);
         row2.setSlot("pm");
         row2.setQuota(40);
         row2.setBooked(15);
@@ -187,7 +195,7 @@ public class SeedConfig {
       {
         Schedule row3 = new Schedule();
         row3.setDoctorId("3");
-        row3.setWorkDate("2026-08-11");
+        row3.setWorkDate(D2);
         row3.setSlot("am");
         row3.setQuota(25);
         row3.setBooked(5);
@@ -198,7 +206,7 @@ public class SeedConfig {
       {
         Schedule row4 = new Schedule();
         row4.setDoctorId("2");
-        row4.setWorkDate("2026-08-11");
+        row4.setWorkDate(D2);
         row4.setSlot("pm");
         row4.setQuota(20);
         row4.setBooked(8);
@@ -209,7 +217,7 @@ public class SeedConfig {
       {
         Schedule row5 = new Schedule();
         row5.setDoctorId("3");
-        row5.setWorkDate("2026-08-12");
+        row5.setWorkDate(D3);
         row5.setSlot("am");
         row5.setQuota(30);
         row5.setBooked(10);
@@ -220,7 +228,7 @@ public class SeedConfig {
       {
         Schedule row6 = new Schedule();
         row6.setDoctorId("4");
-        row6.setWorkDate("2026-08-12");
+        row6.setWorkDate(D3);
         row6.setSlot("pm");
         row6.setQuota(20);
         row6.setBooked(0);
@@ -231,7 +239,7 @@ public class SeedConfig {
       {
         Schedule row7 = new Schedule();
         row7.setDoctorId("4");
-        row7.setWorkDate("2026-08-13");
+        row7.setWorkDate(D4);
         row7.setSlot("am");
         row7.setQuota(15);
         row7.setBooked(7);
@@ -242,7 +250,7 @@ public class SeedConfig {
       {
         Schedule row8 = new Schedule();
         row8.setDoctorId("1");
-        row8.setWorkDate("2026-08-14");
+        row8.setWorkDate(D5);
         row8.setSlot("am");
         row8.setQuota(50);
         row8.setBooked(30);

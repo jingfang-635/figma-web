@@ -1,4 +1,4 @@
-/* Generated from Visual IR / Layout IR. Re-run: node scripts/generate-tokens-css.mjs */
+/* Generated from Visual IR / Layout IR + screen geometry. Re-run: node scripts/generate-tokens-css.mjs */
 import type { ThemeConfig } from 'antd';
 
 export const antdTheme: ThemeConfig = {
@@ -14,7 +14,7 @@ export const antdTheme: ThemeConfig = {
     colorTextSecondary: '#595959',
     colorBorder: '#E5E7EB',
     borderRadius: 8,
-    fontFamily: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    fontFamily: "\"Noto Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
     fontSize: 14,
     controlHeight: 32,
   },
@@ -37,6 +37,8 @@ export const antdTheme: ThemeConfig = {
     },
     Table: {
       headerBg: '#FAFAFA',
+      cellPaddingBlock: 13, // from Layout IR row height 62px
+      cellPaddingInline: 24,
     },
     Card: {
       borderRadiusLG: 8,
@@ -44,8 +46,8 @@ export const antdTheme: ThemeConfig = {
     Modal: {
       contentBg: '#FFFFFF',
       headerBg: '#FFFFFF',
+      titleFontSize: 16, // from Layout IR modal title text height
       boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
-      titleFontSize: 16,
     },
   },
 };

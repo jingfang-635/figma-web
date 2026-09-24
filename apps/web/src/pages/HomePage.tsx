@@ -69,11 +69,14 @@ export default function HomePage() {
     api<ChartData>('/dashboard/charts').then(setCharts).catch(() => {});
   }, [gate]);
 
+  // 逐字段兜底：真实 API 缺哪个字段就回退示例值，杜绝「标签在、数值空」
+  const s = {
+    ...GATE_STATS,
+    ...(stats ?? {}),
+  };
   const trend = charts?.trend ?? GATE_CHARTS.trend;
   const deptBars = charts?.deptBars ?? GATE_CHARTS.deptBars;
   const income = charts?.income ?? GATE_CHARTS.income;
-  const s = stats ?? GATE_STATS;
-
   const trendData = toSeries(trend.labels, trend.values);
   const barData = toSeries(deptBars.labels, deptBars.values);
   const incomeData = toSeries(income.labels, income.values);
@@ -101,7 +104,7 @@ export default function HomePage() {
               <YAxis domain={[5, 25]} ticks={[5, 10, 15, 20, 25]} tick={{ fontSize: 12, fill: '#595959' }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Line
-                type="linear"
+                type="monotone"
                 dataKey="value"
                 stroke="#1890FF"
                 strokeWidth={2}
@@ -137,7 +140,7 @@ export default function HomePage() {
               <YAxis domain={[150, 750]} ticks={[150, 300, 450, 600, 750]} tick={{ fontSize: 12, fill: '#595959' }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Line
-                type="linear"
+                type="monotone"
                 dataKey="value"
                 stroke="#52C41A"
                 strokeWidth={2}

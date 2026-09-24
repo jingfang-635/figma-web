@@ -89,7 +89,7 @@ npm run web
 
 ## App Spec 最小字段
 
-`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], benchmarkScreens[], seedAdmin{email,username,password}, notes[]`
+`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], seedAdmin{email,username,password}, notes[]`
 
 **`entities[]`**（gen:backend 的数据源，闸门环节回填；`fields[].type` 合法值 `String|Integer|Float|Decimal|Boolean|DateTime`）：
 
@@ -116,11 +116,11 @@ npm run web
 - `seedRows`：逐字种子数据（字段值来自原型）；省略则生成 `<Entity>示例N` 占位
 - `seedCount`：无 seedRows 时的占位行数（默认 6）
 
-**`benchmarkScreens`**（标杆屏，覆盖 5 种模式）：
+**`screens[]`**（全屏闸门：每屏都进 Layout IR 抽取 + Blueprint + 视觉闸门，无标杆/非标杆之分）：
 
 ```json
 {
-  "benchmarkScreens": [
+  "screens": [
     { "id": "home", "type": "chart", "route": "/", "name": "首页" },
     { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
     { "id": "appointment-form", "type": "form", "route": "/appointments/new", "name": "新增预约" },
@@ -137,7 +137,7 @@ npm run web
 - `modal.trigger`：打开弹窗的按钮文案（正则或字符串）
 - `chrome`：侧栏等 chrome 组件（不单独跑闸门，参与 token 提取）
 
-**`screens[]`** 每屏字段（字段级还原的载体，闸门后回填、`needsReview: false`）：
+**`screens[]` 每屏字段细节**（字段级还原的载体，闸门后回填、`needsReview: false`；清单字段见上）：
 
 ```json
 {
@@ -176,4 +176,4 @@ npm run web
 `Score = 0.35×功能 + 0.35×视觉还原 + 0.20×可维护 + 0.10×性能`；及格 ≥70。
 
 - 功能：CRUD / 业务主路径冒烟通过率 ≥80%
-- 视觉：标杆屏视觉闸门项通过率 ≥80%（见 visual-fidelity.md）
+- 视觉：视觉闸门项通过率 ≥80%（全屏闸门，见 visual-fidelity.md）

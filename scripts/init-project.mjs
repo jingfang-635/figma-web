@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 项目初始化：解析 Figma 结构 → 生成 app-spec.json 骨架（含 benchmarkScreens）
+ * 项目初始化：解析 Figma 结构 → 生成 app-spec.json 骨架（screens 全量即闸门全集）
  *
  * Usage:
  *   node scripts/init-project.mjs --slug <slug> --file <fileKey或URL> [--name <项目名>] [--yes]
@@ -9,7 +9,7 @@
  *   imports/figma/<fileKey>-summary.json   页面/Frame 清单
  *   fixtures/<slug>/app-spec.json          App Spec 骨架（screens 从 summary 推断，needsReview 标记）
  *
- * 骨架中 benchmarkScreens 默认选中：最大画板(dashboard) + 其余前 4 个画板。
+ * 骨架中 screens 全量生成（无标杆/非标杆之分），needsReview 标记待人工确认。
  * 实体/API 由人工（或 LLM 辅助）在闸门环节补齐 —— 本脚本不臆造业务。
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -128,27 +128,7 @@ const screens = screenFrames.map((f) => ({
   needsReview: true,
 }));
 
-// benchmarkScreens：dashboard 优先，再取前 4 个非 dashboard；含一个 modal（若有）
-const dash = screens.find((s) => s.type === "dashboard");
-const others = screens.filter((s) => s !== dash && !String(s.name).includes("弹窗"));
-const firstModal = modalFrames[0];
-const benchmarkScreens = [];
-if (dash) {
-  benchmarkScreens.push({ id: dash.id, type: "chart", route: dash.route, name: dash.name });
-}
-for (const s of others.slice(0, 4)) {
-  benchmarkScreens.push({ id: s.id, type: s.type === "dashboard" ? "chart" : s.type, route: s.route, name: s.name });
-}
-if (firstModal) {
-  const parent = screens.find((s) => firstModal.name.includes(s.name));
-  benchmarkScreens.push({
-    id: firstModal.name,
-    type: "modal",
-    route: parent?.route || `/${firstModal.name}`,
-    name: firstModal.name,
-    modal: { trigger: /新增/ },
-  });
-}
+// 全屏闸门：screens 即闸门全集（无标杆/非标杆之分）
 
 const spec = {
   version: "1.0",
@@ -168,11 +148,10 @@ const spec = {
   entities: [],
   apis: [],
   screens,
-  benchmarkScreens,
   seedAdmin: null, // 闸门时填写：{ email, password }
   notes: [
     "骨架由 init-project.mjs 生成；screens/entities/apis 为推断值，needsReview=true",
-    "闸门环节必须人工确认：实体英文名、路由、benchmarkScreens、seedAdmin",
+    "闸门环节必须人工确认：实体英文名、路由、screens 全量、seedAdmin（screens 即闸门全集，无标杆屏）",
   ],
 };
 
@@ -185,8 +164,8 @@ if (existsSync(specPath) && !yes) {
 }
 writeFileSync(specPath, JSON.stringify(spec, null, 2), "utf8");
 console.log("Wrote", specPath);
-console.log(`screens=${screens.length} modals=${modalFrames.length} benchmark=${benchmarkScreens.length}`);
+console.log(`screens=${screens.length} modals=${modalFrames.length}（全量即闸门全集）`);
 console.log("\n下一步：");
-console.log("1. 人工确认 fixtures/" + slug + "/app-spec.json（stack 必填 + 实体/路由/benchmarkScreens/seedAdmin）");
+console.log("1. 人工确认 fixtures/" + slug + "/app-spec.json（stack 必填 + 实体/路由/screens/seedAdmin）");
 console.log("2. npm run visual:layout && npm run visual:extract && npm run visual:shots");
 console.log("3. 回填 scripts 回 catalog 后 npm run visual:gen");

@@ -17,7 +17,7 @@ description: >-
 - **字段级 100% 还原**：columns / formFields / filters / modalFields / stats / actions / title / subtitle / sections / formCard / hint 必须逐字对齐 `imports/figma/screens/*.png` 与 `fixtures/figma-fields.json`；禁止臆造、改名、增删、调序；弹窗字段以弹窗截图为准。
 - **双闸门（交付前必跑）**：
   1. `npm run visual:fields` — `screenConfigs.ts` 中 `needsReview: true` 数量 = 0，且逐屏字段与 figma-fields.json 逐字一致；
-  2. `npm run visual:gate` — 标杆屏 SSIM ≥ 0.97 或 mismatch < 2%（1440×1068，报告 `artifacts/visual-diff/score.json`）。
+  2. `npm run visual:gate` — 全屏 SSIM 闸门（无标杆/非标杆之分；1440×1068，报告 `artifacts/visual-diff/score.json`）。
   未过任一闸门不得宣称完成。
 - **禁止**用通用 ResourcePage / 自制 UI 库冒充设计还原；图标必须来自 Layout IR 导出的 `public/assets`，禁止 emoji 冒充。
 - 密钥只写仓库根 `.env`，永不写入 `.env.example`、聊天长文或提交内容。
@@ -47,7 +47,7 @@ description: >-
 5. **鉴权**：JWT / 无（无默认，必选）
 6. **产出路径**：`apps/web`+`apps/api` 或 `output/<runId>/`
 7. **数据库**：从仓库根 .env 预置连接中选择：mysql（MYSQL_URL）/ postgresql（POSTGRES_URL）/ sqlite（仅 Node 系）——不使用 Docker
-8. **标杆屏**：覆盖 5 种模式（列表/表单/详情/弹窗/图表）
+8. **页面范围确认**：screens 全量即闸门全集（每屏必过）
 
 > 前端还原度按 visual-fidelity 方案验收（不作为可选项）；UI 技术栈由用户逐层选定，无默认。
 
@@ -73,7 +73,7 @@ description: >-
 npm run init:project    # 拉结构 + app-spec 骨架
 npm run visual:layout   # Layout IR + tokens
 npm run visual:extract  # Visual IR
-npm run visual:shots    # 标杆屏对照 PNG（:all 全量）
+npm run visual:shots    # 全屏对照 PNG
 npm run visual:gen      # tokens.css / 主题文件 / blueprints / screenConfigs
 npm run gen:backend     # 后端 codegen：node→Nest+Prisma / java→Spring+JPA（按 spec.stack）
 npm run visual:assets   # 图标原图
@@ -83,7 +83,7 @@ npm run visual:round    # 还原轮次：capture + compare
 # 或 npm run visual:all（init 外全部，gate 需先启动服务）
 ```
 
-配置来源：`fixtures/<slug>/app-spec.json`（标杆屏/路由/闸门账号）、`gate-masks.json`（mask）。**脚本不含任何业务硬编码；项目差异全部由 spec 驱动。**
+配置来源：`fixtures/<slug>/app-spec.json`（screens 全屏清单/路由/闸门账号）、`gate-masks.json`（mask）。**脚本不含任何业务硬编码；项目差异全部由 spec 驱动。**
 
 ## 被调用时的行为
 

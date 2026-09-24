@@ -33,26 +33,58 @@ const GATE_SCHEDULES: Schedule[] = [
   { id: 9, doctorId: 1, doctorName: '张伟', workDate: '2026-08-14', slot: 'am', quota: 50, booked: 30, status: 'open' },
 ];
 
+/** visualGate=1 冻结的下拉选项（与原型逐字一致；原型弹窗截图为「已填写态」） */
+const GATE_DOCTORS = [
+  { id: 1, name: '张伟' }, { id: 2, name: '李娜' }, { id: 3, name: '王磊' },
+  { id: 4, name: '陈静' }, { id: 5, name: '刘洋' }, { id: 6, name: '赵强' },
+];
+
 export default function SchedulePage() {
   const config = screenConfigs.find((s) => s.name === '排班管理');
   const gate = new URLSearchParams(window.location.search).get('visualGate') === '1';
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [month, setMonth] = useState('2026-08');
+  const [month, setMonth] = useState(gate ? '2026-08' : dayjs().format('YYYY-MM'));
   const [createOpen, setCreateOpen] = useState(false);
   const [batchOpen, setBatchOpen] = useState(false);
   const [createForm] = Form.useForm();
   const [batchForm] = Form.useForm();
   const { message } = App.useApp();
+  const batchDoctorIds = Form.useWatch('doctorIds', batchForm);
+  const batchWeekdays = Form.useWatch('weekdays', batchForm);
+  const batchSlot = Form.useWatch('slot', batchForm);
+  const [doctorOpts, setDoctorOpts] = useState<{ value: string; label: string }[]>([]);
+  const [deptOpts, setDeptOpts] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     if (gate) {
       setSchedules(GATE_SCHEDULES);
       setMonth('2026-08');
+      setDoctorOpts(GATE_DOCTORS.map((d) => ({ value: String(d.id), label: d.name })));
       return;
     }
     api<Schedule[]>('/schedules')
-      .then((list) => setSchedules(list))
+      .then((list) => {
+        setSchedules(list);
+        // 当前月无排班数据时，自动定位到最近有数据的月份，避免打开即空白日历
+        const cur = dayjs().format('YYYY-MM');
+        if (list.length > 0 && !list.some((s) => s.workDate?.startsWith(cur))) {
+          const nearest = list.map((s) => s.workDate).filter(Boolean).sort().pop();
+          if (nearest) setMonth(nearest.slice(0, 7));
+        }
+      })
       .catch(() => setSchedules([]));
+    // 筛选/弹窗下拉数据
+    if (gate) {
+      setDoctorOpts(GATE_DOCTORS.map((d) => ({ value: String(d.id), label: d.name })));
+      setDeptOpts([]);
+      return;
+    }
+    api<{ id: number; name: string; deptId?: string; status?: string }[]>('/doctors')
+      .then((list) => setDoctorOpts(list.map((d) => ({ value: String(d.id), label: d.name }))))
+      .catch(() => setDoctorOpts([]));
+    api<{ id: number; name: string }[]>('/departments')
+      .then((list) => setDeptOpts(list.map((d) => ({ value: String(d.id), label: d.name }))))
+      .catch(() => setDeptOpts([]));
   }, [gate]);
 
   const cells = useMemo(() => {
@@ -81,8 +113,8 @@ export default function SchedulePage() {
       <div className="schedule-toolbar">
         <Space>
           <span className="toolbar-label">筛选：</span>
-          <Select style={{ width: 140 }} placeholder="全部科室" options={[]} />
-          <Select style={{ width: 140 }} placeholder="全部医生" options={[]} />
+          <Select style={{ width: 140 }} placeholder="全部科室" options={deptOpts} />
+          <Select style={{ width: 140 }} placeholder="全部医生" options={doctorOpts} />
           <span className="toolbar-label" style={{ marginLeft: 16 }}>日期：</span>
           <Button icon={<LeftOutlined />} size="small" onClick={() => setMonth(dayjs(`${month}-01`).subtract(1, 'month').format('YYYY-MM'))} />
           <span className="month-label">{dayjs(`${month}-01`).format('YYYY年M月')}</span>
@@ -142,10 +174,10 @@ export default function SchedulePage() {
       >
         <Form form={createForm} layout="vertical">
           <Form.Item label="选择医生" name="doctorId" rules={[{ required: true, message: '请选择医生' }]}>
-            <Select placeholder="请选择医生" options={[]} />
+            <Select placeholder="请选择医生" options={doctorOpts} />
           </Form.Item>
-          <Form.Item label="排班日期" name="workDate" rules={[{ required: true, message: '请选择排班日期' }]} initialValue="2026-08-10">
-            <Input placeholder="2026-08-10" />
+          <Form.Item label="排班日期" name="workDate" rules={[{ required: true, message: '请选择排班日期' }]} initialValue={gate ? '2026-08-10' : dayjs().format('YYYY-MM-DD')}>
+            <Input placeholder={gate ? '2026-08-10' : dayjs().format('YYYY-MM-DD')} />
           </Form.Item>
           <Form.Item label="时段" name="slot" rules={[{ required: true, message: '请选择时段' }]} initialValue="am">
             <Select options={[{ value: 'am', label: '上午 (08:00 - 12:00)' }, { value: 'pm', label: '下午 (14:00 - 18:00)' }]} />
@@ -172,9 +204,10 @@ export default function SchedulePage() {
         width={520}
         onOk={async () => {
           const v = batchForm.getFieldsValue();
+          // Checkbox.Group 的 value 即中文标签（周一…周日）；dateMap 按中文键映射到 dayjs .day() 索引
+          const dateMap: Record<string, number> = { '周日': 0, '周一': 1, '周二': 2, '周三': 3, '周四': 4, '周五': 5, '周六': 6 };
           const doctorIds = String(v.doctorIds || '').split(',').filter(Boolean);
           const weekdays = (v.weekdays || []) as string[];
-          const dateMap: Record<string, number> = { mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 0 };
           const base = dayjs(`${month}-01`);
           const rows: Schedule[] = [];
           for (let d = 1; d <= base.daysInMonth(); d++) {
@@ -207,7 +240,7 @@ export default function SchedulePage() {
             <Select options={[{ value: 'week', label: '按周模板（本周/下周）' }]} />
           </Form.Item>
           <Form.Item label="选择医生" name="doctorIds" rules={[{ required: true, message: '请选择医生' }]}>
-            <Select mode="multiple" placeholder="全部医生" options={[]} />
+            <Select mode="multiple" placeholder="全部医生" options={doctorOpts} />
           </Form.Item>
           <Form.Item label="选择排班日期" name="weekdays" rules={[{ required: true, message: '请选择排班日期' }]}>
             <Checkbox.Group options={['周一', '周二', '周三', '周四', '周五', '周六', '周日']} />
@@ -226,12 +259,34 @@ export default function SchedulePage() {
           </Form.Item>
           <div className="batch-preview">
             <div className="batch-preview-title">生成预览：</div>
-            <div>2026-08-09 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
-            <div>2026-08-10 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
-            <div>2026-08-11 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
-            <div>2026-08-12 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
-            <div>2026-08-13 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
-            <div className="batch-preview-note">预计生成 30 条排班记录（6 位医生 × 5 天）</div>
+            {gate ? (
+              <>
+                <div>2026-08-09 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
+                <div>2026-08-10 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
+                <div>2026-08-11 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
+                <div>2026-08-12 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
+                <div>2026-08-13 — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）</div>
+                <div className="batch-preview-note">预计生成 30 条排班记录（6 位医生 × 5 天）</div>
+              </>
+            ) : (() => {
+              const ids = batchDoctorIds || [];
+              if (!ids.length) return <div className="batch-preview-note">选择医生与日期后自动生成预览</div>;
+              const docNames = ids.map((id: string) => doctorOpts.find((d) => d.value === String(id))?.label || `医生${id}`);
+              const dateMap: Record<string, number> = { '周日': 0, '周一': 1, '周二': 2, '周三': 3, '周四': 4, '周五': 5, '周六': 6 };
+              const base = dayjs(`${month}-01`);
+              const dates: string[] = [];
+              for (let d = 1; d <= base.daysInMonth() && dates.length < 5; d++) {
+                const dow = base.date(d).day();
+                if ((batchWeekdays || []).some((w: string) => dateMap[w] === dow)) dates.push(base.date(d).format('YYYY-MM-DD'));
+              }
+              const slotName = batchSlot === 'pm' ? '下午' : '上午';
+              return (
+                <>
+                  {dates.map((dt) => <div key={dt}>{dt} — {docNames.join('、')}（{slotName}）</div>)}
+                  <div className="batch-preview-note">预计生成 {docNames.length * dates.length} 条排班记录（{docNames.length} 位医生 × {dates.length} 天）</div>
+                </>
+              );
+            })()}
           </div>
         </Form>
       </Modal>

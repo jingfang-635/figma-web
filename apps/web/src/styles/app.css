@@ -10,7 +10,7 @@ body {
 .app-sider { border-right: 1px solid #F0F0F0; }
 .app-sider .ant-layout-sider-children { display: flex; flex-direction: column; height: 100%; }
 
-.sider-brand { display: flex; align-items: center; gap: 10px; padding: 16px 20px 22px; }
+.sider-brand { display: flex; align-items: center; gap: 10px; padding: 16px 20px 16px; }
 .brand-logo {
   width: 36px; height: 36px; border-radius: 8px; background: #20BF88;
   color: #FFFFFF; display: grid; place-items: center; font-size: 18px;
@@ -37,7 +37,7 @@ body {
   color: #fff; font-size: 11px; display: grid; place-items: center; padding: 0 6px;
 }
 
-.nav-divider { width: 163px; height: 1px; background: #F0F0F0; margin: 6px 0 11px 28px; }
+.nav-divider { width: 163px; height: 1px; background: #F0F0F0; margin: 10px 0 11px 28px; }
 .nav-item.nav-group {
   font-size: 14px; font-weight: 500; color: #8C8C8C; height: 38px; padding-left: 24px;
 }
@@ -166,16 +166,33 @@ body {
 .login-title { font-size: 22px; font-weight: 500; }
 .login-subtitle { font-size: 13px; color: #8C8C8C; margin-top: 4px; }
 
-/* 弹窗上传区（新增科室/新增医生�?*/
-.upload-area { display: flex; gap: 16px; align-items: flex-start; }
+/* modal upload + custom modal (figma geometry) */
+.upload-area { display: flex; gap: 12px; align-items: flex-start; }
 .upload-box {
-  width: 96px; height: 96px; border: 1px dashed #D9D9D9; border-radius: 8px;
+  width: 80px; height: 80px; border: 1px solid #D9D9D9; border-radius: 6px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 6px; cursor: pointer; background: #FAFAFA;
+  gap: 4px; cursor: pointer; background: #FAFAFA;
 }
-.upload-plus { font-size: 22px; color: #8C8C8C; line-height: 1; }
-.upload-text { font-size: 11px; color: #8C8C8C; }
-.upload-hints { font-size: 12px; color: #8C8C8C; line-height: 1.8; padding-top: 4px; }
+.upload-plus { font-size: 24px; color: #BFBFBF; line-height: 1; }
+.upload-text { font-size: 11px; color: #BFBFBF; }
+.upload-hints { font-size: 12px; color: #BFBFBF; line-height: 20px; padding-top: 2px; }
+
+/* custom modal to match figma */
+.dept-modal .ant-modal-content { padding: 0; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+.dept-modal .ant-modal-header { height: 61px; padding: 20px; margin: 0; border-bottom: 1px solid #F0F0F0; }
+.dept-modal .ant-modal-title { font-size: 16px; font-weight: 500; color: #262626; line-height: 23px; }
+.dept-modal .ant-modal-close { top: 22px; right: 20px; }
+.dept-modal .ant-modal-close-x { width: 17px; height: 17px; font-size: 13px; color: #595959; display: inline-flex; align-items: center; justify-content: center; }
+.dept-modal .ant-modal-body { padding: 14px 20px 24px; min-height: 376px; }
+.dept-modal .ant-modal-footer { height: 52px; padding: 0 20px; margin: 0; border-top: 1px solid #F0F0F0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.dept-modal .ant-modal-footer .ant-btn { height: 31px; padding: 0 17px; border-radius: 6px; font-size: 13px; }
+.dept-modal .ant-form-item { margin-bottom: 10px; }
+.dept-modal .ant-form-item .ant-form-item-label { width: 77px; flex: 0 0 77px; }
+.dept-modal .ant-form-item .ant-form-item-label > label { font-size: 13px; color: #595959; justify-content: flex-end; height: 40px; }
+.dept-form-item-align { display: flex; }
+.dept-modal .ant-form-item-control { flex: 1; }
+.dept-modal .ant-input { height: 40px; border-radius: 6px; }
+.dept-modal textarea.ant-input { height: 60px; min-height: 60px; }
 
 /* 批量排班预览 */
 .batch-preview {
@@ -184,3 +201,35 @@ body {
 }
 .batch-preview-title { color: #595959; }
 .batch-preview-note { color: #8C8C8C; }
+
+/* doctor modal (same figma geometry as dept-modal) */
+.doctor-modal .ant-modal-content { padding: 0; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+.doctor-modal .ant-modal-header { height: 61px; padding: 20px; margin: 0; border-bottom: 1px solid #F0F0F0; }
+.doctor-modal .ant-modal-title { font-size: 16px; font-weight: 500; color: #262626; line-height: 23px; }
+.doctor-modal .ant-modal-close { top: 22px; right: 20px; }
+.doctor-modal .ant-modal-close-x { width: 17px; height: 17px; font-size: 13px; color: #595959; display: inline-flex; align-items: center; justify-content: center; }
+.doctor-modal .ant-modal-body { padding: 14px 20px 24px; min-height: 376px; }
+.doctor-modal .ant-modal-footer { height: 52px; padding: 0 20px; margin: 0; border-top: 1px solid #F0F0F0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.doctor-modal .ant-modal-footer .ant-btn { height: 31px; padding: 0 17px; border-radius: 6px; font-size: 13px; }
+.doctor-modal .ant-form-item { margin-bottom: 16px; }
+.doctor-modal .ant-form-item .ant-form-item-label { width: 77px; flex: 0 0 77px; }
+.doctor-modal .ant-form-item .ant-form-item-label > label { font-size: 13px; color: #595959; justify-content: flex-end; height: 40px; }
+.doctor-modal .ant-form-item-control { flex: 1; }
+.doctor-modal .ant-input, .doctor-modal .ant-input-affix-wrapper, .doctor-modal .ant-select-selector { height: 40px; border-radius: 6px; }
+.doctor-modal textarea.ant-input { height: 60px; min-height: 60px; }
+
+/* list card header/toolbar (figma: card y255, header text y275-295, toolbar y293-321) */
+.ant-card .ant-card-head { min-height: 56px; padding: 12px 24px; }
+.ant-card .ant-card-head-title { font-size: 16px; font-weight: 500; color: #262626; }
+.ant-card .ant-card-extra { font-size: 13px; }
+.list-toolbar { margin-bottom: 12px; }
+
+/* list card header/toolbar (figma: card y255, header text y275-295, toolbar y293-321) */
+.ant-card .ant-card-head { min-height: 56px; padding: 12px 24px; }
+.ant-card .ant-card-head-title { font-size: 16px; font-weight: 500; color: #262626; }
+.ant-card .ant-card-extra { font-size: 13px; }
+.list-toolbar { margin-bottom: 12px; }
+
+/* table row height: figma data row 62px */
+.ant-table-tbody > tr > td { padding-top: 13px !important; padding-bottom: 13px !important; }
+.ant-table-thead > tr > th { padding-top: 12px !important; padding-bottom: 12px !important; }

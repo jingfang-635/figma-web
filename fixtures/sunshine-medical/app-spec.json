@@ -127,14 +127,6 @@
     { "id": "modal-batch-schedule", "name": "批量排班弹窗", "route": "/schedules", "type": "modal", "entity": "schedules", "needsReview": false, "modal": { "trigger": "批量排班" } },
     { "id": "sidebar", "name": "sidebar", "type": "chrome", "needsReview": false }
   ],
-  "benchmarkScreens": [
-    { "id": "home", "type": "chart", "route": "/", "name": "首页" },
-    { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
-    { "id": "organization", "type": "form", "route": "/organization", "name": "机构信息" },
-    { "id": "modal-create-dept", "type": "modal", "route": "/departments", "name": "新增科室弹窗", "modal": { "trigger": "新增科室" } },
-    { "id": "modal-create-doctor", "type": "modal", "route": "/doctors", "name": "新增医生弹窗", "modal": { "trigger": "新增医生" } },
-    { "id": "sidebar", "type": "chrome", "name": "sidebar" }
-  ],
   "seedAdmin": {
     "email": "admin@sunshine.com",
     "username": "admin",
@@ -143,7 +135,7 @@
   "notes": [
     "栈 C：Java + Spring Boot + MySQL + JPA；数据库用仓库根 .env 预置 MYSQL_URL（不使用 Docker）",
     "页面范围：只做已画屏（5 业务屏 + 4 弹窗）；sidebar 为 chrome 组件不单独成屏",
-    "detail 型标杆屏缺失：原型未画详情屏，以双 modal 型补足模式覆盖（chart/list/form/modal + chrome）",
+    "detail 型屏缺失：原型未画详情屏，以双 modal 型补足模式覆盖（chart/list/form/modal + chrome）",
     "实体字段与种子数据均来自 Figma 逐字文本（figma-fields.json），needsReview 已清零",
     "闸门账号：admin@sunshine.com / Admin@123456（username: admin）"
   ]

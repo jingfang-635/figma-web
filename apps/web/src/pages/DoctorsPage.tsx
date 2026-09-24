@@ -115,23 +115,28 @@ export default function DoctorsPage() {
         </div>
       </div>
 
-      <Row gutter={16} className="kpi-row">
+      <div className="kpi-strip">
         {(config?.stats || []).map((st) => (
-          <Col span={6} key={st.key}>
-            <Card><Statistic title={st.label} value={stats ? (stats[st.key] ?? 0) : 0} /></Card>
-          </Col>
+          <div className="kpi-card" key={st.key}>
+            <div className="kpi-label">{st.label}</div>
+            <div className="kpi-value">{stats ? (stats[st.key] ?? 0) : 0}</div>
+          </div>
         ))}
-      </Row>
+      </div>
 
-      <Card title={config?.cardTitle || '医生列表'}>
+      <Card
+      title={config?.cardTitle || '医生列表'}
+      extra={
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+          新增医生
+        </Button>
+      }
+    >
         <div className="list-toolbar">
           <Space>
             <Input.Search placeholder="搜索医生、科室或擅长" style={{ width: 240 }} />
             <Select placeholder="全部科室" style={{ width: 140 }} options={[]} />
           </Space>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
-            新增医生
-          </Button>
       </div>
         <Table
           rowKey="id"

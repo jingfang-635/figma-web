@@ -7,7 +7,7 @@
 ```
 Figma REST/MCP
     ↓
-init-project.mjs → App Spec（实体、路由、API、benchmarkScreens、seedAdmin）【人工闸门】
+init-project.mjs → App Spec（实体、路由、API、screens 全屏清单、seedAdmin）【人工闸门】
     ↓
 Layout IR（每屏完整子树几何：padding/gap/size/fill/font/export id）
     ↓
@@ -24,13 +24,13 @@ Codegen（按用户选定框架的页面 + 生成的 tokens.css / 主题文件 +
 
 | 层 | 职责 | 产出 |
 |---|---|---|
-| **App Spec** | 数据模型、关系、REST API、路由、benchmarkScreens | `fixtures/<slug>/app-spec.json` |
-| **Layout IR** | 标杆 Frame 几何、资源 nodeId | `fixtures/<slug>/layout-ir/*.json` |
+| **App Spec** | 数据模型、关系、REST API、路由、screens 全屏清单 | `fixtures/<slug>/app-spec.json` |
+| **Layout IR** | 全屏 Frame 几何、资源 nodeId | `fixtures/<slug>/layout-ir/*.json` |
 | **Visual IR** | 设计 token、侧栏/顶栏 chrome、屏模板分类、弹窗 | `fixtures/<slug>/visual-ir.json` |
 | **Screen Blueprint** | 每屏 KPI/列表/图表/弹窗 + `layout.regions` | `fixtures/<slug>/screen-blueprints/*.json` → `apps/web/src/blueprints/` |
-| **生成物** | 可运行前端 | `tokens.css`、主题文件（如 `antdTheme.ts` / `theme.ts`）、`screenConfigs.ts`、标杆页、assets |
+| **生成物** | 可运行前端 | `tokens.css`、主题文件（如 `antdTheme.ts` / `theme.ts`）、`screenConfigs.ts`、Blueprint 页、assets |
 
-**项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动**：标杆屏（`benchmarkScreens`：type = chart/list/form/detail/modal/chrome）、路由、闸门账号（`seedAdmin`）、localStorage key（`auth.storageKey`）、品牌（`brand.title/subtitle`）。脚本与流程不含业务硬编码。
+**项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动**：全屏清单（`screens`：type = chart/list/form/detail/modal/chrome，全部进闸门）、路由、闸门账号（`seedAdmin`）、localStorage key（`auth.storageKey`）、品牌（`brand.title/subtitle`）。脚本与流程不含业务硬编码。
 
 **禁止**从 Figma 节点直接吐 React/Vue 代码；**禁止**用一套 `ResourcePage` + 自制 Button/Table 覆盖全部业务屏；**禁止**用 ant icons / emoji 冒充已导出的 Figma 图标。
 
@@ -54,7 +54,7 @@ Codegen（按用户选定框架的页面 + 生成的 tokens.css / 主题文件 +
 
 **数据源：**
 
-- `imports/figma/screens/*.png`：全量对照截图（`visual:shots:all` 可导出全部屏 + 弹窗；默认 `visual:shots` 只导出标杆屏）
+- `imports/figma/screens/*.png`：全量对照截图（`visual:shots:all` 可导出全部屏 + 弹窗；默认 `visual:shots` 覆盖全部非 chrome 屏）
 - `fixtures/figma-fields.json`：Figma 节点真实文本归档（`extract-figma-texts.mjs` 收集每屏 TEXT 节点），字段逐字比对的权威依据
 
 **校验步骤：**
@@ -92,9 +92,9 @@ Codegen（按用户选定框架的页面 + 生成的 tokens.css / 主题文件 +
 
 ```bash
 npm run init:project       # 拉结构 + app-spec 骨架（--slug <slug> --file <key>）
-npm run visual:layout      # Layout IR（标杆 Frame 完整子树）
+npm run visual:layout      # Layout IR（全屏 Frame 完整子树）
 npm run visual:extract     # Visual IR（token 优先读 Layout IR）
-npm run visual:shots       # 标杆屏对照 PNG → imports/figma/screens/
+npm run visual:shots       # 全屏对照 PNG → imports/figma/screens/
 npm run visual:shots:all   # 全量屏 + 弹窗 PNG
 npm run visual:gen         # tokens.css + 主题文件 + Blueprint + screenConfigs
 npm run visual:assets      # 按 Layout IR nodeId 导出原图
@@ -123,18 +123,18 @@ apps/web/src/
 ├── blueprints/
 ├── components/chrome/
 ├── config/navIcons.tsx         # 优先 <img src="/assets/...">
-├── pages/                      # 标杆页
-└── templates/ResourceListPage.tsx   # 其余 list 屏（不进 SSIM 标杆闸门）
+├── pages/                      # Blueprint 页（全屏）
+└── templates/ResourceListPage.tsx   # list 屏模板（同样进全屏闸门）
 ```
 
 ## 屏模板与 Blueprint
 
-标杆屏（进 SSIM）由 `app-spec.benchmarkScreens` 声明（type = chart/list/form/detail/modal；chrome 不单独跑）。Blueprint 由 `generate-blueprints.mjs` 从 App Spec + Layout IR 生成，含：
+全屏闸门：`spec.screens` 中每个屏（type = chart/list/form/detail/modal；chrome 不单独跑）都进 SSIM。Blueprint 由 `generate-blueprints.mjs` 从 App Spec + Layout IR 生成，含：
 
 - `layout.regions[]`：`id, padding, gap, width, height, font, color`（由 Layout IR 生成）
 - `sample`：闸门冻结用的样例（来自 Figma 真实文本提取）
 
-其余 list 屏走 `ResourceListPage`，进还原轮次（逐页截图对比），但不进标杆 SSIM。
+list 屏可走 `ResourceListPage` 模板渲染，但同样进全屏闸门与还原轮次（逐页截图对比）。
 
 ## 视觉闸门（双闸门之二，验收必过）
 

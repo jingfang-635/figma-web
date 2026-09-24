@@ -114,8 +114,12 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
         <nav className="sider-nav">
           {renderTop()}
-          <div className="nav-divider" />
-          {GROUPS.map(renderGroup)}
+          {GROUPS.map((g) => (
+            <div key={g.label}>
+              <div className="nav-divider" />
+              {renderGroup(g)}
+            </div>
+          ))}
         </nav>
       </Sider>
       <AntLayout>

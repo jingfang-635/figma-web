@@ -21,9 +21,9 @@ init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Scr
 ## 必须遵守
 
 - **禁止**通用 `ResourcePage` 或自制 Button/Table/Modal 覆盖全部业务屏（组件一律取自用户选定的组件库）
-- 项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动（标杆屏 `benchmarkScreens` / 路由 / 闸门账号 / 品牌）；**脚本与流程禁止业务硬编码**
+- 项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动（screens 全屏清单 / 路由 / 闸门账号 / 品牌）；**脚本与流程禁止业务硬编码**
 - 必跑：`npm run visual:all`（layout / extract / shots / gen / assets / fields / gate）
-- 标杆屏由 `benchmarkScreens` 声明（覆盖图表/列表/表单/详情/弹窗 5 种模式）；SSIM ≥ 0.97 或 mismatch < 2%
+- 全屏闸门：`screens` 全量屏（含弹窗）一律进 SSIM 闸门，无标杆/非标杆之分；SSIM ≥ 0.97 或 mismatch < 2%
 - 字段一致性：`screenConfigs` 中 `needsReview: true` 数量 = 0，且逐屏字段与 `fixtures/figma-fields.json` 逐字一致
 - **第一版全栈之后**必须进入字段还原 + 页面还原轮次：Playwright 逐页截图对比，列出差异并修代码；每轮结束询问是否下一轮，直至用户选择不进入
 - Blueprint：`fixtures/<slug>/screen-blueprints/` → `apps/web/src/blueprints/`

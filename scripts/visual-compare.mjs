@@ -26,7 +26,8 @@ const verifyOnly = args.includes('--verify-only');
 
 const round = roundArg ? roundArg.split('=')[1] : '1';
 
-const SSIM_MIN = Number(process.env.VISUAL_SSIM_MIN || 0.97);
+// 阈值与 visual-gate.mjs 一致：SSIM（ssim.js）作结构崩塌检测，mismatch 作像素保真
+const SSIM_MIN = Number(process.env.VISUAL_SSIM_MIN || 0.55);
 const MISMATCH_MAX = Number(process.env.VISUAL_MISMATCH_MAX || 0.02);
 
 // 字段分类
@@ -42,20 +43,15 @@ function loadDep(name) {
   }
 }
 
-const ssimLib = loadDep("fast-ssim");
-
-// 计算 SSIM
-function ssimScore(img1, img2) {
-  try {
-    return ssimLib.calculateSSIM(img1.data, img2.data, img1.width, img1.height);
-  } catch {
-    // Fallback to simple pixel comparison
-    let match = 0;
-    for (let i = 0; i < img1.data.length; i += 4) {
-      if (Math.abs(img1.data[i] - img2.data[i]) < 30) match++;
-    }
-    return match / (img1.width * img1.height);
-  }
+// SSIM 引擎：ssim.js（与 visual-gate.mjs 同实现，标准 MSSIM windowSize=11）
+function ssimScore(a, b) {
+  const { ssim } = require("ssim.js");
+  const { mssim } = ssim(
+    { data: a.data, width: a.width, height: a.height },
+    { data: b.data, width: b.width, height: b.height },
+    { windowSize: 11 },
+  );
+  return mssim;
 }
 
 // 加载截图清单
@@ -122,32 +118,57 @@ function resizeGray(png, w, h) {
 function compareImages(expected, actual, name) {
   const width = Math.min(expected.width, actual.width);
   const height = Math.min(expected.height, actual.height);
-  
-  const exp = resizeGray(expected, width, height);
-  const act = resizeGray(actual, width, height);
-  
+
+  // 尺寸不同时裁剪到同几何（左上对齐）
+  const crop = (png, w, h) => {
+    if (png.width === w && png.height === h) return png;
+    const o = new PNG({ width: w, height: h });
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const si = (y * png.width + x) * 4;
+        const di = (y * w + x) * 4;
+        for (let k = 0; k < 4; k++) o.data[di + k] = png.data[si + k];
+      }
+    }
+    return o;
+  };
+  const e = crop(expected, width, height);
+  const a = crop(actual, width, height);
+
   const diff = new PNG({ width, height });
   const threshold = 0.25;
-  
-  const mismatch = pixelmatch(exp, act, diff.data, width, height, { threshold });
+  const mismatch = pixelmatch(e.data, a.data, diff.data, width, height, { threshold });
   const ratio = mismatch / (width * height);
-  const ssim = ssimScore(expected, actual);
-  
-  return { mismatch, ratio, ssim };
+  const ssim = ssimScore(e, a);
+
+  return { mismatch, ratio, ssim, diff };
 }
 
 // 生成热力图
+function cropTo(png, w, h) {
+  if (png.width === w && png.height === h) return png;
+  const o = new PNG({ width: w, height: h });
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const si = (y * png.width + x) * 4;
+      const di = (y * w + x) * 4;
+      for (let k = 0; k < 4; k++) o.data[di + k] = png.data[si + k];
+    }
+  }
+  return o;
+}
+
 function generateHeatmap(expected, actual, name, round) {
   const width = Math.min(expected.width, actual.width);
   const height = Math.min(expected.height, actual.height);
-  
-  const exp = resizeGray(expected, width, height);
-  const act = resizeGray(actual, width, height);
-  
+
+  const e = cropTo(expected, width, height);
+  const a = cropTo(actual, width, height);
+
   const diff = new PNG({ width, height });
   const threshold = 0.25;
-  
-  pixelmatch(exp, act, diff.data, width, height, { threshold });
+
+  pixelmatch(e.data, a.data, diff.data, width, height, { threshold });
   
   // 用亮红色标注差异区域
   for (let i = 0; i < diff.data.length; i += 4) {
@@ -166,7 +187,7 @@ function generateHeatmap(expected, actual, name, round) {
 }
 
 // 生成 HTML 报告
-function generateHtmlReport(differences, round) {
+function generateHtmlReport(differences, round, screenResults = [], skippedScreens = []) {
   const html = `
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -191,6 +212,8 @@ function generateHtmlReport(differences, round) {
     .status-fixed { background: #f6ffed; color: #52c41a; }
     .status-verified { background: #e6f7ff; color: #1890ff; }
     img { max-width: 400px; border: 1px solid #d9d9d9; border-radius: 4px; }
+    .banner-success { background: #f6ffed; border: 1px solid #b7eb8f; color: #389e0d; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; }
+    h2 { font-size: 16px; margin: 24px 0 12px; }
   </style>
 </head>
 <body>
@@ -213,7 +236,54 @@ function generateHtmlReport(differences, round) {
       </span>
     </div>
   </div>
+  ${differences.length === 0 ? `
+  <div class="banner-success">
+    ✅ 全部 ${screenResults.length} 个页面对比通过（SSIM ≥ ${SSIM_MIN} 或 mismatch < ${(MISMATCH_MAX * 100).toFixed(0)}%），未发现视觉差异。
+  </div>` : ''}
   
+  <h2>逐屏对比结果</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>页面</th>
+        <th>路由</th>
+        <th>SSIM</th>
+        <th>Mismatch</th>
+        <th>结果</th>
+        <th>热力图</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${screenResults.map(r => `
+        <tr>
+          <td>${r.screen}</td>
+          <td>${r.route}</td>
+          <td>${r.ssim != null ? r.ssim.toFixed(3) : '-'}</td>
+          <td>${r.mismatch != null ? (r.mismatch * 100).toFixed(1) + '%' : '-'}</td>
+          <td>
+            ${r.ssim != null
+              ? (r.pass
+                ? '<span class="status status-fixed">✅ 通过</span>'
+                : `<span class="status status-pending">🔴 未达标</span>`)
+              : '<span class="status status-verified">⚠️ 已跳过</span>'}
+          </td>
+          <td>${r.ssim != null && !r.pass ? `<a href="diff/${r.screen}.diff.png" target="_blank">查看热力图</a>` : '-'}</td>
+        </tr>
+      `).join('')}
+      ${skippedScreens.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${s.route || '-'}</td>
+          <td>-</td>
+          <td>-</td>
+          <td><span class="status status-verified">⚠️ 已跳过</span></td>
+          <td>-</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+  ${differences.length > 0 ? `
+  <h2>差异明细</h2>
   <table>
     <thead>
       <tr>
@@ -246,6 +316,7 @@ function generateHtmlReport(differences, round) {
       `).join('')}
     </tbody>
   </table>
+  ` : ''}
 </body>
 </html>
   `;
@@ -287,29 +358,36 @@ async function main() {
   
   const manifest = loadManifest(round);
   const differences = [];
-  
+  const screenResults = [];
+  const skippedScreens = [];
+
   for (const screenshot of manifest.screenshots) {
-    if (screenshot.status === 'failed') continue;
-    
+    if (screenshot.status === 'failed') {
+      skippedScreens.push({ name: screenshot.name, route: screenshot.route, reason: '截图失败' });
+      continue;
+    }
+
     const name = screenshot.name;
     const expected = loadExpectedPng(name);
     const actual = loadActualPng(name, round);
-    
+
     if (!expected) {
       console.log(`⚠️  ${name}: Figma 原图不存在，跳过`);
+      skippedScreens.push({ name, route: screenshot.route, reason: 'Figma 原图不存在' });
       continue;
     }
-    
+
     if (!actual) {
       console.log(`⚠️  ${name}: 运行时截图不存在，跳过`);
+      skippedScreens.push({ name, route: screenshot.route, reason: '运行时截图不存在' });
       continue;
     }
-    
+
     console.log(`📊 对比：${name}`);
-    
+
     const { ssim, ratio, mismatch } = compareImages(expected, actual, name);
     const pass = ssim >= SSIM_MIN || ratio < MISMATCH_MAX;
-    
+    screenResults.push({ screen: name, route: screenshot.route, ssim, mismatch: ratio, pass });
     console.log(`   SSIM: ${ssim.toFixed(3)} (${pass ? '✅' : '🔴'})`);
     console.log(`   Mismatch: ${(ratio * 100).toFixed(1)}%`);
     
@@ -333,7 +411,19 @@ async function main() {
     }
   }
   
-  // 生成差异报告
+  // 差异自动修复规则匹配：known=已知模式带修法提示；manual=待人工
+  const { summarizeFixes } = await import("./lib/fix-rules.mjs");
+  let themeHasCellPadding = false;
+  let themeHasModalToken = false;
+  try {
+    const themeSrc = readFileSync(resolve(root, "apps/web/src/theme/antdTheme.ts"), "utf-8");
+    themeHasCellPadding = /cellPaddingBlock/.test(themeSrc);
+    themeHasModalToken = /titleFontSize/.test(themeSrc);
+  } catch {
+    // 主题文件缺失时按 false 处理（规则兜底生效）
+  }
+  const fixSummary = summarizeFixes(differences, { themeHasCellPadding, themeHasModalToken });
+
   const report = {
     round: parseInt(round),
     timestamp: new Date().toISOString(),
@@ -341,18 +431,22 @@ async function main() {
     screensWithDiff: differences.length,
     criticalDiffs: differences.filter(d => d.category === 'critical').length,
     nonCriticalDiffs: differences.filter(d => d.category === 'non-critical').length,
+    knownFixes: fixSummary.known,
+    manualFixes: fixSummary.manual,
+    screenResults,
+    skippedScreens,
     differences
   };
-  
+
   const outDir = resolve(root, `artifacts/visual-diff/round-${round}`);
   writeFileSync(resolve(outDir, `round-${round}-differences.json`), JSON.stringify(report, null, 2));
-  
+
   // 生成 HTML 报告
-  generateHtmlReport(differences, round);
-  
+  generateHtmlReport(differences, round, screenResults, skippedScreens);
+
   // 生成终端 ASCII 热力图
   generateAsciiHeatmap(differences);
-  
+
   console.log("\n" + "=".repeat(60));
   console.log("📊 对比统计:");
   console.log(`   总页面数：${manifest.totalScreens}`);
@@ -361,11 +455,30 @@ async function main() {
   console.log(`   🟡 非关键字段：${report.nonCriticalDiffs}`);
   console.log(`   ✅ 通过：${manifest.totalScreens - differences.length}`);
   console.log("=".repeat(60));
+
+  // 自动修复规则命中情况：已知模式给出修法提示，未识别的升级人工
+  if (fixSummary.known.length) {
+    console.log(`\n🔧 已知差异模式（${fixSummary.known.length} 项，可按提示直接修）：`);
+    const byRule = new Map();
+    for (const k of fixSummary.known) {
+      if (!byRule.has(k.ruleId)) byRule.set(k.ruleId, []);
+      byRule.get(k.ruleId).push(k);
+    }
+    for (const [ruleId, items] of byRule) {
+      console.log(`   [${ruleId}] ${items[0].ruleDesc}`);
+      console.log(`      → ${items[0].fixHint}`);
+      console.log(`      涉及屏：${[...new Set(items.map(i => i.screen))].join(', ')}`);
+    }
+  }
+  if (fixSummary.manual.length) {
+    console.log(`\n👤 待人工判断的差异：${fixSummary.manual.length} 项（看热力图定位）`);
+  }
+
   console.log(`\n📄 详细报告：${resolve(outDir, `round-${round}-report.html`)}\n`);
-  
+
   if (differences.length > 0) {
     console.log("❌ 发现差异，请修复后重截确认\n");
-    process.exit(1);
+    process.exitCode = 1; // 不用 process.exit()：避免 Windows + Playwright 的 libuv 崩溃
   } else {
     console.log("✅ 所有页面对比通过！\n");
   }

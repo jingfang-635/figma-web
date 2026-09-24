@@ -169,7 +169,7 @@ const token = process.env.FIGMA_ACCESS_TOKEN;
 const frames = summary.pages?.[0]?.frames || [];
 
 const chromeNames = new Set(
-  (spec?.benchmarkScreens || []).filter((b) => b.type === "chrome").map((b) => b.name),
+  (spec?.screens || []).filter((s) => s.type === "chrome").map((s) => s.name),
 );
 const screenFrames = frames.filter(
   (f) =>

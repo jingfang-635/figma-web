@@ -3,7 +3,7 @@
  * Screen Blueprint 生成器（spec 驱动，跨项目通用）
  *
  * 输入：
- *   fixtures/<slug>/app-spec.json   —— screens/benchmarkScreens（权威来源）
+ *   fixtures/<slug>/app-spec.json   —— screens（权威来源，全屏闸门）
  *   fixtures/<slug>/layout-ir/*.json —— Layout IR 几何（可选，有则注入 layout.regions）
  *
  * 输出：
@@ -127,20 +127,11 @@ function blueprintFor(screen) {
   return bp;
 }
 
-// benchmarkScreens 优先（闸门屏）；screens 全量（含非标杆）
-const bms = spec.benchmarkScreens || [];
+// 全屏单循环：spec.screens 即闸门全集（无标杆/非标杆之分）
 const screens = spec.screens || [];
-const byName = new Map(screens.map((s) => [s.name, s]));
-const ids = new Set();
 const out = [];
+const ids = new Set();
 
-for (const b of bms) {
-  if (b.type === "chrome") continue;
-  const screen = byName.get(b.name) || {};
-  const bp = blueprintFor({ id: b.id, name: b.name, route: b.route, subtitle: screen.subtitle, ...screen });
-  ids.add(bp.id);
-  out.push(bp);
-}
 for (const s of screens) {
   const id = s.id || s.name;
   if (ids.has(id)) continue;
@@ -149,7 +140,7 @@ for (const s of screens) {
 }
 
 if (!out.length) {
-  console.error("No screens/benchmarkScreens in app-spec.json — nothing to generate.");
+  console.error("No screens in app-spec.json — nothing to generate.");
   process.exit(1);
 }
 

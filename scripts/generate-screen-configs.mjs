@@ -47,6 +47,7 @@ export interface FilterConfig {
   placeholder?: string;
   label?: string;
   options?: SelectOption[];
+  optionsFrom?: string; // 关联资源的下拉数据源（如 departments/doctors），页面层解析
 }
 
 export interface ScreenAction {
@@ -75,7 +76,7 @@ export interface ScreenConfig {
   subtitle?: string;
   cardTitle?: string;
   cardSubtitle?: string;
-  formCard?: { title?: string; primaryAction?: string };
+  formCard?: { title?: string; subtitle?: string; primaryAction?: string };
   filters: FilterConfig[];
   actions: ScreenAction[];
   columns: ColumnConfig[];

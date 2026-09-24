@@ -1,7 +1,9 @@
 package com.sunshinemedical.api.controller;
 
 import com.sunshinemedical.api.common.CrudController;
+import com.sunshinemedical.api.entity.Doctor;
 import com.sunshinemedical.api.entity.Schedule;
+import com.sunshinemedical.api.repository.DoctorRepository;
 import com.sunshinemedical.api.repository.ScheduleRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +19,11 @@ import java.util.Map;
 public class ScheduleController extends CrudController<Schedule> {
 
   private final ScheduleRepository repo;
+  private final DoctorRepository doctors;
 
-  public ScheduleController(ScheduleRepository repo) {
+  public ScheduleController(ScheduleRepository repo, DoctorRepository doctors) {
     this.repo = repo;
+    this.doctors = doctors;
   }
 
   @Override
@@ -31,6 +35,8 @@ public class ScheduleController extends CrudController<Schedule> {
   protected Map<String, Object> toMap(Schedule e) {
     Map<String, Object> m = new LinkedHashMap<>();
     m.put("doctorId", nz(e.getDoctorId()));
+    m.put("doctorName", e.getDoctorId() == null || e.getDoctorId().isBlank() ? ""
+        : doctors.findById(Long.valueOf(e.getDoctorId())).map(d -> nz(d.getName())).orElse(""));
     m.put("workDate", nz(e.getWorkDate()));
     m.put("slot", nz(e.getSlot()));
     m.put("quota", nz(e.getQuota()));

@@ -41,7 +41,7 @@ function loadScreenConfigs() {
   const routes = [];
   
   // 解析 routeConfig 数组（JSON 键序：name 在 route 前，支持两种顺序）
-  const routeRegex = /route:\s*['"]([^'"]+)['"][\s\S]{0,120}?name:\s*['"]([^'"]+)['"]|name:\s*['"]([^'"]+)['"][\s\S]{0,120}?route:\s*['"]([^'"]+)['"]/g;
+  const routeRegex = /"?(?:route)"?\s*:\s*['"]([^'"]+)['"][\s\S]{0,160}?"?(?:name)"?\s*:\s*['"]([^'"]+)['"]|"?(?:name)"?\s*:\s*['"]([^'"]+)['"][\s\S]{0,160}?"?(?:route)"?\s*:\s*['"]([^'"]+)['"]/g;
   let match;
   while ((match = routeRegex.exec(content)) !== null) {
     if (match[1] !== undefined) {
@@ -51,7 +51,8 @@ function loadScreenConfigs() {
     }
   }
   
-  return routes;
+  // chrome 组件（sidebar 等）不是页面，跳过
+  return routes.filter((r) => r.route && r.route !== '/sidebar');
 }
 
 // 从 Layout IR 读取视口配置
@@ -119,11 +120,11 @@ async function main() {
     // 2. 设置登录态
     await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
     await page.evaluate(
-      ({ token, user }) => {
+      ({ token, user, storageKey }) => {
         localStorage.setItem(storageKey, token);
         localStorage.setItem(storageKey + "_user", JSON.stringify(user));
       },
-      { token: accessToken, user: loginBody.user }
+      { token: accessToken, user: loginBody.user, storageKey }
     );
     
     // 3. 批量截图所有页面

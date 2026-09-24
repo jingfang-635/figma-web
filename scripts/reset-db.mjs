@@ -1,43 +1,36 @@
 #!/usr/bin/env node
-/** 重置数据库：DROP + CREATE sunshine_medical（用 .env 凭证，mysql-connector jar 直连） */
+/**
+ * 重置数据库：DROP + CREATE（无 Docker；用 ~/.m2 的 mysql-connector-j jar 直连）
+ * 连接信息取仓库根 .env 预置（MYSQL_JDBC_URL / MYSQL_USER / MYSQL_PASSWORD），库名从 URL 解析，无业务硬编码。
+ */
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
-import { resolve, dirname, join } from "node:path";
+import { writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { dbInfo, findMysqlJar } from "./lib/db.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const envText = readFileSync(resolve(root, ".env"), "utf8");
-const env = {};
-for (const line of envText.split(/\r?\n/)) {
-  const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-  if (m && m[2] !== "") env[m[1]] = m[2];
-}
+const { dbName, user, password, jdbcBase } = dbInfo();
 
-// Node fs 定位 mysql-connector jar（避免 PowerShell 引号问题）
-const m2 = join(process.env.USERPROFILE || "", ".m2", "repository", "com", "mysql", "mysql-connector-j");
-let jar = "";
-if (existsSync(m2)) {
-  for (const ver of readdirSync(m2)) {
-    const f = join(m2, ver, "mysql-connector-j-" + ver + ".jar");
-    if (existsSync(f)) { jar = f; break; }
-  }
-}
+const jar = findMysqlJar();
 if (!jar) {
-  console.error("mysql-connector-j jar not found under", m2);
+  console.error("mysql-connector-j jar not found under ~/.m2 — 先构建一次 API（mvnw compile）再试");
   process.exit(1);
 }
 
-const javaSrc = resolve(root, "artifacts", "ResetDb.java");
+const work = resolve(root, "artifacts");
+mkdirSync(work, { recursive: true });
+const javaSrc = resolve(work, "ResetDb.java");
 writeFileSync(
   javaSrc,
   `import java.sql.*;
 public class ResetDb {
   public static void main(String[] a) throws Exception {
     Class.forName("com.mysql.cj.jdbc.Driver");
-    try (Connection c = DriverManager.getConnection(System.getenv("JDBC_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
+    try (Connection c = DriverManager.getConnection("${jdbcBase}", "${user}", "${password}");
          Statement s = c.createStatement()) {
-      s.execute("DROP DATABASE IF EXISTS sunshine_medical");
-      s.execute("CREATE DATABASE sunshine_medical DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+      s.execute("DROP DATABASE IF EXISTS ${dbName}");
+      s.execute("CREATE DATABASE ${dbName} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
       System.out.println("DB reset OK");
     }
   }
@@ -45,8 +38,11 @@ public class ResetDb {
 `,
   "utf8",
 );
-execSync(`javac "${javaSrc}"`, { stdio: "inherit" });
-execSync(`java -cp "${jar};${resolve(root, "artifacts")}" ResetDb`, {
-  stdio: "inherit",
-  env: { ...process.env, JDBC_URL: "jdbc:mysql://127.0.0.1:3306", DB_USER: env.MYSQL_USER, DB_PASS: env.MYSQL_PASSWORD },
-});
+try {
+  execSync(`javac "${javaSrc}"`, { stdio: "inherit" });
+  execSync(`java -cp "${jar};${work}" ResetDb`, { stdio: "inherit" });
+} finally {
+  rmSync(javaSrc, { force: true });
+  rmSync(resolve(work, "ResetDb.class"), { force: true });
+}
+console.log(`database '${dbName}' reset`);

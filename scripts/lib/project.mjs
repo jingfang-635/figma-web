@@ -42,24 +42,29 @@ export function slugOrDefault(root, fileKey) {
 }
 
 /**
- * 标杆屏（benchmarkScreens）→ 与 BENCHMARK_FRAMES 兼容的形状。
- * spec.benchmarkScreens: [{ id, type, route, name, description, modal? }]
+ * 全屏清单（spec.screens 即闸门全集，无标杆屏双轨）→ 与 BENCHMARK_FRAMES 兼容的形状。
+ * spec.screens: [{ id, type, route, name, description, modal? }]
  * type: chart|list|form|detail|modal|chrome
  * modal: { trigger: "新增科室", width?, height? }（type=modal 时）
  */
-export function benchmarkFrames(root) {
+export function allFrames(root) {
   const { spec } = resolveProject(root);
-  const bms = spec?.benchmarkScreens;
-  if (!Array.isArray(bms) || !bms.length) return null;
-  return bms.map((b) => ({
-    id: b.id,
-    names: [b.name, b.id].filter(Boolean),
-    preferType: b.type === "chrome" ? "COMPONENT" : "FRAME",
-    route: b.route,
-    shot: b.name ? `${b.name}.png` : `${b.id}.png`,
-    type: b.type || "list",
-    modal: b.modal || null,
+  const screens = spec?.screens;
+  if (!Array.isArray(screens) || !screens.length) return null;
+  return screens.map((s) => ({
+    id: s.id,
+    names: [s.name, s.id].filter(Boolean),
+    preferType: s.type === "chrome" ? "COMPONENT" : "FRAME",
+    route: s.route,
+    shot: s.name ? `${s.name}.png` : `${s.id}.png`,
+    type: s.type || "list",
+    modal: s.modal || null,
   }));
+}
+
+/** 兼容旧调用名：现与 allFrames 同义（全屏清单，无标杆/非标杆之分） */
+export function benchmarkFrames(root) {
+  return allFrames(root);
 }
 
 /**

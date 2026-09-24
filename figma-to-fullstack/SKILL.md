@@ -27,7 +27,7 @@ Figma URL
   ↓
 0. init-project.mjs        # 拉结构 → summary + app-spec.json 骨架（needsReview=true）
   ↓
-1. App Spec 人工闸门        # 确认实体/路由/benchmarkScreens/seedAdmin；缺决策就问，不猜
+1. App Spec 人工闸门        # 确认实体/路由/screens 全屏清单/seedAdmin；缺决策就问，不猜
   ↓
 2. 视觉抽取（REST）         # visual:layout / extract / shots(:all) / assets
   ↓
@@ -35,9 +35,9 @@ Figma URL
   ↓
 4. visual:gen               # tokens.css + 主题文件 + Blueprint + screenConfigs
   ↓
-5. codegen：DB + API + 前端（按用户选定框架与组件库；标杆页 + list 模板）
+5. codegen：DB + API + 前端（按用户选定框架与组件库；全屏 Blueprint + list 模板）
   ↓
-6. 冒烟 + 双闸门             # 字段一致性 + SSIM 视觉闸门（标杆屏）
+6. 冒烟 + 双闸门             # 字段一致性 + SSIM 视觉闸门（全屏）
   ↓
 7. 还原轮次                  # Playwright 逐页对比 → 列差异 → 修代码 → 问是否下一轮
   ↓
@@ -55,7 +55,7 @@ Figma URL
 5. **鉴权**：JWT / 无（无默认）
 6. **产出路径**：`apps/web`+`apps/api` / `output/<runId>/`
 7. **数据库类型**（从仓库根 .env 预置连接中选择，不使用 Docker）：mysql（MYSQL_URL / MYSQL_JDBC_URL）/ postgresql（POSTGRES_URL）/ sqlite（仅 Node 系，file:./dev.db）
-8. **标杆屏选择**（必选，覆盖 5 种模式：列表/表单/详情/弹窗/图表；缺的说明）
+8. **页面范围确认**（必做；screens 全量即闸门全集，无标杆/非标杆之分）
 
 > 前端还原度按 visual-fidelity 方案（高还原 + 双闸门）验收；但 **UI 技术栈（框架/组件库/图表/日期库）由用户逐层选定，无默认**。
 
@@ -66,7 +66,7 @@ Figma URL
 ```
 - [ ] 0. 决策 + .env（FIGMA_ACCESS_TOKEN）
 - [ ] 1. init-project.mjs → summary + app-spec 骨架
-- [ ] 2. App Spec 人工闸门（实体/路由/benchmarkScreens/seedAdmin）
+- [ ] 2. App Spec 人工闸门（实体/路由/screens 全屏清单/seedAdmin）
 - [ ] 3. visual:layout / extract / shots(:all) / assets
 - [ ] 4. 字段回填（figma-fields → catalog/spec，needsReview 清零）
 - [ ] 5. visual:gen（tokens.css / 主题文件 / blueprints / screenConfigs）
@@ -99,14 +99,14 @@ npm run init:project -- --slug <slug> --file <fileKey或URL> [--name <项目名>
 
 ### 2. App Spec 人工闸门
 
-展示摘要并确认：实体表 + 页面路由 + API 清单 + benchmarkScreens（覆盖 5 种模式）+ `seedAdmin`（闸门账号）。用户说「跳过确认 / --yes」才可直接生成。
+展示摘要并确认：实体表 + 页面路由 + API 清单 + screens 全屏清单（每屏都进闸门）+ `seedAdmin`（闸门账号）。用户说「跳过确认 / --yes」才可直接生成。
 
 ### 3. 视觉抽取
 
 ```bash
-npm run visual:layout      # Layout IR（标杆屏完整子树几何）
+npm run visual:layout      # Layout IR（全屏完整子树几何）
 npm run visual:extract     # Visual IR（tokens 优先读 Layout IR 命名节点）
-npm run visual:shots       # 标杆屏 PNG → imports/figma/screens/
+npm run visual:shots       # 全屏对照 PNG → imports/figma/screens/
 npm run visual:shots:all   # 全量屏 + 弹窗 PNG（字段回填对照用）
 npm run visual:assets      # Layout IR nodeId → apps/web/public/assets/
 ```
@@ -150,13 +150,13 @@ npm run gen:backend -- --out output/run1 # 产出路径重定向（默认 apps/�
 | DB | `gen:backend`（java 栈） | JPA entity（`ddl-auto: update` 建表）+ `config/SeedConfig.java` |
 | API | `gen:backend`（node 栈） | Nest 模块：auth(JWT) + 每资源 CRUD + dashboard（有 dashboard 屏时） |
 | API | `gen:backend`（java 栈） | Spring Boot：CrudController 基类 + 每实体 controller/repository + Auth/Dashboard |
-| Web | 人工 + Blueprint | 按用户选定组件库渲染 + 生成的主题 + Blueprint 标杆页 + `templates/ResourceListPage` 其余 list 屏 |
+| Web | 人工 + Blueprint | 按用户选定组件库渲染 + 生成的主题 + 全屏 Blueprint + `templates/ResourceListPage` 模板 |
 
 生成后允许（且应当）人工增强：关联字段展开、dashboard 聚合查询、业务校验；但 CRUD 骨架与 seed 不要手写。
 
-Web 实现顺序：`main.tsx` → chrome/Layout → 标杆页 → ResourceListPage → 对照截图微调 app.css。
+Web 实现顺序：`main.tsx` → chrome/Layout → Blueprint 页 → ResourceListPage 模板 → 对照截图微调 app.css。
 
-**禁止**：通用 ResourcePage 覆盖标杆屏；自制 Button/Table/Modal；ant icons/emoji 冒充已导出的 Figma 图标。
+**禁止**：通用 ResourcePage 覆盖 Blueprint 屏；自制 Button/Table/Modal；ant icons/emoji 冒充已导出的 Figma 图标。
 
 ### 7. 冒烟
 
@@ -186,6 +186,26 @@ npm run visual:gate       # SSIM ≥ 0.97 或 mismatch < 2%（1440×1068）
 ### 10. 收尾
 
 `apps/GENERATED.md`：Figma 链接、fileKey、slug、栈、还原策略、闸门结果（分数）、还原轮次数、页面清单、启动命令、默认账号。
+
+## 稳定性与编辑纪律（2026-09-24 复盘，必读）
+
+> 来源：本项目实际事故——Vite 反复报语法错误、API 未就绪导致 ECONNREFUSED 刷屏、重复启动任务互相 kill、PowerShell 语法不兼容。后续每轮生成/还原都必须遵守。
+
+### 编辑纪律（防 Vite/TSC 语法错误）
+1. 每次修改 `.tsx/.ts` 后，先跑 `npx tsc --noEmit`（或让 Vite HMR 无报错）确认无重复声明/语法错误，**验证通过才算改完**。
+2. 多处插入/替换代码后必须重读目标区域，检查是否产生重复行（本项目曾出现 `const s`、`const batchSlot` 各被声明两次）；`return (` 之后禁止再出现语句。
+3. 大改动拆成多个小编辑，每个编辑后立即验证，不要攒一批改完再查。
+
+### 服务生命周期（Windows / PowerShell）
+1. 验证类命令一律用 PowerShell 兼容语法：**禁止 `cmd1 & cmd2` 链接**（PowerShell 报 AmpersandNotAllowed），用 `;` 分隔或拆成多次调用。
+2. 重启 API 前先确认旧进程已停、端口已释放：`netstat -ano | findstr :3001`，按 PID 精确 kill；禁止 `Stop-Process -Name java` 全杀（误伤其它 Java 进程）。
+3. 同一服务只允许一个启动任务：上一个任务确认「Started ApiApplication」+ 端口监听后才算成功；未确认前不要并发启动第二个实例（会端口冲突、互相 kill）。
+4. `mvnw spring-boot:run` 被外部 kill 时会报 `BUILD FAILURE: Process terminated with exit code: -1`——这是关停表现而非构建错误；判断服务真实状态看启动日志 + 端口监听 + health 探活，不要见 BUILD FAILURE 就重启动。
+
+### 冒烟与探活
+1. API 启动后、前端联调前先探活：`Invoke-WebRequest http://localhost:3001/actuator/health`（或任一 GET 接口返回 200）；探活不通过不要让前端开始轮询（否则代理 ECONNREFUSED 刷屏，掩盖真问题）。
+2. 探活/冒烟用对 HTTP 方法：`/api/auth/login` 是 POST，GET 会 405；健康轮询不得打 POST-only 接口。
+3. 前端请求层对连续失败应退避并提示「后端未启动」，而不是每 5s 无限重试。
 
 ## 换 Figma 时的增量策略
 

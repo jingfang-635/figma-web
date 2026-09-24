@@ -2,11 +2,11 @@
   "name": "figma-to-fullstack",
   "private": true,
   "scripts": {
-    "api": "npm run start:dev --prefix apps/api",
+    "api": "node scripts/run-with-env.mjs apps/api mvnw.cmd -q spring-boot:run",
     "web": "npm run dev --prefix apps/web",
-    "build": "npm run build --prefix apps/api && npm run build --prefix apps/web",
-    "seed": "npm run prisma:seed --prefix apps/api",
-    "db:reset": "npm run db:reset --prefix apps/api",
+    "build": "cd apps/api && mvnw.cmd -q package && cd ..\\web && npm run build",
+    "db:create": "node scripts/create-db.mjs",
+    "db:reset": "node scripts/reset-db.mjs",
     "visual:layout": "node scripts/extract-layout-ir.mjs",
     "visual:extract": "node scripts/extract-visual-ir.mjs",
     "visual:shots": "node scripts/export-screenshots.mjs",
@@ -20,12 +20,15 @@
     "visual:stats": "node scripts/field-stats.mjs",
     "visual:all": "npm run visual:layout && npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets && npm run visual:fields && npm run visual:gate",
     "init:project": "node scripts/init-project.mjs",
+    "visual:doctor": "node scripts/visual-doctor.mjs",
+    "visual:bootstrap": "node scripts/visual-bootstrap.mjs",
     "visual:fields": "node scripts/check-field-consistency.mjs",
-    "visual:round": "node scripts/capture-screens.mjs && node scripts/visual-compare.mjs"
+    "visual:round": "npm run visual:doctor -- --quick && node scripts/capture-screens.mjs && node scripts/visual-compare.mjs"
   },
   "devDependencies": {
     "pixelmatch": "^5.3.0",
     "playwright": "^1.49.0",
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "ssim.js": "^3.5.0"
   }
 }
