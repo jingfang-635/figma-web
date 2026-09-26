@@ -7,7 +7,7 @@ import { useAuth } from '../../auth/AuthContext';
 const { Sider, Header, Content } = AntLayout;
 
 /** 菜单图标全部取自 Layout IR 导出资产（public/assets/nav），禁止 emoji 或自制图形 */
-function NavIcon({ name, size = 20 }: { name: string; size?: number }) {
+function NavIcon({ name, size = 24 }: { name: string; size?: number }) {
   return (
     <span className="nav-ic">
       <img

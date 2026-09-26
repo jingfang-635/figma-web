@@ -4,12 +4,12 @@ Skill 配套说明：栈矩阵、环境变量、命令速查。
 
 ## 前端还原
 
-**所有新项目启用** [visual-fidelity.md](visual-fidelity.md) 的验收标准（高还原 + 双闸门），无需用户勾选；但 UI 技术栈由用户逐层选择，无默认。
+**所有新项目启用** [visual-fidelity.md](visual-fidelity.md) 的验收标准（高还原 + 闸门组），无需用户勾选；但 UI 技术栈由用户逐层选择，无默认。
 
 - UI 组件库/图表/日期库：**由用户在栈闸门逐层选定，无默认**（React 可选 antd/MUI/Mantine 等；Vue 可选 Element Plus 等）
 - 中间层：Layout IR → Visual IR → Screen Blueprint → `screenConfigs.ts` / `blueprints/`
 - 禁止：通用 ResourcePage、自制 UI 组件库
-- 验收：双闸门（`visual:fields` + `visual:gate`）+ 还原轮次
+- 验收：闸门组（`visual:fields` + `visual:gate` 像素三腿 + `visual:data` + `visual:geom` 几何腿）+ 还原轮次
 
 ## 合法栈矩阵
 
@@ -35,10 +35,21 @@ FIGMA_API_BASE=https://api.figma.com
 GATE_ADMIN_EMAIL=
 GATE_ADMIN_PASSWORD=
 
-# 闸门参数（可选覆盖）
+# 闸门参数（可选覆盖）。0.85=还原目标线（像素三腿 AND，2026-09-25/26 校准；勿调回 0.97——真 MSSIM 下不可达）
 WEB_URL=http://localhost:5173
-VISUAL_SSIM_MIN=0.97
+VISUAL_SSIM_MIN=0.85
 VISUAL_MISMATCH_MAX=0.02
+# 低对比度盲区腿（平坦底色漂移）：mismatch 的 threshold=0.25 对 <25% 色差失明
+# （#FFFFFF vs #F5F7FA ≈3.9%），故需独立判据。校准：visual-gate --calibrate
+VISUAL_FLATBG_MAX=0.025
+VISUAL_FLATBG_MODAL_MAX=0.06
+# 宽视口自适应锁定（只许横向铺满、不许纵向重排）
+VISUAL_WIDE_WIDTH=1888
+VISUAL_WIDE_TOL=1.5
+VISUAL_FILL_TOL=2
+VISUAL_MODAL_CENTER_TOL=2
+# 几何腿（IR 控件框 ↔ DOM 框逐框断言；像素三腿对「尺寸/位置」偏差结构性失明）
+VISUAL_GEO_TOL=3
 FIGMA_SLUG=
 
 DEFAULT_STACK_ID=A
@@ -77,9 +88,11 @@ npm run gen:backend -- --out output/run1 # 产出路径重定向（默认 apps/�
 node scripts/extract-figma-texts.mjs
 npm run visual:fields
 
-# 4. 双闸门 + 轮次（gate 需 api+web 已启动）
+# 4. 闸门组 + 轮次（需 api+web 已启动）
 npm run visual:gate
-npm run visual:round            # capture-screens + visual-compare
+npm run visual:data             # config↔API 闭环 + 非 gate DOM 回填断言
+npm run visual:geom             # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
+npm run visual:round            # capture-screens + visual-compare + data + geom
 npm run visual:all              # 全链路（init 外）
 
 # 5. 服务

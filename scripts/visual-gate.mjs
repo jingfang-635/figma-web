@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 /**
  * Visual gate: Playwright screenshot vs Figma PNG.
- * SSIM >= VISUAL_SSIM_MIN OR pixel mismatch < VISUAL_MISMATCH_MAX required.
+ * 三条腿全部达标才算通过（AND）：
+ *   1) SSIM >= VISUAL_SSIM_MIN                —— 结构崩塌检测（行错位/单列错排）
+ *   2) mismatch < VISUAL_MISMATCH_MAX         —— 像素保真（高对比差异）
+ *   3) flatBg 漂移 <= VISUAL_FLATBG_MAX       —— 低对比度盲区（底色/卡片底/容器填充）
+ * （1+2 AND 起于 2026-09-25，旧 OR 对留白/拉伸屏假阳性；
+ *   3 起于 2026-09-26「关键指标」事故：白卡吞白格，前两条腿双双失明，详见 lib/pixel-metrics.mjs）
+ *
+ * 另有宽视口自适应锁定（原型帧 1440×1068，窗口更宽时须按比例铺满、不得纵向重排）：
+ *   - 同一屏在 1440 与 VISUAL_WIDE_WIDTH 下量同一批 DOM 框：①无横向溢出 ②内容铺满可用宽度
+ *     ③每框 y/h 与 1440 一致（只横向自适应）；弹窗为固定尺寸对话框，只校验尺寸不变 + 居中
  *
  * Usage (repo root, with api+web running):
- *   node scripts/visual-gate.mjs               # 正式闸门
- *   node scripts/visual-gate.mjs --calibrate   # 阈值校准：对已有截图打分 + 结构崩塌自检
+ *   node scripts/visual-gate.mjs                      # 正式闸门（SSIM + 宽视口锁定）
+ *   node scripts/visual-gate.mjs --viewport-lock-only  # 只跑宽视口锁定 → viewport-lock.json（visual:round 挂载）
+ *   node scripts/visual-gate.mjs --calibrate           # 阈值校准：对已有截图打分 + 结构崩塌自检
  * Env: WEB_URL (default http://localhost:5173)
+ *      阈值取自仓库根 .env（loadRootEnv），显式 export 的 env 优先
  *
  * SSIM 引擎：ssim.js（标准 MSSIM，windowSize=11，C1/C2 按 Wang2004）。
  * 阈值语义（2026-09-24 基线校准）：
@@ -23,12 +34,16 @@
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolveProject, gateCredentials, gateMasks } from "./lib/project.mjs";
+import { resolveProject, gateCredentials, gateMasks, loadRootEnv, shadowPad } from "./lib/project.mjs";
+import { flatBgDrift, flatBgDriftOverlay, FLATBG_DEFAULTS } from "./lib/pixel-metrics.mjs";
 
 const CALIBRATE = process.argv.includes("--calibrate");
+// 只跑宽视口锁定（不比对标杆图，不需要 imports/figma/screens）：供 visual:round 挂载
+const VIEWPORT_LOCK_ONLY = process.argv.includes("--viewport-lock-only");
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
+loadRootEnv(root);
 
 function loadDep(name) {
   try {
@@ -56,6 +71,16 @@ const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
 // 0.97 在真 SSIM 下不可达（已校准：整屏通过下限 ≈0.75 / 弹窗 ≈0.60），勿调回。
 const SSIM_MIN = Number(process.env.VISUAL_SSIM_MIN || 0.55);
 const MISMATCH_MAX = Number(process.env.VISUAL_MISMATCH_MAX || 0.02);
+// 低对比度盲区腿（2026-09-26「关键指标」事故）：pixelmatch threshold=0.25 对
+// #FFFFFF vs #F5F7FA（亮度差 ~3.9%）完全失明，SSIM 又被整屏稀释 → 需独立判据。
+// 默认值取严格侧（.env 未加载则更易失败而非静默放行）。校准：--calibrate
+const FLATBG_MAX = Number(process.env.VISUAL_FLATBG_MAX || 0.025);
+const FLATBG_MODAL_MAX = Number(process.env.VISUAL_FLATBG_MODAL_MAX || 0.06);
+// 宽视口锁定：横向须按可用宽度铺满（右侧只留 padding），纵向骨架不得变化；弹窗水平居中
+const WIDE_WIDTH = Number(process.env.VISUAL_WIDE_WIDTH || 1888);
+const WIDE_TOL = Number(process.env.VISUAL_WIDE_TOL || 1.5);
+const FILL_TOL = Number(process.env.VISUAL_FILL_TOL || 2);
+const MODAL_CENTER_TOL = Number(process.env.VISUAL_MODAL_CENTER_TOL || 2);
 const VIEWPORT = { width: 1440, height: 1068 };
 const outDir = resolve(root, "artifacts/visual-diff");
 mkdirSync(outDir, { recursive: true });
@@ -167,13 +192,50 @@ function clipPng(png, x, y, w, h) {
   return out;
 }
 
-function compare(expectedBuf, actualBuf, name) {
-  let expectedPng = PNG.sync.read(expectedBuf);
-  const actualRaw = PNG.sync.read(actualBuf);
+/** 弹窗截图补白边：按 IR 阴影余量四边补（详见 lib/project.mjs shadowPad）
+ *  旧实现固定 12px 四边 → 纵向与标杆错位 shadow.y（本设计 4px）→ 逐像素比必判结构错位 */
+function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
+  const inner = PNG.sync.read(buf);
+  const padded = new PNG({
+    width: inner.width + pad.left + pad.right,
+    height: inner.height + pad.top + pad.bottom,
+  });
+  padded.data.fill(255);
+  PNG.bitblt(inner, padded, 0, 0, inner.width, inner.height, pad.left, pad.top);
+  return PNG.sync.write(padded);
+}
+
+/**
+ * 合成到白底：Figma 导出的弹窗标杆图带 alpha（阴影为「未预乘」——RGB 暗、alpha 低），
+ * 而运行时截图恒为不透明。若直接逐通道比，SSIM 会把 alpha≈3 的阴影像素当成「深灰」，
+ * 整条阴影带 SSIM 掉到 0.48（实测 modal-create-dept 顶部带），把弹窗从 0.91 拉到 0.83。
+ * 两者先各自合成到白底再比，才是同域比较（2026-09-26 弹窗 SSIM 卡在 0.76~0.83 的根因之二）。
+ */
+function compositeOverWhite(png) {
+  const out = new PNG({ width: png.width, height: png.height });
+  for (let i = 0; i < png.data.length; i += 4) {
+    const a = png.data[i + 3] / 255;
+    if (a >= 1) {
+      out.data[i] = png.data[i];
+      out.data[i + 1] = png.data[i + 1];
+      out.data[i + 2] = png.data[i + 2];
+    } else {
+      out.data[i] = Math.round(png.data[i] * a + 255 * (1 - a));
+      out.data[i + 1] = Math.round(png.data[i + 1] * a + 255 * (1 - a));
+      out.data[i + 2] = Math.round(png.data[i + 2] * a + 255 * (1 - a));
+    }
+    out.data[i + 3] = 255;
+  }
+  return out;
+}
+
+function compare(expectedBuf, actualBuf, name, { modal = false } = {}) {
+  let expectedPng = compositeOverWhite(PNG.sync.read(expectedBuf));
+  const actualRaw = compositeOverWhite(PNG.sync.read(actualBuf));
     const height = Math.min(expectedPng.height, actualRaw.height, VIEWPORT.height);
   const width = Math.min(expectedPng.width, actualRaw.width, VIEWPORT.width);
   const exp = fitPng(expectedPng, width, height);
-  const act = fitPng(actualRaw, width, height);
+    const act = fitPng(actualRaw, width, height);
   writeFileSync(resolve(outDir, `${name}.actual.raw.png`), PNG.sync.write(act));
   const masks = masksFor(name);
   if (masks.length) {
@@ -183,15 +245,25 @@ function compare(expectedBuf, actualBuf, name) {
     }
   }
   const diff = new PNG({ width, height });
-  const threshold = 0.25;
+    const threshold = 0.25;
   const mismatch = pixelmatch(exp.data, act.data, diff.data, width, height, { threshold });
   const ratio = mismatch / (width * height);
   const ssim = ssimScore(exp, act);
+  // 低对比度盲区：平坦底色漂移（文字渲染差异不计入）
+  const flat = flatBgDrift(exp, act);
+  const flatMax = modal ? FLATBG_MODAL_MAX : FLATBG_MAX;
+  const flatPass = flat.rate <= flatMax;
   writeFileSync(resolve(outDir, `${name}.expected.png`), PNG.sync.write(exp));
   writeFileSync(resolve(outDir, `${name}.actual.png`), PNG.sync.write(act));
   writeFileSync(resolve(outDir, `${name}.diff.png`), PNG.sync.write(diff));
-  const pass = ssim >= SSIM_MIN || ratio < MISMATCH_MAX;
-  return { name, width, height, mismatch, ratio, ssim, pass };
+  // 底色错热力图（diff.png 看不见低对比差异，这张专标盲区）
+  writeFileSync(resolve(outDir, `${name}.flatbg.png`), PNG.sync.write(flatBgDriftOverlay(exp, act, PNG)));
+  const pass = ssim >= SSIM_MIN && ratio < MISMATCH_MAX && flatPass;
+  return {
+    name, width, height, mismatch, ratio, ssim, pass,
+    flatbgRate: flat.rate, flatbgDrift: flat.drift, flatbgArea: flat.area,
+    flatbgMax: flatMax, flatbgPass: flatPass,
+  };
 }
 
 async function waitForWeb() {
@@ -208,7 +280,7 @@ async function waitForWeb() {
 }
 
 const shotsDir = resolve(root, "imports/figma/screens");
-if (!existsSync(shotsDir)) {
+if (!VIEWPORT_LOCK_ONLY && !existsSync(shotsDir)) {
   console.error("Missing imports/figma/screens. Run npm run visual:shots first.");
   process.exit(1);
 }
@@ -230,6 +302,7 @@ if (CALIBRATE) {
   }
   console.log("=== SSIM 阈值校准（ssim.js, windowSize=11）===\n");
   const achieved = [];
+  const flatRates = [];
   for (const p of pairs) {
     const exp = PNG.sync.read(readFileSync(p.expPath));
     const act = PNG.sync.read(readFileSync(p.actPath));
@@ -241,10 +314,48 @@ if (CALIBRATE) {
     act.data.copy(shifted.data, 8 * act.width * 4, 0, act.data.length - 8 * act.width * 4);
     const sShift = ssimScore(exp, shifted);
     console.log(`  ↳ 崩塌自检（下移 8px）: ssim=${sShift.toFixed(4)} ${s - sShift > 0.05 ? "✅ 敏感" : "⚠️ 区分度不足"}`);
+    // 实测基线（用于建议预算；文字亚像素位置差是主要残余噪声来源）
+    const flatOk = flatBgDrift(exp, act);
+    const isModal = !!TARGETS.find((t) => t.id === p.base)?.modal;
+    flatRates.push({ name: p.base, rate: flatOk.rate, modal: isModal });
+    console.log(`  ↳ 平坦底色漂移: ${(flatOk.rate * 100).toFixed(2)}%（${isModal ? "弹窗" : "全屏"}基线）`);
   }
   const floor = Math.min(...achieved.map((a) => a.ssim));
-  console.log(`\n当前通过构建的 SSIM 下限 = ${floor.toFixed(4)}`);
+    console.log(`\n当前通过构建的 SSIM 下限 = ${floor.toFixed(4)}`);
   console.log(`建议 VISUAL_SSIM_MIN ≤ ${Math.max(0.5, floor - 0.05).toFixed(2)}（留 0.05 裕量），且远高于崩塌区（~<0.5）`);
+
+  // —— 低对比度盲区腿：度量本身的确定性自检（与屏幕内容无关）——
+  // 若有人把 driftTol 抬到 ≥ 白/画布色差（≈9.7）或改坏算法，这一步会立刻报警，
+  // 而不是等到「白卡吞白格」再次静默通过。
+  const mkFlat = (n, v) => {
+    const png = new PNG({ width: n, height: n });
+    for (let i = 0; i < png.data.length; i += 4) {
+      png.data[i] = v; png.data[i + 1] = v; png.data[i + 2] = v; png.data[i + 3] = 255;
+    }
+    return png;
+  };
+  const N = 256;
+  const white = mkFlat(N, 255);
+  const canvas = mkFlat(N, 245); // #F5F7FA 的亮度 ≈ 246.6，用 245 逼近
+  // 合成「白卡吞掉一半画布」：左半 #FFFFFF、右半 #F5F7FA
+  const half = mkFlat(N, 255);
+  for (let y = 0; y < N; y++) {
+    for (let x = N / 2; x < N; x++) {
+      const i = (y * N + x) * 4;
+      half.data[i] = 245; half.data[i + 1] = 247; half.data[i + 2] = 250;
+    }
+  }
+  const ctrl = flatBgDrift(white, white).rate; // 完全相同 → 应 ≈ 0
+  const sig = flatBgDrift(half, white).rate; // 画布被白卡吞 → 应 ≈ 50%
+  const ok = ctrl < 0.005 && sig > 0.4;
+  console.log(`\n平坦底色漂移（rad=${FLATBG_DEFAULTS.rad} flatTol=${FLATBG_DEFAULTS.flatTol} driftTol=${FLATBG_DEFAULTS.driftTol}）`);
+  console.log(`  度量自检: 对照(同图)=${(ctrl * 100).toFixed(2)}%  合成事故(半幅画布被白卡吞)=${(sig * 100).toFixed(2)}% ${ok ? "✅ 敏感" : "⚠️ 已失明（driftTol 过大或算法失效）"}`);
+  const fullMax = Math.max(...flatRates.filter((f) => !f.modal).map((f) => f.rate), 0);
+  const modalMax = Math.max(...flatRates.filter((f) => f.modal).map((f) => f.rate), 0);
+  console.log(`  当前基线: 全屏上限 ${(fullMax * 100).toFixed(2)}%  弹窗上限 ${(modalMax * 100).toFixed(2)}%`);
+  console.log(`  建议: VISUAL_FLATBG_MAX ≥ ${Math.max(0.01, fullMax * 1.5).toFixed(3)}（基线×1.5，当前 ${FLATBG_MAX}）`);
+  console.log(`        VISUAL_FLATBG_MODAL_MAX ≥ ${Math.max(0.01, modalMax * 1.4).toFixed(3)}（弹窗基线×1.4，当前 ${FLATBG_MODAL_MAX}）`);
+  console.log("  说明：该腿只判「标杆为平坦色块处运行时是否改色」，文字渲染差异不计入。");
   console.log("\n校准完成（不影响 score.json / 闸门结果）。");
   process.exit(0);
 }
@@ -278,64 +389,192 @@ await page.goto(`${WEB_URL}/?visualGate=1`, { waitUntil: "networkidle" });
 await page.waitForSelector(".app-sider", { timeout: 20000 });
 await page.evaluate(() => document.fonts.ready);
 
-const scores = [];
-for (const t of TARGETS) {
-  const refPath = resolve(shotsDir, t.shot);
-  if (!existsSync(refPath)) {
-    console.warn("skip missing ref", t.shot);
-    scores.push({ name: t.id, pass: false, error: `missing ${t.shot}` });
-    continue;
+// —— 单屏取图（1440 与宽视口共用同一路径，保证两次可比）——
+// 全屏：固定截 0..VIEWPORT.width（不含宽视口多出来的右侧）；弹窗：截弹窗自身 box
+async function openModal(t) {
+  if (!t.modal) return;
+  try {
+    // 等页面主体渲染（表格页有 .ant-table；日历/表单页退化为 .page-head/.app-content）
+    await page.waitForSelector(".ant-table, .calendar-grid, .app-content", { timeout: 10000 });
+    await page.getByRole("button", { name: t.trigger }).click({ force: true });
+    await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
+    await page.waitForTimeout(400);
+  } catch (err) {
+    console.warn("modal open failed:", err.message);
   }
-  const url = `${WEB_URL}${t.route}?visualGate=1`;
-  await page.goto(url, { waitUntil: "networkidle" });
-    await page.waitForTimeout(600);
+}
+
+async function capture(t) {
   if (t.modal) {
-    try {
-      // 等页面主体渲染（表格页有 .ant-table；日历/表单页退化为 .page-head/.app-content）
-      await page.waitForSelector(".ant-table, .calendar-grid, .app-content", { timeout: 10000 });
-      await page.getByRole("button", { name: t.trigger }).click({ force: true });
-      await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
-      await page.waitForTimeout(400);
-    } catch (err) {
-      console.warn("modal open failed:", err.message);
-    }
-  }
-  await page.evaluate(() => document.fonts.ready);
-  const actual = t.modal
-    ? await (async () => {
-        const content = page.locator(".dept-modal .ant-modal-content, .ant-modal-content").last();
-        let box = (await content.count()) > 0 ? await content.boundingBox() : null;
-        if (!box) box = await page.getByRole("dialog").boundingBox().catch(() => null);
-        if (box) {
-          const w = Math.ceil(box.width);
-                    const h = Math.ceil(box.height);
-          const x = Math.max(0, Math.round(box.x + Math.max(0, box.width - w) / 2));
-          const y = Math.max(0, Math.round(box.y));
-          return page.screenshot({
-            type: "png",
-            clip: { x, y, width: w, height: h },
-            animations: "disabled",
-            caret: "hide",
-          });
-        }
-        return page.screenshot({
-          type: "png",
-          clip: t.clip || { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height },
-          animations: "disabled",
-          caret: "hide",
-        });
-      })()
-    : await page.screenshot({
+    const content = page.locator(".dept-modal .ant-modal-content, .ant-modal-content").last();
+    let box = (await content.count()) > 0 ? await content.boundingBox() : null;
+    if (!box) box = await page.getByRole("dialog").boundingBox().catch(() => null);
+    if (box) {
+      const w = Math.ceil(box.width);
+      const h = Math.ceil(box.height);
+      const x = Math.max(0, Math.round(box.x + Math.max(0, box.width - w) / 2));
+      const y = Math.max(0, Math.round(box.y));
+      return page.screenshot({
         type: "png",
-        clip: t.clip || { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height },
+        clip: { x, y, width: w, height: h },
         animations: "disabled",
         caret: "hide",
       });
-  const result = compare(readFileSync(refPath), actual, t.id);
+    }
+  }
+  return page.screenshot({
+    type: "png",
+    clip: t.clip || { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height },
+    animations: "disabled",
+    caret: "hide",
+  });
+}
+
+async function shoot(t) {
+  await page.goto(`${WEB_URL}${t.route}?visualGate=1`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(600);
+  await openModal(t);
+  await page.evaluate(() => document.fonts.ready);
+  return capture(t);
+}
+
+/**
+ * 宽视口取样：量一批元素框 + 弹窗（含可用宽度）。
+ * 量 DOM 而非比位图：位图重采样有噪声，而「每个框都精确等于 1440 框 × k」是
+ * 「按比例自适应」的充要条件，且能直接指出是哪个元素没跟上。
+ */
+const PROBE_SELECTORS = [
+  ".app-content", ".page", ".page-head", ".kpi-strip", ".kpi-card",
+  ".chart-grid", ".chart-card", ".metric-grid", ".metric-cell",
+  ".ant-card", ".list-toolbar", ".ant-table", ".ant-table-thead > tr > th",
+  ".calendar-wrap", ".calendar-grid", ".calendar-cell", ".schedule-toolbar", ".legend-row",
+  ".org-card", ".org-grid", ".org-grid > .ant-form-item",
+];
+
+async function probeLayout() {
+  return page.evaluate((sels) => {
+    const items = [];
+    for (const sel of sels) {
+      for (const el of document.querySelectorAll(sel)) {
+        const r = el.getBoundingClientRect();
+        if (r.width < 1 || r.height < 1) continue;
+        items.push({ sel, x: +r.x.toFixed(2), y: +r.y.toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2) });
+      }
+    }
+    const mc = document.querySelector(".ant-modal-content");
+    const mr = mc ? mc.getBoundingClientRect() : null;
+    const page = document.querySelector(".page");
+    const pr = page ? page.getBoundingClientRect() : null;
+    const padRight = 24; // body padding（.app-content 24px）
+    return {
+      avail: document.documentElement.clientWidth,
+      docScrollW: document.documentElement.scrollWidth,
+      modal: mr ? { w: +mr.width.toFixed(2), h: +mr.height.toFixed(2), cx: +(mr.x + mr.width / 2).toFixed(2) } : null,
+      viewportCx: window.innerWidth / 2,
+      contentW: pr ? +pr.width.toFixed(2) : 0,
+      fillGap: pr ? +(window.innerWidth - pr.right).toFixed(2) - padRight : 0,
+      items,
+    };
+  }, PROBE_SELECTORS);
+}
+
+/**
+ * 自适应校验（宽视口）：原型帧是按比例铺满，所以宽档要求
+ *   (a) 无横向溢出；(b) 内容确实铺满可用宽度（右侧只留 body padding）；(c) 纵向骨架不变
+ *       —— 每个元素的 y / h 与 1440 档一致（±2px），即「只横向自适应，不纵向重排」。
+ * 弹窗是固定尺寸对话框：只校验尺寸不变 + 水平居中。
+ */
+function proportionalLock(base, wide, isModal) {
+  const overflow = wide.docScrollW - wide.avail; // >0 = 横向溢出（没按可用宽度收敛）
+  if (isModal) {
+    const b = base.modal;
+    const w = wide.modal;
+    if (!b || !w) return { pass: false, error: "弹窗未出现" };
+    const sizeDev = Math.max(Math.abs(w.w - b.w), Math.abs(w.h - b.h));
+    const centerDev = Math.abs(w.cx - wide.viewportCx) + Math.abs(b.cx - base.viewportCx);
+    const tol = Math.max(WIDE_TOL, MODAL_CENTER_TOL);
+    return {
+      pass: sizeDev <= WIDE_TOL && centerDev <= MODAL_CENTER_TOL,
+      kind: "modal",
+      worst: { sel: ".ant-modal-content", key: "尺寸+居中", base: `${b.w}x${b.h}@${b.cx}`, wide: `${w.w}x${w.h}@${w.cx}`, expected: `不变，居中 ${base.viewportCx}`, dev: +Math.max(sizeDev, centerDev).toFixed(2), tol },
+    };
+  }
+  if (base.items.length !== wide.items.length) {
+    return { pass: false, error: `DOM 数量随视口变化 ${base.items.length} → ${wide.items.length}（发生重排）` };
+  }
+  if (base.fillGap > FILL_TOL) {
+    return { pass: false, error: `1440 档内容未铺满（右侧空 ${base.fillGap}px）` };
+  }
+  // 纵向骨架：y / h 必须与 1440 档一致
+  let worst = null;
+  for (let i = 0; i < base.items.length; i++) {
+    const a = base.items[i];
+    const b = wide.items[i];
+    if (a.sel !== b.sel) return { pass: false, error: `DOM 顺序随视口变化 @${i}` };
+    for (const key of ["y", "h"]) {
+      const dev = Math.abs(b[key] - a[key]);
+      if (!worst || dev > worst.dev) {
+        worst = { sel: a.sel, key, base: a[key], wide: b[key], expected: `不变（±${WIDE_TOL}px）`, dev: +dev.toFixed(2), tol: WIDE_TOL };
+      }
+    }
+  }
+  // 横向铺满：宽档右侧也只留 padding
+  const fillOk = wide.fillGap <= FILL_TOL + 1;
+  const grew = wide.contentW > base.contentW + 1;
+  const pass = overflow <= 0 && fillOk && grew && worst.dev <= WIDE_TOL;
+  return { pass, overflow, worst, fillGap: wide.fillGap, contentW: `${base.contentW} → ${wide.contentW}` };
+}
+
+const scores = [];
+const shots1440 = new Map();
+const probe1440 = new Map();
+for (const t of TARGETS) {
+  if (!VIEWPORT_LOCK_ONLY) {
+    const refPath = resolve(shotsDir, t.shot);
+    if (!existsSync(refPath)) {
+      console.warn("skip missing ref", t.shot);
+      scores.push({ name: t.id, pass: false, error: `missing ${t.shot}` });
+      continue;
+    }
+  }
+  const actual = await shoot(t);
+  shots1440.set(t.id, actual);
+  probe1440.set(t.id, await probeLayout());
+  if (VIEWPORT_LOCK_ONLY) continue;
+  const result = compare(readFileSync(resolve(shotsDir, t.shot)), t.modal ? padWhite(actual, shadowPad(root, t.id)) : actual, t.id, { modal: !!t.modal });
   scores.push(result);
   console.log(
-    `${t.id}: ssim=${result.ssim.toFixed(4)} mismatch=${(result.ratio * 100).toFixed(2)}% ${result.pass ? "PASS" : "FAIL"}`,
+    `${t.id}: ssim=${result.ssim.toFixed(4)} mismatch=${(result.ratio * 100).toFixed(2)}% flatBg=${(result.flatbgRate * 100).toFixed(2)}%(≤${(result.flatbgMax * 100).toFixed(1)}%) ${result.pass ? "PASS" : "FAIL"}`,
   );
+}
+
+// —— 宽视口锁定：横向按可用宽度铺满，纵向骨架不变（不得重排 / 留白 / 溢出）——
+// 不依赖标杆图：同一屏在 1440 与 WIDE 下量同一批 DOM 框，校验「只横向自适应」。
+// 弹窗为固定尺寸对话框：只校验尺寸不变 + 水平居中。
+const wide = [];
+console.log(`\n宽视口锁定 ${VIEWPORT.width} → ${WIDE_WIDTH}（纵向允差 ${WIDE_TOL}px，铺满余量 ≤ ${FILL_TOL}px）`);
+await page.setViewportSize({ width: WIDE_WIDTH, height: VIEWPORT.height });
+for (const t of TARGETS) {
+  const base = probe1440.get(t.id);
+  if (!base) {
+    wide.push({ name: t.id, pass: false, error: "no 1440 probe" });
+    continue;
+  }
+  try {
+    await shoot(t);
+  } catch (err) {
+    wide.push({ name: t.id, pass: false, error: err.message });
+    console.log(`${t.id}: ${err.message} FAIL`);
+    continue;
+  }
+  const r = proportionalLock(base, await probeLayout(), t.modal);
+  wide.push({ name: t.id, ...r });
+  const detail = r.error
+    ? r.error
+    : r.kind === "modal"
+      ? `${r.worst.base} → ${r.worst.wide}（偏差 ${r.worst.dev}px / 允差 ${r.worst.tol}px）`
+      : `内容宽 ${r.contentW} 右侧余量 ${r.fillGap}px 纵向最大偏差 ${r.worst ? r.worst.dev : 0}px / 允差 ${WIDE_TOL}px${r.worst ? ` @${r.worst.sel}.${r.worst.key}(${r.worst.base}→${r.worst.wide})` : ""}`;
+  console.log(`${t.id}: ${detail} ${r.pass ? "PASS" : "FAIL"}`);
 }
 
 await browser.close();
@@ -345,15 +584,40 @@ const report = {
   webUrl: WEB_URL,
   ssimMin: SSIM_MIN,
   mismatchMax: MISMATCH_MAX,
-  ssimEngine: "ssim.js@3.5 (MSSIM windowSize=11)",
+    ssimEngine: "ssim.js@3.5 (MSSIM windowSize=11)",
+  lowContrast: {
+    metric: "flatBgDrift（平坦底色漂移，排除文字渲染差异）",
+    params: FLATBG_DEFAULTS,
+    max: FLATBG_MAX,
+    modalMax: FLATBG_MODAL_MAX,
+    note: "补 mismatch(threshold=0.25) 对 <25% 色差不敏感的盲区；#FFFFFF vs #F5F7FA ≈ 3.9%",
+  },
+  mode: VIEWPORT_LOCK_ONLY ? "viewport-lock-only" : "full",
   scores,
+  viewportLock: { wideWidth: WIDE_WIDTH, tolPx: WIDE_TOL, fillTol: FILL_TOL, modalCenterTol: MODAL_CENTER_TOL, scores: wide },
 };
-writeFileSync(resolve(outDir, "score.json"), JSON.stringify(report, null, 2), "utf8");
-console.log("Wrote", resolve(outDir, "score.json"));
+// 只锁定模式不写 score.json（避免覆盖正式闸门成绩）
+const reportFile = VIEWPORT_LOCK_ONLY ? "viewport-lock.json" : "score.json";
+writeFileSync(resolve(outDir, reportFile), JSON.stringify(report, null, 2), "utf8");
+console.log("Wrote", resolve(outDir, reportFile));
 
 const failed = scores.filter((s) => !s.pass);
-if (failed.length) {
-  console.error(`Visual gate failed: ${failed.map((f) => f.name).join(", ")}`);
+const failedWide = wide.filter((s) => !s.pass);
+if (failed.length || failedWide.length) {
+  if (failed.length) {
+    console.error(`Visual gate failed: ${failed.map((f) => f.name).join(", ")}`);
+    // 指出是三条腿里的哪条没过（避免"修了 SSIM 却没修底色"的反复）
+    for (const f of failed) {
+      const reasons = [];
+      if (f.ssim < SSIM_MIN) reasons.push(`SSIM ${f.ssim.toFixed(3)} < ${SSIM_MIN}`);
+      if (f.ratio >= MISMATCH_MAX) reasons.push(`mismatch ${(f.ratio * 100).toFixed(2)}% ≥ ${(MISMATCH_MAX * 100).toFixed(0)}%`);
+      if (f.flatbgPass === false) reasons.push(`低对比底色漂移 ${(f.flatbgRate * 100).toFixed(2)}% > ${(f.flatbgMax * 100).toFixed(1)}%`);
+      if (f.error) reasons.push(f.error);
+      console.error(`  · ${f.name}: ${reasons.join(" / ") || "unknown"}`);
+      if (f.flatbgPass === false) console.error(`    → 看图 artifacts/visual-diff/${f.name}.flatbg.png（洋红=标杆平坦底色被改色）`);
+    }
+  }
+  if (failedWide.length) console.error(`宽视口锁定失败: ${failedWide.map((f) => f.name).join(", ")}`);
   process.exitCode = 1; // 不用 process.exit()：避免 Windows + Playwright 的 libuv 断言崩溃
 } else {
   console.log("Visual gate passed.");

@@ -98,10 +98,12 @@ export default function HomePage() {
       <div className="chart-grid">
         <ChartCard title="近7天预约量趋势">
           <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={trendData} margin={{ top: 18, right: 16, bottom: 0, left: -20 }}>
+            {/* 几何全部照 layout-ir/home.json：绘图区 x=332..754（margin.left 0 + YAxis 68 / right 48）、
+                顶 y=320（margin.top 10）、x 轴线 y=459（XAxis height 31）、0..25 域（5 条网格 320/348/376/403/431） */}
+            <LineChart data={trendData} margin={{ top: 10, right: 48, bottom: 0, left: 0 }}>
               <CartesianGrid vertical={false} stroke="#F0F0F0" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#595959' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
-              <YAxis domain={[5, 25]} ticks={[5, 10, 15, 20, 25]} tick={{ fontSize: 12, fill: '#595959' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" height={31} tickMargin={7} padding={{ left: 29, right: -9.5 }} tick={{ fontSize: 11, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
+              <YAxis width={68} domain={[0, 25]} ticks={[5, 10, 15, 20, 25]} tickMargin={15} tick={{ fontSize: 12, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
               <Tooltip />
               <Line
                 type="monotone"
@@ -109,7 +111,7 @@ export default function HomePage() {
                 stroke="#1890FF"
                 strokeWidth={2}
                 dot={{ r: 4, fill: '#FFFFFF', stroke: '#1890FF', strokeWidth: 2 }}
-                label={{ position: 'top', fontSize: 12, fill: '#595959' }}
+                label={{ position: 'top', fontSize: 12, fill: '#000000' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -117,16 +119,18 @@ export default function HomePage() {
 
         <ChartCard title="近7天各科室预约量">
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={barData} margin={{ top: 18, right: 8, bottom: 0, left: -20 }}>
+            {/* 柱图几何（layout-ir）：绘图区 x=926..1348、顶 y=325、0 网格与 x 轴重合 y=459；
+                柱中心 972.5/1054.5/1137.5/1219.5/1301.5（左右各 5.4 padding），y 轴标签距轴线 3px */}
+            <BarChart data={barData} margin={{ top: 15, right: 48, bottom: 0, left: 0 }}>
               <CartesianGrid vertical={false} stroke="#F0F0F0" />
-              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#595959' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
-              <YAxis domain={[0, 40]} ticks={[0, 10, 20, 30, 40]} tick={{ fontSize: 12, fill: '#595959' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" height={31} tickMargin={7} padding={{ left: 5.4, right: 5.4 }} tick={{ fontSize: 12, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
+              <YAxis width={68} domain={[0, 40]} ticks={[0, 10, 20, 30, 40]} tickMargin={3} tick={{ fontSize: 12, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
               <Tooltip />
-              <Bar dataKey="value" barSize={49} radius={[2, 2, 0, 0]}>
+              <Bar dataKey="value" barSize={49}>
                 {barData.map((_, i) => (
                   <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
                 ))}
-                <LabelList dataKey="value" position="top" fontSize={12} fill="#595959" />
+                <LabelList dataKey="value" position="top" fontSize={12} fill="#000000" />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -134,10 +138,11 @@ export default function HomePage() {
 
         <ChartCard title="近7天挂号收入">
           <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={incomeData} margin={{ top: 18, right: 16, bottom: 0, left: -20 }}>
+            {/* 收入折线几何同「预约量趋势」（layout-ir 两张卡绘图区完全一致），y 域 0..750 */}
+            <LineChart data={incomeData} margin={{ top: 10, right: 48, bottom: 0, left: 0 }}>
               <CartesianGrid vertical={false} stroke="#F0F0F0" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#595959' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
-              <YAxis domain={[150, 750]} ticks={[150, 300, 450, 600, 750]} tick={{ fontSize: 12, fill: '#595959' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" height={31} tickMargin={7} padding={{ left: 29, right: -9.5 }} tick={{ fontSize: 11, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
+              <YAxis width={68} domain={[0, 750]} ticks={[150, 300, 450, 600, 750]} tickMargin={15} tick={{ fontSize: 12, fill: '#000000' }} axisLine={{ stroke: '#D9D9D9' }} tickLine={false} />
               <Tooltip />
               <Line
                 type="monotone"
@@ -145,13 +150,16 @@ export default function HomePage() {
                 stroke="#52C41A"
                 strokeWidth={2}
                 dot={{ r: 4, fill: '#FFFFFF', stroke: '#52C41A', strokeWidth: 2 }}
-                label={{ position: 'top', fontSize: 12, fill: '#595959', formatter: (v: number) => `¥${v}` }}
+                label={{ position: 'top', fontSize: 12, fill: '#52C41A', formatter: (v: number) => `¥${v}` }}
               />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="chart-card">
+        {/* 关键指标：原型中该区块不是白卡（见 layout-ir/home.json —— 157:191..157:200
+            四个 263x78 白格子直接落在 #F5F7FA 画布上，周围无白色卡片底）。
+            沿用 .chart-card 的白底会让白格子白底同色而「消失」，故用 .metric-card 去底。 */}
+        <div className="chart-card metric-card">
           <div className="chart-head">
             <span className="chart-ic">
               <img src="/assets/nav/关键指标.png" alt="" width={14} height={14} />

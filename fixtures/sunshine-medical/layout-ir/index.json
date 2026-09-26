@@ -2,7 +2,7 @@
   "version": "1.0",
   "slug": "sunshine-medical",
   "fileKey": "KLYzRbufrish4gmY4jpUS0",
-  "extractedAt": "2026-09-24T06:59:22.393Z",
+  "extractedAt": "2026-09-25T14:22:08.925Z",
   "frames": [
     {
       "id": "home",
@@ -11,16 +11,28 @@
       "name": "首页"
     },
     {
+      "id": "organization",
+      "path": "fixtures/sunshine-medical/layout-ir/organization.json",
+      "nodeId": "157:203",
+      "name": "机构信息"
+    },
+    {
       "id": "departments",
       "path": "fixtures/sunshine-medical/layout-ir/departments.json",
       "nodeId": "157:312",
       "name": "科室管理"
     },
     {
-      "id": "organization",
-      "path": "fixtures/sunshine-medical/layout-ir/organization.json",
-      "nodeId": "157:203",
-      "name": "机构信息"
+      "id": "doctors",
+      "path": "fixtures/sunshine-medical/layout-ir/doctors.json",
+      "nodeId": "157:523",
+      "name": "医生管理"
+    },
+    {
+      "id": "schedules",
+      "path": "fixtures/sunshine-medical/layout-ir/schedules.json",
+      "nodeId": "157:756",
+      "name": "排班管理"
     },
     {
       "id": "modal-create-dept",
@@ -33,6 +45,18 @@
       "path": "fixtures/sunshine-medical/layout-ir/modal-create-doctor.json",
       "nodeId": "157:4212",
       "name": "新增医生弹窗"
+    },
+    {
+      "id": "modal-create-schedule",
+      "path": "fixtures/sunshine-medical/layout-ir/modal-create-schedule.json",
+      "nodeId": "176:4",
+      "name": "新增排班弹窗"
+    },
+    {
+      "id": "modal-batch-schedule",
+      "path": "fixtures/sunshine-medical/layout-ir/modal-batch-schedule.json",
+      "nodeId": "176:46",
+      "name": "批量排班弹窗"
     },
     {
       "id": "sidebar",

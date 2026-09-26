@@ -1,11 +1,11 @@
 ---
-description: Figma 全栈生成启用 Layout IR + Screen Blueprint + 双闸门（字段 + SSIM）；技术栈由用户逐层选择，无默认
+description: Figma 全栈生成启用 Layout IR + Screen Blueprint + 三闸门（fields + gate AND×3 + data）+ 几何腿（visual:geom：IR 控件框 ↔ DOM 框）+ 文本腿（visual:text：IR TEXT ↔ DOM 文本盒）；技术栈由用户逐层选择，无默认
 alwaysApply: true
 ---
 
 # 前端还原方案（按用户选择的栈适配）
 
-本仓库从 Figma 生成全栈时采用高还原方案（Layout IR → Visual IR → Blueprint → 双闸门 → 还原轮次）。
+本仓库从 Figma 生成全栈时采用高还原方案（Layout IR → Visual IR → Blueprint → 三闸门 + 几何腿 + 文本腿 → 还原轮次）。
 
 ## 技术栈：完全由用户逐层选择，无默认
 
@@ -16,15 +16,61 @@ alwaysApply: true
 
 ## 流水线
 
-init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Screen Blueprint** → codegen → **双闸门（字段一致性 + SSIM 视觉闸门）** → 还原轮次
+init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Screen Blueprint** → codegen → **三闸门（fields + gate AND×3 + data）+ 几何腿（visual:geom）** → 还原轮次
 
 ## 必须遵守
 
 - **禁止**通用 `ResourcePage` 或自制 Button/Table/Modal 覆盖全部业务屏（组件一律取自用户选定的组件库）
 - 项目差异全部由 `fixtures/<slug>/app-spec.json` 驱动（screens 全屏清单 / 路由 / 闸门账号 / 品牌）；**脚本与流程禁止业务硬编码**
-- 必跑：`npm run visual:all`（layout / extract / shots / gen / assets / fields / gate）
-- 全屏闸门：`screens` 全量屏（含弹窗）一律进 SSIM 闸门，无标杆/非标杆之分；SSIM ≥ 0.97 或 mismatch < 2%
+- 必跑：`npm run visual:all`（layout / extract / shots / gen / assets / fields / gate / **data** / **geom**）+ **还原轮次每轮手动跑 `npm run visual:text`**（文本腿尚未并入 `visual:all` / `visual:round` 自动链路——5 个内容屏挂起文本差异未清完，并入即每轮 FAIL；清完后并入）
+- 全屏闸门：`screens` 全量屏（含弹窗）一律进闸门，无标杆/非标杆之分；**像素三腿 AND**：`SSIM ≥ 0.85` **且** `mismatch < 2%` **且** `平坦底色漂移 ≤ VISUAL_FLATBG_MAX`（默认 0.025，弹窗 0.06）（旧 OR 已废弃，防假阳性）；阈值必须经 `loadRootEnv` 从根 `.env` 读入，未加载即静默回落 = 闸门失效（`visual:doctor` 已脚本校验阈值都在 `.env` 里）
+- **几何腿（第四条，独立脚本 `npm run visual:geom`）**：三条像素腿**全是全屏统计量**，对「尺寸/位置」偏差结构性失明（表单窄 164px 时 1px 边框位移只影响 ~0.3% 像素 → 三腿全过）。故必须另有几何腿：把 Layout IR 的**控件框**与运行时 DOM 输入控件逐框配对断言 `|dx| |dy| |dw| |dh| ≤ VISUAL_GEO_TOL`（默认 3px）。判据从 IR 派生，**无按屏配置、无业务硬编码**；已挂入 `visual:all` / `visual:round`，`visual:doctor` 必含「✅ 几何闸门（IR↔DOM 控件框）」（校验 `.env` 有 `VISUAL_GEO_TOL` + 判据未失明）
+- **文本腿（第五条，独立脚本 `npm run visual:text`）**：像素三腿 + 几何腿**都看不见文本级偏差**（几何腿判据是「带 `stroke` 的 RECTANGLE」、TEXT 节点不是 rect；文本 ink 占画面比例极小，8px 整列位移在 `threshold=0.25` 下等于不存在）。故须另有文本腿：IR 的 `TEXT` 节点 `(x,y,w,h,font.size,font.color)` ↔ DOM 文本盒（按 `parentElement` 分组）+ 控件值/占位符，断言 `|dx| |dy| |dw| ≤ VISUAL_TEXT_TOL`（3px）+ `|Δfont-size| ≤ VISUAL_TEXT_SIZE_TOL`（0.6px）+ 颜色全等（alpha 合成白底）；**文本数量必须相等**（DOM 多出 = 组件库多渲染了东西；IR 有 DOM 无 = 文本没落）。判据从 IR 派生，**无按屏配置、无业务硬编码**；`visual:doctor` 必含「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」（校验 `.env` 有两条阈值 + 判据未失明）。详见下「文本级还原硬规则」
+- **宽视口按比例自适应（2026-09-26 用户口径修订）**：
+  - **用户明确要求：宽度不得写死，页面要自适应屏幕宽度**。因此 `.app-content` **不加 `max-width`**，内容区随窗口铺满；原型几何只在 1440 帧宽下成立，宽屏按同一比例横向铺开
+  - 实现方式：布局宽度一律用相对单位（`fr` / `%`），**禁止钉死像素上限**。首页格栅天然按比例（`repeat(4, 1fr)` → 1440 下正好 281×92；`1fr 1fr` → 578；2×2 → 263），照抄即可；内部双列表单等用**原型比例**表达，如机构信息双列 `48.94% / 2.12% / 48.94%`（= IR 的 554 / 24 / 554 ÷ 1132，其中 554 = label 88 + 间距 12 + **输入框 454**），1440 下与 IR 逐像素一致、宽屏按比例放大。**注意 454 是输入框宽不是列宽**——把它当列宽就是 2026-09-26 表单窄 164px 事故的根因（见下「表单几何换算」）
+  - 禁止反过来的写法：**不要为了「1440 像素级对齐」而把内容区钉成固定宽度**（`max-width: 1220px` 已删除）——这会让用户宽屏上右侧留大块空白，是用户两次明确否决的行为
+  - 闸门已脚本强制**宽视口自适应锁定**（`visual:gate` 与 `visual:round` 均跑）：同一屏在 1440 与 `VISUAL_WIDE_WIDTH`（1888）下量同一批 DOM 框 → 要求 ①无横向溢出 ②内容确实铺满（右侧只留 body padding 24px，`VISUAL_FILL_TOL`）③**纵向骨架不变**（每框 y/h 与 1440 一致，`VISUAL_WIDE_TOL` 1.5px，即只横向自适应、不纵向重排）；弹窗为固定尺寸对话框，只校验尺寸不变 + 水平居中（`VISUAL_MODAL_CENTER_TOL`）
+  - 注意代价：卡宽在宽屏会大于原型（1680 → KPI 341×92；1920 → 401×92），这是「铺满不写死」的必然结果；1440 下的 SSIM 仍逐像素对齐原型（改动后 5 屏 SSIM 完全不变）
+- **弹窗还原硬规则（2026-09-25 弹窗事故沉淀）**：
+  - 写弹窗前必读 `layout-ir/modal-<id>.json`，布局方向/列宽/节距/footer 逐项照 IR 落，**禁止按组件库默认形态（如 vertical 表单）凭感觉写**（原型弹窗均为横向表单）
+  - 弹窗必须进截图/对比链路：`capture-screens.mjs` / `visual-gate.mjs` 按 `modal.trigger` 打开弹窗截 `.ant-modal-content`；还原轮次统计里每个 modal 屏必须各有一条记录
+  - 弹窗标杆图含 12px 阴影白边（标杆 = IR frame + 24px），运行时截图补同样白边再比，防 fitPng 拉伸错位
+  - `visual:doctor` 必含「✅ 弹窗闸门覆盖」（modal 缺 trigger 即报错）；doctor 必含「✅ Layout IR 完整性」
 - 字段一致性：`screenConfigs` 中 `needsReview: true` 数量 = 0，且逐屏字段与 `fixtures/figma-fields.json` 逐字一致
+- **数据闸门（脚本强制，必跑 `npm run visual:data`）**：`check-config-api-closure`（stats key 后端必须产出）+ `check-data-backfill`（非 gate DOM 回填，表单不许全空）；已挂入 `visual:all` / `visual:round`
+- **屏面还原硬规则（2026-09-25 机构信息屏事故沉淀）**：
+  - **闸门通过 ≠ 还原到位 → 已 AND 机械化**：旧 OR 对留白页假阳性（事故屏 SSIM 0.768 却过闸）。现 `SSIM ≥ 0.85 AND mismatch < 2% AND 平坦底色漂移 ≤ 2.5%`（三腿，第三条见下「区块容器」事故）；还原轮次筛屏以未达标项为准
+  - form/detail 屏同受「无 IR 不写屏」约束：写屏前逐项照 `layout-ir/<id>.json` 落布局方向/列宽/label 宽/行距/按钮位置，**禁止按组件库默认形态（vertical 单列表单、按钮沉底）凭感觉写**（原型为横向双列，**列 = 88px label + 12px 间距 + 454px 输入框 = 554px**，地址/简介全宽 1032px，保存按钮在卡头右上 112×31）
+  - `screenConfigs.stats` 的 key 必须与后端接口闭环：接口缺字段就补后端，禁止前端 `?? 0` 静默兜底掩盖缺字段；由 `visual:data` 静态扫描强制
+  - **表单/详情屏必须回填真实数据**：seed 已含原型 sample 数据，还原页面时必须把数据显示出来（「标签在、数值空」即未完成）；契约以 `CrudController` 实际行为为准——`GET /<res>` 返回数组、单条数据屏取 `list[0]` 回填、保存 `PUT /<res>/{id}`（`toMap` 必须返回 `id`）；由 `check-data-backfill` Playwright DOM 断言强制
+- **区块容器/卡片底色硬规则（2026-09-26「关键指标」事故沉淀）**：
+  - **禁止按「同类栅格单元长得一样」类比推容器**。首页「关键指标」在原型里**没有白卡底**：IR 中 4 个 263×78 白格子是页面 frame 的**直接子节点，无带 `fill` 的父容器**，直接落在 `#F5F7FA` 画布上；实现却按另三张图表卡类比套了 `.chart-card`（白底）→ 白格子叠白卡、格子边界消失
+  - 写每个区块前**从 IR 求证容器是否存在**：有带 `fill` 的父节点 → 用该 fill；**没有 → 必须透明，不得加卡片底**。**IR 的「没有容器节点」是设计信息，不是缺失信息**
+  - 连带项也照 IR：该区块标题 icon x=864 = 区块左缘 838 + **26**（`.chart-card` padding 为 20 → 需补 6px），不得沿用同类卡片的 padding
+  - **低对比度差异是旧闸门的结构性盲区，已补第三条腿**：`pixelmatch threshold=0.25` 只统计色差 ≥25% 的像素，而 `#FFFFFF` vs `#F5F7FA` 仅 ~3.9% → 该差异在 mismatch 腿里**等于不存在**（实测修复前 1.194% / 事故版 1.191%，bug 版反而更低）；SSIM 也被整屏稀释（0.869→0.882，0.85 阈值未触发）。现 `flatBgDrift`（平坦底色漂移，排除文字渲染差异）补位：事故 4.80% vs 修复 0.32%，闸门由 PASS 转 FAIL
+  - 该腿若参数失效会静默放行 → `visual:doctor` 必含「✅ 低对比度盲区闸门（flatBg）」（校验 4 条阈值都在 `.env` + 度量可用）；`visual-gate --calibrate` 必含度量自检（对照 0% / 半幅画布被吞 50%）；失败时看 `artifacts/visual-diff/<屏>.flatbg.png`（洋红=标杆平坦底色被改色）
+- **表单几何换算硬规则（2026-09-26 机构信息「表单窄 164px」事故沉淀）**：
+  - **事故**：机构信息屏看起来「还原了」（字段全、KPI 全、保存按钮在卡头右上），实际整张表单比原型**窄 164px**、右端够不到卡片内缘：机构名称输入框 `377×40@(341,335)` 而 IR 是 `454×40@(364,327)`；地址/简介 `806` 而 IR `1032`（窄 226px）；行首 y `335` 而 IR `327`
+  - **根因（代码层）**：IR 里一行是**四段** `label 88 + 间距 12 + 输入框 454 = 列 554`，两列 + 列距 24 = 1132。实现写 `grid-template-columns: 40.11% 40.11%`——**40.11% = 454/1132，把「输入框宽」当成了「列宽」**；随后 antd 的 label 又从这 454 里吃掉 77px → 输入框只剩 `454−77 = 377`。二次错误：`.org-full` 用被压窄的和算 `width: 91.17%` → 全宽行 806 而非 1032。**错误是「控件宽当列宽 → 再从列里扣 label → 再拿压窄的和算全宽」三次换算叠出来的**
+  - **根因（工具层）**：三条像素腿**双双放行**——mismatch 阈值 0.25 只统计色差 ≥25% 的像素，1px 灰边框位移+白底缩水只占 ~0.3% 像素（bug 版 1.18% vs 修复版 1.05%，**无区分度**）；SSIM 0.868 仍在 0.85 之上（修复后 0.943）；flatBg 只测「标杆平坦底色是否被**改色**」，测不到「**边缘位移**」（1.38% < 2.5%）。**结论：缺的不是更严的阈值，是判据的维度——像素统计之外必须有「几何尺寸」这条腿**
+  - **防复发（已脚本强制）**：`npm run visual:geom`（`scripts/check-geometry.mjs`）把 IR 控件框（带 `stroke` 的 RECTANGLE，h 36~120、w≥80，故 31px 描边按钮与无 stroke 卡片天然排除）与 DOM 输入控件（`.ant-input` / `.ant-input-affix-wrapper` / `.ant-select-selector` / `.ant-picker`，取最外层去嵌套）按 (y,x) **一一配对**，断言 `|dx| |dy| |dw| |dh| ≤ VISUAL_GEO_TOL`（默认 3px）。**有效性自证**：拿事故版 CSS 复跑 → 机构信息 6 框全报错（Δw −77 / −226px、Δx −23 / −87、Δy 9）FAIL；修复版 6 框最大偏差 2px PASS
+  - **该腿上线即抓到第 2 例同类缺陷（医生管理筛选条）**：搜索框 `212×32` 而 IR `280×40`——`DoctorsPage` 用的是裸 `<Input>`，不在 `.ant-input-affix-wrapper` 里，旧 CSS 的 `.ant-input-search { width: 280px }` 与 `.ant-input-affix-wrapper { height: 40px !important }` **两条都命中不到** → 退回 antd 默认 32px 高、宽度被 flex 压到 212，并把后面的下拉整体左移 68px；下拉容器仍是 32px，`.ant-select-selector` 被 `!important` 拉到 40 后**从容器顶部溢出 4px**。修复后 doctors SSIM 0.874 → **0.906**、flatBg 1.43% → 0.61%（像素腿本来就是 PASS，人眼与像素闸门都看不出）
+  - **写 form/list 屏的几何换算 checklist**：
+    - [ ] 把 IR 那一行**拆成段**：`label + 段间距 + 控件宽 = 列宽`；**列宽必须含 label**，禁止把控件宽当列宽
+    - [ ] 全宽行**不要手算百分比**，用 `grid-column: 1 / -1` 让浏览器 stretch（91.17% 就是二次换算错的来源）
+    - [ ] label 右对齐留白用「label 容器宽 = label 宽 + 段间距」表达（`width: 100px; padding-right: 12px`），不要用组件库默认 labelCol
+    - [ ] **组件库默认尺寸 ≠ IR**：antd `Input`/`Select` 默认高 32px；`Select` 容器高度要与 `.ant-select-selector` **一起**钉（只改 selector 会溢出 4px）
+    - [ ] 跑 `npm run visual:geom`，该屏控件框逐框 PASS
+  - **已知边界（别以为绿了就没事）**：①几何腿只断言**输入控件框**的 x/y/w/h，卡片/容器高度、文本基线、图标位置仍只有像素腿兜底；②**modal 屏暂未纳入几何腿**（需 trigger 打开 + 处理 80×80 灰底投放区等非 antd 控件）——弹窗的**文本**由文本腿 `visual:text` 兜底（4 个弹窗文本已对齐，像素三腿 + flatBg 均已 PASS）；③判据依赖「IR 里存在带 stroke 的控件 rect」，原型本就没有输入控件的屏（departments/home）几何腿对该屏空转——会打印屏数，不会假装通过
+- **文本级还原硬规则（2026-09-26 弹窗文本事故沉淀）**：
+  - **事故**：4 个弹窗**全部/部分通过像素闸门**，但逐项都错：label 文本整体**左偏 8px**（`label` 是 `inline-flex` 自带 `gap: 8px`，我们又加 `margin-left: 8px` → 16px）；**非必填 label 左偏 13px**（`colon={false}` **并没有删掉** antd 的 `::after`，只把内容换成空格并保留 `margin: 0 8px 0 2px` = 12.92px）；控件文本 **14px / 主题色** 而 IR 是 15px `#333333`；「全部医生」用 `placeholder`（灰 `rgba(0,0,0,.25)`）而 IR 是**深色值** `#262626`；「选择排班日期」label **左溢出 12px**（IR 里 `*` 因放不下**掉到第二行**）；预览末行**多一条边框**（IR 末行只有 TEXT、无描边矩形）
+  - **根因三类（可迁移到任何「组件库 + 原型」场景）**：①**组件库的隐式默认**——缺陷全部来自「我们没写的属性」（`colon` 的空格占位、label 的 `flex gap`、`font-size: 14px`、占位符 alpha、默认高 32px、`::after` 的 margin）；**「关掉/补上」必须 DOM 探针实测，不能凭「我写了这条 CSS」假定生效**（`colon={false}` 就是典型反例）；②**IR 的「非文本」信息也是验收项**——「IR 里没有边框」「`*` 掉到第二行」「文本是深色=值不是占位符」都不会表现为「多了/少了什么」，写屏前必须把 IR 节点 `(x, y, w, h, font.size, font.color)` 当清单逐项对；③**判据维度缺失**——像素腿对文本级偏差结构性失明（文本 ink 占弹窗 40.8 万像素的极小比例，8px 整列位移 + 14→15px 字号在 `threshold=0.25` 下几乎不存在：dept 弹窗 label 全偏 8px 仍 `SSIM 0.9087` / mismatch 0.54% PASS），几何腿判据是「带 `stroke` 的 **RECTANGLE**」——**TEXT 节点不是 rect**，且当时显式跳过 modal 屏 → 弹窗文本**双盲区**
+  - **防复发（已脚本强制）**：`npm run visual:text`（`scripts/check-text.mjs`）——IR 侧取 `type === "TEXT"` 节点 `(x,y,w,h,font.size,font.color)`（弹窗坐标相对弹出框左上，与 DOM 取 `.ant-modal-content` 同源）；DOM 侧按 **`parentElement` 分组**测量文本（多文本节点/换行拼成一个测量单元），`Range` 盒给几何、computed style 给字号（SVG 取 `fill` 上色）；文本**归一化去全部空白**后按**多重集 + 位置最近**配对，**数量必须相等**（DOM 多出 = 组件库多渲染了东西；IR 有 DOM 无 = 该还原的文本没落）；断言 `|dx| |dy| |dw| ≤ VISUAL_TEXT_TOL`（3px）+ `|Δfont-size| ≤ VISUAL_TEXT_SIZE_TOL`（0.6px）+ 颜色全等（**alpha 必须先合成到白底**，否则 antd 占位符 `rgba(0,0,0,.25)` 会被误判成 `rgb(0,0,0)`）；控件内文本走「控件值/占位符断言」。**豁免**（框架通用规则，非按屏配置）：`*`（CSS `::after` 渲染）、单字符非中英文数字（`‹ › × ✓` 是图标字形）、中心落在 `<canvas>`/`<svg>` 内的 IR 文本（图表标签归像素腿）
+  - **为什么 3px 容差不为 0**：IR 文本盒（Figma 字面行框）与 DOM `Range` 盒（CSS line box）有 1~2px 度量约定差（实测 13px 标签稳定 `dy −1~−2`），3px 是噪声地板，而事故缺陷是 **8/11/13px 与 1px 字号** → 仍全部命中；**不断言 `h`**（两者语义不同：本项目 KPI 值 28px 字 / 40px 行高）
+  - **有效性自证**：修好 4 个弹窗**再**补这条腿时，它立刻回抓出**第 3 例同类缺陷**（「排班状态」label 左偏 13px = `colon={false}` 未真删 `::after`）+ 占位符字号 14→15 + footer「取消」色 `#1F2937→#595959` + 「医生头像」被误标必填（IR 该行无 `*`）+ 上传区用 `＋` 文本冒充图标（IR 是 `PlusOutlined` 矢量）；修完后 4 个弹窗文本节点最大偏差 2px
+  - **组件库默认值的正确改法（antd 实例）**：`colon={false}` 不够 → 必须显式 `label:not(.ant-form-item-required)::after { content: none; display: none; }`，再 `padding-right: 2px` 才能让非必填 label 右缘落在 IR 的 108；label 自带 `gap: 8px` 时**不要**再补 `margin-left`（补了就 16px）；控件字号/字色/占位符色必须显式覆盖（antd 默认 14px `@theme.colorText`），IR 是 15px `#333333` + 占位符 `#BFBFBF`；图标一律来自 `public/assets`（`PlusOutlined`），禁止 `＋` 文本冒充
+  - **已知挂起项**：文本腿只覆盖 **HTML 文本**（SVG/canvas 文字归像素腿）；5 个内容屏有挂起文本差异（`chrome` 用户名 `dx=28`、头像 `18px vs IR 13px`、`系统管理员` 整块缺失；侧栏多渲染 16~17 项、灰显色 `#BFBFBF` vs IR `#595959`；机构信息 label 右缘 13px；医生单元格 `dx=9`；排班 `cell-count` 11px vs IR 10px）——**像素腿本来就是 PASS**，必须在还原轮次里清掉。**当前 `visual:text` 未并入 `visual:all` / `visual:round`**（并入即每轮 FAIL），故还原轮次每轮**手动必跑**并把它并进差异表；清完挂起项后再并入阻断链路
 - **第一版全栈之后**必须进入字段还原 + 页面还原轮次：Playwright 逐页截图对比，列出差异并修代码；每轮结束询问是否下一轮，直至用户选择不进入
 - Blueprint：`fixtures/<slug>/screen-blueprints/` → `apps/web/src/blueprints/`
 - 图标必须来自 Layout IR 导出的 `public/assets`，禁止 emoji 冒充
@@ -38,4 +84,4 @@ init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Scr
 
 ## 验收
 
-未过双闸门（`visual:fields` + `visual:gate`）不得宣称生成完成。第一版全栈后须跑还原轮次（见 visual-fidelity.md「还原轮次」），用户未明确停止前不得收尾。
+未过闸门组（`visual:fields` + `visual:gate` + `visual:data` + `visual:geom` + `visual:text`）不得宣称生成完成。第一版全栈后须跑还原轮次（见 visual-fidelity.md「还原轮次」），用户未明确停止前不得收尾。

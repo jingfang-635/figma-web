@@ -14,7 +14,9 @@ dayjs.locale('zh-cn');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ConfigProvider locale={zhCN} theme={antdTheme}>
+    {/* autoInsertSpace：antd 默认给「两字中文按钮」插入空格（取消 → 取 消，按钮 60 → 65px），
+        Figma 原型无此间距（IR 两字按钮文本恰 26 = 2em、按钮 60 宽）→ 关掉 */}
+    <ConfigProvider locale={zhCN} theme={antdTheme} button={{ autoInsertSpace: false }}>
       <AntApp>
         <BrowserRouter>
           <App />

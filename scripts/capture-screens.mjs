@@ -12,7 +12,7 @@
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolveProject, gateCredentials } from "./lib/project.mjs";
+import { resolveProject, gateCredentials, shadowPad } from "./lib/project.mjs";
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
@@ -26,8 +26,16 @@ const round = roundArg ? roundArg.split('=')[1] : '1';
 const targetScreens = screensArg ? screensArg.split('=')[1].split(',') : null;
 
 const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
-const { slug } = resolveProject(root);
+const { slug, spec } = resolveProject(root);
 const { email, password, storageKey } = gateCredentials(root);
+
+// 从 app-spec 读取弹窗清单（type=modal，含 trigger），与页面截图走同一套命名/目录
+function loadModalTargets() {
+  const screens = spec?.screens || [];
+  return screens
+    .filter((s) => s.type === "modal" && s.route && s.modal?.trigger)
+    .map((s) => ({ id: s.id, route: s.route, name: s.name, trigger: s.modal.trigger }));
+}
 
 // 从 screenConfigs 读取路由列表
 function loadScreenConfigs() {
@@ -75,6 +83,20 @@ function loadViewport(screenName) {
 
 async function main() {
   const playwright = require("playwright");
+const { PNG } = require("pngjs");
+
+/** 弹窗截图补白边：按 IR 阴影余量四边补（详见 lib/project.mjs shadowPad）
+ *  旧实现固定 12px 四边 → 纵向与标杆错位 shadow.y（本设计 4px）→ 逐像素比必判结构错位 */
+function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
+  const inner = PNG.sync.read(buf);
+  const padded = new PNG({
+    width: inner.width + pad.left + pad.right,
+    height: inner.height + pad.top + pad.bottom,
+  });
+  padded.data.fill(255);
+  PNG.bitblt(inner, padded, 0, 0, inner.width, inner.height, pad.left, pad.top);
+  return PNG.sync.write(padded);
+}
   
   console.log(`🔄 开始第 ${round} 轮批量截图...\n`);
   
@@ -84,11 +106,21 @@ async function main() {
     ? routes.filter(r => targetScreens.some(s => r.route.includes(s) || r.name.includes(s)))
     : routes;
   
-  console.log(`📄 待截图页面：${filteredRoutes.length} 个`);
+    console.log(`📄 待截图页面：${filteredRoutes.length} 个`);
   if (targetScreens) {
     console.log(`   筛选：${targetScreens.join(', ')}`);
   }
   console.log('');
+
+  // 弹窗目标（app-spec type=modal；--screens 过滤同样生效）
+  const modalTargets = loadModalTargets().filter((m) =>
+    !targetScreens || targetScreens.some((s) => m.route.includes(s) || m.name.includes(s) || m.id.includes(s))
+  );
+  if (modalTargets.length) {
+    console.log(`🪟 待截图弹窗：${modalTargets.length} 个（trigger 驱动，截 .ant-modal-content）`);
+    for (const m of modalTargets) console.log(`   - ${m.name} (${m.route}, trigger: ${m.trigger})`);
+    console.log('');
+  }
   
   // 准备输出目录
   const outDir = resolve(root, `artifacts/visual-diff/round-${round}/actuals`);
@@ -127,10 +159,10 @@ async function main() {
       { token: accessToken, user: loginBody.user, storageKey }
     );
     
-    // 3. 批量截图所有页面
+    // 3. 批量截图所有页面 + 弹窗
     console.log("📸 开始批量截图...\n");
     const screenshots = [];
-    
+
     for (const route of filteredRoutes) {
       const routeName = route.name || route.route.replace('/', '') || 'home';
       const screenshotName = `${routeName}.png`;
@@ -185,7 +217,45 @@ async function main() {
       }
     }
     
-    // 4. 输出统计
+    // 4. 弹窗截图（点击 trigger → 截 .ant-modal-content，命名与标杆图一致）
+    for (const m of modalTargets) {
+      console.log(`   弹窗：${m.name} (${m.route}, trigger: ${m.trigger})`);
+      try {
+        const viewport = loadViewport(m.id);
+        await page.setViewportSize(viewport);
+        await page.goto(`${WEB_URL}${m.route}?visualGate=1`, { waitUntil: "networkidle", timeout: 30000 });
+        await page.evaluate(() => document.fonts.ready);
+        try {
+          await page.waitForSelector(".ant-table, .calendar-grid, .app-content", { timeout: 10000 });
+        } catch {
+          // 页面主体选择器缺失时仍尝试点击
+        }
+        await page.getByRole("button", { name: m.trigger }).first().click({ force: true });
+        await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
+        await page.waitForTimeout(400);
+        await page.evaluate(() => document.fonts.ready);
+
+        const content = page.locator(".ant-modal-content").last();
+        const box = await content.boundingBox();
+        if (!box) throw new Error("modal content not visible");
+        const clip = {
+          x: Math.max(0, Math.round(box.x)),
+          y: Math.max(0, Math.round(box.y)),
+          width: Math.ceil(box.width),
+          height: Math.ceil(box.height),
+        };
+        const screenshot = await page.screenshot({ type: "png", clip, animations: "disabled", caret: "hide" });
+        const outputPath = resolve(outDir, `${m.name}.png`);
+        writeFileSync(outputPath, padWhite(screenshot, shadowPad(root, m.id)));
+        screenshots.push({ name: m.name, route: m.route, path: outputPath, status: 'success', modal: true, viewport: clip });
+        console.log(`      ✅ 成功 (弹窗 ${clip.width}×${clip.height})\n`);
+      } catch (error) {
+        console.error(`      ❌ 失败：${error.message}\n`);
+        screenshots.push({ name: m.name, route: m.route, path: null, status: 'failed', modal: true, error: error.message });
+      }
+    }
+
+    // 5. 输出统计
     const successCount = screenshots.filter(s => s.status === 'success').length;
     const failedCount = screenshots.filter(s => s.status === 'failed').length;
     

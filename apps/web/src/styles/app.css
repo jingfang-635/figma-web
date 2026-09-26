@@ -10,7 +10,7 @@ body {
 .app-sider { border-right: 1px solid #F0F0F0; }
 .app-sider .ant-layout-sider-children { display: flex; flex-direction: column; height: 100%; }
 
-.sider-brand { display: flex; align-items: center; gap: 10px; padding: 16px 20px 16px; }
+.sider-brand { display: flex; align-items: center; gap: 10px; padding: 14px 20px 16px; }
 .brand-logo {
   width: 36px; height: 36px; border-radius: 8px; background: #20BF88;
   color: #FFFFFF; display: grid; place-items: center; font-size: 18px;
@@ -18,7 +18,7 @@ body {
 .brand-title { font-size: 16px; font-weight: 500; color: #262626; line-height: 21px; }
 .brand-subtitle { font-size: 12px; color: #8C8C8C; line-height: 17px; margin-top: 1px; }
 
-.sider-nav { flex: 1; overflow: auto; padding: 0 0 16px; }
+.sider-nav { flex: 1; overflow: auto; padding: 4px 0 16px; }
 
 .nav-item {
   display: flex; align-items: center;
@@ -26,18 +26,21 @@ body {
   font-size: 15px; color: #595959; cursor: pointer;
   position: relative; user-select: none;
 }
+/* 一级菜单：图标 24（IR x26..50）、文字 x57（IR 实测 58） */
+.nav-item.nav-top { padding-left: 26px; }
+.nav-item.nav-top .nav-ic { width: 24px; margin-right: 7px; }
 .nav-item:hover { background: #F5F5F5; }
 .nav-top.active { background: #E6F4FF; color: #262626; font-weight: 500; }
 .nav-disabled { color: #BFBFBF; }
 .nav-disabled .nav-label { color: #BFBFBF; }
 .nav-ic { width: 20px; display: inline-flex; justify-content: center; margin-right: 10px; }
 .nav-badge {
-  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 25px; top: 50%; transform: translateY(-50%);
   min-width: 22px; height: 17px; border-radius: 9px; background: #FF4D4F;
   color: #fff; font-size: 11px; display: grid; place-items: center; padding: 0 6px;
 }
 
-.nav-divider { width: 163px; height: 1px; background: #F0F0F0; margin: 10px 0 11px 28px; }
+.nav-divider { width: 163px; height: 1px; background: #F0F0F0; margin: 6px 0 11px 28px; }
 .nav-item.nav-group {
   font-size: 14px; font-weight: 500; color: #8C8C8C; height: 38px; padding-left: 24px;
 }
@@ -67,6 +70,9 @@ body {
 .header-logout { font-size: 13px; color: #8C8C8C; }
 .header-logout:hover { color: #1890FF; }
 
+/* 内容区按比例自适应：宽度一律由相对单位推导，不写死像素上限。
+   原型帧 1440（侧栏 220 + 内容 1172 + 两侧 24），格栅用 fr / % 表达后
+   在 1440 下与原型逐像素一致，窗口更宽时整幅等比铺满（不留白、不重排）。 */
 .app-content { padding: 20px 24px 24px; }
 
 .page-head { margin-bottom: 18px; }
@@ -78,10 +84,12 @@ body {
 .kpi-row { margin-bottom: 20px; }
 .kpi-card {
   background: #FFFFFF; border-radius: 8px; height: 92px; padding: 20px 24px;
-  display: flex; flex-direction: column; justify-content: center;
+  /* IR：label 行框 y=163（=卡顶 143 + padding 20，**顶部对齐**）、value 行框 y=182。
+     原来用 center：内容 54.86 > 内容区 52 → 溢出居中，label 被顶到 161.6、value 到 182.4。 */
+  display: flex; flex-direction: column; justify-content: flex-start;
 }
-.kpi-label { font-size: 12px; color: #8C8C8C; }
-.kpi-value { font-size: 28px; font-weight: 500; color: #1890FF; line-height: 34px; margin-top: 2px; }
+.kpi-label { font-size: 12px; color: #8C8C8C; line-height: 16.8px; }
+.kpi-value { font-size: 28px; font-weight: 500; color: #1890FF; line-height: 28px; margin-top: 2px; }
 
 .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .chart-card {
@@ -93,6 +101,13 @@ body {
 .chart-title { font-size: 14px; font-weight: 500; color: #262626; }
 .chart-plot { flex: 1; }
 
+/* 关键指标：原型的该区块没有白色卡片底 —— 4 个白格子（263x78 r6，间距 12）
+   直接落在 #F5F7FA 画布上（layout-ir/home.json 中 157:191..157:200 之外为画布色）。
+   若沿用 .chart-card 白底，白格子与白卡同色 → 格子边界消失，与原型不符。 */
+.metric-card { background: transparent; }
+/* 原型标题/图标相对区块左缘内缩 26px（IR 关键指标 icon x=864 = 838+26），
+   而 .chart-card padding 为 20px → 补 6px 对齐。 */
+.metric-card .chart-head { margin-left: 6px; }
 .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; }
 .metric-cell {
   background: #FFFFFF; border-radius: 6px; height: 78px; padding: 14px 0;
@@ -116,44 +131,97 @@ body {
   margin-right: 8px; vertical-align: middle;
 }
 
-/* 排班日历 */
+/* ===== 排班日历（几何来自 Layout IR schedules.json：卡片内工具条 y159 / 图例 y223 / 表头行 32px #FAFAFA / 单元格 155x110）===== */
+.schedule-card .ant-card-body { padding: 16px 20px 20px; }
+
 .schedule-toolbar {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
 }
-.toolbar-label { color: #595959; font-size: 13px; }
-.month-label { font-size: 14px; font-weight: 600; margin: 0 4px; }
-.legend-row { display: flex; gap: 20px; margin-bottom: 12px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #595959; }
-.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.dot-open { background: #52C41A; }
+.toolbar-left { display: flex; align-items: center; height: 40px; gap: 12px; }
+.toolbar-right { display: flex; align-items: flex-start; gap: 8px; }
+.toolbar-label { color: #8C8C8C; font-size: 13px; font-weight: 500; line-height: 19px; }
+.toolbar-select, .toolbar-select .ant-select-selector { height: 40px !important; }
+.toolbar-select .ant-select-selection-item { color: #333333; font-size: 15px; line-height: 38px; }
+.toolbar-divider { width: 1px; height: 24px; background: #F0F0F0; margin: 0 4px; }
+.month-nav { display: inline-flex; align-items: center; gap: 43px; margin-left: 6px; }
+.month-arrow { font-size: 12px; color: #595959; cursor: pointer; line-height: 17px; user-select: none; }
+.month-arrow:hover { color: #1890FF; }
+.month-label { font-size: 14px; font-weight: 500; color: #333333; min-width: 68px; text-align: center; }
+.today-link { font-size: 12px; color: #595959; cursor: pointer; margin-left: 17px; }
+.today-link:hover { color: #1890FF; }
+.schedule-toolbar .ant-btn { height: 31px; padding: 0 25px; font-size: 13px; border-radius: 6px; }
+
+/* 分段控件：#F5F5F5 底 203x31 + 白色活动块 101x27 */
+.view-switch {
+  display: flex; align-items: center;
+  background: #F5F5F5; border-radius: 6px; padding: 2px; height: 31px;
+}
+.view-opt {
+  width: 101px; height: 27px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #595959; cursor: pointer; border-radius: 4px;
+}
+.view-opt.active {
+  background: #FFFFFF; color: #1890FF; font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* 图例：10x10 圆角方块（原型 r=3），非圆形；行高 17（y223–240），下距 7 → 日历 y247 */
+.legend-row { display: flex; gap: 16px; margin-bottom: 7px; align-items: center; height: 17px; line-height: 17px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8C8C8C; line-height: 17px; }
+.dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.dot-open { background: #1890FF; }
 .dot-full { background: #FA8C16; }
 .dot-stopped { background: #FF4D4F; }
+.dot-am { background: #13C2C2; }
+.dot-pm { background: #EB2F96; }
 
+/* 日历网格：#F0F0F0 容器 + 1px 缝隙成线，圆角 8；网格 1092 宽（卡内缩进 40） */
+.calendar-wrap {
+  background: #F0F0F0; border-radius: 8px; padding: 1px; margin: 0 19px;
+}
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 1px;
 }
-.calendar-week-header { text-align: center; font-size: 13px; color: #8C8C8C; padding: 4px 0; }
+.calendar-week-header {
+  height: 32px; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: #8C8C8C; background: #FAFAFA;
+}
+.calendar-week-header.weekend { color: #FF4D4F; }
+/* 单元格：最小高 110，按内容长高（原型 8/10 当周 122）；日期行 24 → 药丸 19+2 → 更多 16 */
 .calendar-cell {
-  min-height: 92px;
-  border: 1px solid #F0F0F0;
-  border-radius: 6px;
-  padding: 6px;
+  min-height: 110px;
+  padding: 6px 8px 7px;
   background: #FFFFFF;
+  overflow: hidden;
 }
-.calendar-cell.empty { background: transparent; border-color: transparent; }
-.calendar-cell.today { border-color: #1890FF; }
-.cell-day { font-size: 12px; color: #8C8C8C; margin-bottom: 4px; }
+.calendar-cell.out { background: #FAFAFA; }
+.calendar-cell.weekend { background: #FFFBFB; }
+.calendar-cell.out .cell-day { color: #D9D9D9; }
+.calendar-cell.today { background: #E6F7FF; }
+.cell-day { font-size: 13px; font-weight: 500; color: #262626; line-height: 24px; height: 24px; margin-bottom: 4px; }
+.day-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 12px;
+  background: #1890FF; color: #FFFFFF;
+}
+
+/* 药丸条 139x19：按时段/状态配色（原型：am=#E6FFFA/#13C2C2, pm=#FFF0F6/#EB2F96, full=#FFF7E6/#FA8C16, open=#E6F7FF/#1890FF） */
 .cell-item {
-  display: flex; justify-content: space-between;
-  font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
+  display: flex; justify-content: space-between; align-items: center;
+  height: 19px; padding: 0 5px; border-radius: 4px; margin-bottom: 2px;
+  font-size: 11px;
 }
-.cell-item.status-open { background: #F6FFED; color: #389E0D; }
-.cell-item.status-full { background: #FFF7E6; color: #D48806; }
-.cell-item.status-stopped { background: #FFF1F0; color: #CF1322; }
-.cell-more { font-size: 12px; color: #8C8C8C; }
+.cell-doctor { font-weight: 500; line-height: 1; }
+.cell-count { font-size: 11px; line-height: 1; }
+.cell-item.pill-am { background: #E6FFFA; color: #13C2C2; }
+.cell-item.pill-pm { background: #FFF0F6; color: #EB2F96; }
+.cell-item.pill-full { background: #FFF7E6; color: #FA8C16; }
+.cell-item.pill-stopped { background: #FFF1F0; color: #FF4D4F; }
+.cell-item.pill-open { background: #E6F7FF; color: #1890FF; }
+.cell-more { font-size: 11px; color: #1890FF; line-height: 16px; margin-top: 2px; }
 
 /* 登录�?*/
 .login-page {
@@ -168,61 +236,165 @@ body {
 
 /* modal upload + custom modal (figma geometry) */
 .upload-area { display: flex; gap: 12px; align-items: flex-start; }
+/* 占位符颜色：IR 一律 #BFBFBF（= antd 默认 rgba(0,0,0,.25) 合成到白底的结果，
+   但上面 `.ant-input { color:#333333 }` 会把它顶掉 → 显式写死） */
+.dept-modal .ant-input::placeholder,
+.doctor-modal .ant-input::placeholder,
+.schedule-modal .ant-input::placeholder { color: #BFBFBF; }
 .upload-box {
   width: 80px; height: 80px; border: 1px solid #D9D9D9; border-radius: 6px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; cursor: pointer; background: #FAFAFA;
+  gap: 6px; cursor: pointer; background: #FAFAFA;
 }
+/* IR：PlusOutlined 24×24 @rel(28,16) + 「上传图标」44×16 @rel(18,46) → 24+6+16=46，上下各留 16/18 */
 .upload-plus { font-size: 24px; color: #BFBFBF; line-height: 1; }
-.upload-text { font-size: 11px; color: #BFBFBF; }
-.upload-hints { font-size: 12px; color: #BFBFBF; line-height: 20px; padding-top: 2px; }
+.upload-text { font-size: 11px; color: #BFBFBF; line-height: 16px; }
+.upload-hints { font-size: 12px; color: #BFBFBF; line-height: 19.2px; padding-top: 1px; }
 
-/* custom modal to match figma */
-.dept-modal .ant-modal-content { padding: 0; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
-.dept-modal .ant-modal-header { height: 61px; padding: 20px; margin: 0; border-bottom: 1px solid #F0F0F0; }
-.dept-modal .ant-modal-title { font-size: 16px; font-weight: 500; color: #262626; line-height: 23px; }
-.dept-modal .ant-modal-close { top: 22px; right: 20px; }
-.dept-modal .ant-modal-close-x { width: 17px; height: 17px; font-size: 13px; color: #595959; display: inline-flex; align-items: center; justify-content: center; }
-.dept-modal .ant-modal-body { padding: 14px 20px 24px; min-height: 376px; }
-.dept-modal .ant-modal-footer { height: 52px; padding: 0 20px; margin: 0; border-top: 1px solid #F0F0F0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
-.dept-modal .ant-modal-footer .ant-btn { height: 31px; padding: 0 17px; border-radius: 6px; font-size: 13px; }
-.dept-modal .ant-form-item { margin-bottom: 10px; }
-.dept-modal .ant-form-item .ant-form-item-label { width: 77px; flex: 0 0 77px; }
-.dept-modal .ant-form-item .ant-form-item-label > label { font-size: 13px; color: #595959; justify-content: flex-end; height: 40px; }
-.dept-form-item-align { display: flex; }
-.dept-modal .ant-form-item-control { flex: 1; }
-.dept-modal .ant-input { height: 40px; border-radius: 6px; }
-.dept-modal textarea.ant-input { height: 60px; min-height: 60px; }
-
-/* 批量排班预览 */
-.batch-preview {
-  background: #F5F7FA; border-radius: 6px; padding: 10px 12px;
-  font-size: 12px; color: #595959; line-height: 1.8; max-height: 132px; overflow: hidden;
-}
-.batch-preview-title { color: #595959; }
-.batch-preview-note { color: #8C8C8C; }
-
-/* doctor modal (same figma geometry as dept-modal) */
+/* ===== 弹窗几何（新增科室/新增医生/新增排班/批量排班），逐项取自 layout-ir/modal-*.json =====
+   共同骨架：框宽 520；头 61（标题 16/22.4 w500 @20,20；关闭图标 17×17 @484,22；下边线 y=60）；
+   label 列 = 20..120（内容右缘 110、padding-right 10），必填 * 在 103..110（= 文本右缘 95 + 8 间距）；
+   控件盒 x=120 宽 380；行距 16（行高各不相同：40 / 60 / 80 / 35）；body 内边距 20；
+   脚 52（上边线 y=卡高-52，按钮高 31、右内缩 20、间距 8 = antd 自带 .ant-btn+.ant-btn 的 margin，勿再加 flex gap 否则变 16）。
+   注：4 个弹窗的 JSX 都用 .dept-modal（或 .doctor-modal），故这两条选择器即全集。 */
+.dept-modal .ant-modal-content,
 .doctor-modal .ant-modal-content { padding: 0; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+.dept-modal .ant-modal-header,
 .doctor-modal .ant-modal-header { height: 61px; padding: 20px; margin: 0; border-bottom: 1px solid #F0F0F0; }
+.dept-modal .ant-modal-title,
 .doctor-modal .ant-modal-title { font-size: 16px; font-weight: 500; color: #262626; line-height: 23px; }
-.doctor-modal .ant-modal-close { top: 22px; right: 20px; }
+/* 关闭：IR 图标 17×17 @(484,22)。antd 的 .ant-modal-close 是 32×32 点击区、图标居中 →
+   要让图标落在 (484,22)，按钮须在 (476.5,14.5)（top/right 各减 7.5 = (32-17)/2） */
+.dept-modal .ant-modal-close,
+.doctor-modal .ant-modal-close { top: 14.5px; right: 11.5px; }
+.dept-modal .ant-modal-close-x,
 .doctor-modal .ant-modal-close-x { width: 17px; height: 17px; font-size: 13px; color: #595959; display: inline-flex; align-items: center; justify-content: center; }
-.doctor-modal .ant-modal-body { padding: 14px 20px 24px; min-height: 376px; }
-.doctor-modal .ant-modal-footer { height: 52px; padding: 0 20px; margin: 0; border-top: 1px solid #F0F0F0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
-.doctor-modal .ant-modal-footer .ant-btn { height: 31px; padding: 0 17px; border-radius: 6px; font-size: 13px; }
+/* body：上 20 → 首行盒顶 = 头 61 + 20 = 81（IR 每屏首行均 81）；下 20 承接末行 margin-bottom 16 */
+.dept-modal .ant-modal-body,
+.doctor-modal .ant-modal-body { padding: 20px 20px 20px; }
+.dept-modal .ant-modal-footer,
+.doctor-modal .ant-modal-footer { height: 52px; padding: 0 20px; margin: 0; border-top: 1px solid #F0F0F0; display: flex; justify-content: flex-end; align-items: center; }
+/* 按钮 31 高、内边距 16 → 两字按钮恰 60 宽（IR 取消/确定各 60 = 1 边框 + 16 + 26 + 16 + 1；
+   批量「确认生成」= 1+16+52+16+1 = 86）。
+   注意：antd 给「两字中文按钮」插空格（60 → 65 且整体左移 5px），已在 main.tsx 用
+   ConfigProvider button.autoInsertSpace=false 全局关闭（IR 文本恰 26 = 2em） */
+.dept-modal .ant-modal-footer .ant-btn,
+.doctor-modal .ant-modal-footer .ant-btn { height: 31px; min-width: 60px; padding: 0 16px; border-radius: 6px; font-size: 13px; }
+/* 行距固定 16（IR 节距 56 = 行高 40 + 16） */
+.dept-modal .ant-form-item,
 .doctor-modal .ant-form-item { margin-bottom: 16px; }
-.doctor-modal .ant-form-item .ant-form-item-label { width: 77px; flex: 0 0 77px; }
-.doctor-modal .ant-form-item .ant-form-item-label > label { font-size: 13px; color: #595959; justify-content: flex-end; height: 40px; }
+.dept-modal .ant-form-item-row,
+.doctor-modal .ant-form-item-row { align-items: flex-start; }
+/* label 列：100 = 90 内容 + 10 段距 → 控件左缘 x=120、宽 380（原 77/383 → 整体右移 3px 且窄 3px） */
+.dept-modal .ant-form-item .ant-form-item-label,
+.doctor-modal .ant-form-item .ant-form-item-label { width: 100px; flex: 0 0 100px; padding-right: 10px; }
+/* label 文本：IR 文本行框顶 = 控件盒顶 + 8（不是垂直居中：40 高控件 89、60 高控件 241、80 高控件 145 都是 +8）
+   flex-wrap：批量弹窗「选择排班日期」文本 78 + 间距 8 + * 6.1 = 92.1 > 列内容 90 → IR 里 * 掉到第二行
+   （IR * @(103,218) 在文本下一行）→ 允许换行才能复现，否则内容左溢出 12px */
+.dept-modal .ant-form-item .ant-form-item-label > label,
+.doctor-modal .ant-form-item .ant-form-item-label > label {
+  font-size: 13px; color: #595959; line-height: 18.2px; height: 18.2px;
+  margin-top: 8px; justify-content: flex-end; flex-wrap: wrap;
+}
+/* 必填 *：IR 在 label 文本右侧（x=103..110），antd 默认放在左侧 → 关掉 ::before、改挂 ::after。
+   label 本身是 inline-flex 且带 8px gap（文本与 * 的真实间距来源），原写法再加 margin-left 8
+   → 实际 16px，把整个文本挤左 8px（实测文本 x=36 而 IR 43，4 个弹窗皆然）→ 只留 gap 的 8px */
+.dept-modal .ant-form-item-label > label.ant-form-item-required::before,
+.doctor-modal .ant-form-item-label > label.ant-form-item-required::before { display: none; content: none; }
+.dept-modal .ant-form-item-label > label.ant-form-item-required::after,
+.doctor-modal .ant-form-item-label > label.ant-form-item-required::after { content: '*'; color: #FF4D4F; margin-left: 0; }
+/* 非必填 label：IR 里没有 *，文本右缘是 **108**（不是必填行的 95 网格）。
+   坑：`colon={false}` 时 antd 并没有真的删掉 ::after，而是把内容换成**一个空格**并保留
+   `margin: 0 8px 0 2px` —— 实测 `::after` footprint = 2 + 2.92 + 8 = 12.92px，
+   把文本右缘从 108 挤到 95.1（视觉:text 抓到的第 1 例：整行左偏 13px）。
+   修法：非必填的 ::after 彻底 content:none，再补 2px 让右缘落在 108（= 110 − 2 ✓） */
+.dept-modal .ant-form-item-label > label:not(.ant-form-item-required)::after,
+.doctor-modal .ant-form-item-label > label:not(.ant-form-item-required)::after { content: none; display: none; }
+.dept-modal .ant-form-item-label > label:not(.ant-form-item-required),
+.doctor-modal .ant-form-item-label > label:not(.ant-form-item-required) { padding-right: 2px; }
+.dept-modal .ant-form-item-control,
 .doctor-modal .ant-form-item-control { flex: 1; }
-.doctor-modal .ant-input, .doctor-modal .ant-input-affix-wrapper, .doctor-modal .ant-select-selector { height: 40px; border-radius: 6px; }
+/* 控件 380×40（IR 每个控件盒）；Select 容器与 selector 必须一起钉，只钉 selector 会从容器溢出 */
+.dept-modal .ant-input,
+.doctor-modal .ant-input,
+.dept-modal .ant-input-affix-wrapper,
+.doctor-modal .ant-input-affix-wrapper,
+.dept-modal .ant-select,
+.doctor-modal .ant-select,
+.dept-modal .ant-select-selector,
+.doctor-modal .ant-select-selector,
+.dept-modal .ant-input-number,
+.doctor-modal .ant-input-number { height: 40px; border-radius: 6px; }
+.dept-modal .ant-select-single .ant-select-selector,
+.doctor-modal .ant-select-single .ant-select-selector { padding-top: 0; padding-bottom: 0; align-items: center; }
+.dept-modal .ant-input-number .ant-input-number-input,
+.doctor-modal .ant-input-number .ant-input-number-input { height: 38px; }
+.dept-modal textarea.ant-input,
 .doctor-modal textarea.ant-input { height: 60px; min-height: 60px; }
+/* 控件文本：IR 一律 15px #333333（antd 默认 14px / 主题 colorText #1F2937）——
+   值、占位符、InputNumber、Select 值都吃这一条（实测：字号 14→15、颜色 #1F2937→#333333） */
+.dept-modal .ant-input,
+.doctor-modal .ant-input,
+.dept-modal .ant-input-number-input,
+.doctor-modal .ant-input-number-input,
+.dept-modal .ant-select-selection-item,
+.doctor-modal .ant-select-selection-item { font-size: 15px; color: #333333; }
 
-/* list card header/toolbar (figma: card y255, header text y275-295, toolbar y293-321) */
-.ant-card .ant-card-head { min-height: 56px; padding: 12px 24px; }
-.ant-card .ant-card-head-title { font-size: 16px; font-weight: 500; color: #262626; }
-.ant-card .ant-card-extra { font-size: 13px; }
-.list-toolbar { margin-bottom: 12px; }
+/* 排班弹窗：号源行内提示（IR 176:30：输入框右侧两行小字 11px #8C8C8C） */
+.quota-inline { display: flex; align-items: center; gap: 14px; }
+.quota-inline .ant-input-number { width: 203px; flex: 0 0 203px; }
+.quota-hint { font-size: 11px; color: #8C8C8C; line-height: 15px; }
+
+/* 批量排班：星期标签（IR：47×35 圆角 6，选中 #E6F7FF/#1890FF，未选 #FFFFFF/#D9D9D9/#333） */
+.weekday-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.schedule-modal .weekday-tags .ant-checkbox-wrapper { width: 47px; height: 35px; box-sizing: border-box; border: 1px solid #D9D9D9; border-radius: 6px; background: #FFFFFF; color: #333333; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; transition: all 0.2s; }
+.schedule-modal .weekday-tags .ant-checkbox-wrapper .ant-checkbox { display: none; }
+.schedule-modal .weekday-tags .ant-checkbox-wrapper-checked { background: #E6F7FF; border-color: #1890FF; color: #1890FF; }
+.pair-selects { display: flex; gap: 8px; }
+
+/* 批量排班预览（IR 176:105：#FAFAFA 圆角 6 全宽容器 480×192，内边距 12 → 行宽 456；note 为 #1890FF）
+   192 = 12 + 标题 17 + 5 + 5 行 × 25 + 汇总区（5 + 17）+ 11，行高恰好 25，末行（第 5 天）不带下边线 */
+.batch-preview { background: #FAFAFA; border-radius: 6px; padding: 12px 12px 11px; font-size: 12px; }
+.batch-preview-title { color: #8C8C8C; line-height: 17px; margin-bottom: 5px; }
+.batch-preview-row { height: 25px; line-height: 24px; color: #595959; border-bottom: 1px solid #F0F0F0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 末行（第 5 天）不带下边线：IR 176:119 只有文本、无 border-bottom 矩形
+   （行都包在 .batch-preview-list 里，note 在容器外，故末行即 :last-child） */
+.batch-preview-row:last-child { border-bottom: none; }
+.batch-preview-note { color: #1890FF; font-weight: 500; margin-top: 5px; line-height: 17px; }
+
+/* 排班弹窗行距（IR 节距 56px；首个标签 y=+89 → body 顶距 20px；create 弹窗底距 20 → 内容高恰为 489） */
+.schedule-modal .ant-form-item { margin-bottom: 16px; }
+.schedule-modal .ant-modal-body { min-height: 0; padding: 20px 20px 20px; }
+.schedule-modal .weekday-tags .ant-checkbox-wrapper { margin-inline-start: 0; }
+/* 星期标签行：IR 节距 58（= 标签 35 + 23），其余行一律 56 → 该行单独 23，否则下面 5 行整体上移 7px */
+.schedule-modal .weekday-item { margin-bottom: 23px; }
+/* IR 里三处控件盒高与其它行不同（非笔误，逐屏照抄）：创建弹窗「选择医生」38、「排班日期」42、
+   批量弹窗「全部医生」（多选）38。行距仍 16，故其后各行 y 与 IR 完全一致（135 / 193 / …） */
+.schedule-modal .row-h38 .ant-select,
+.schedule-modal .row-h38 .ant-select-selector,
+.schedule-modal .multi-doctor.ant-select,
+.schedule-modal .multi-doctor .ant-select-selector { height: 38px; }
+.schedule-modal .row-h42 .ant-input { height: 42px; }
+/* 控件值/占位文本（IR 逐项量得，非组件库默认）：值一律 15px #333333、占位 15px #BFBFBF，
+   且行框不垂直居中——IR 文本 ink 顶 = 控件盒顶 + 11（40 高盒：90+2），居中会低 2.5~3px。
+   align-items: flex-start + line-height 33 → ink 顶 = 1(边框) + (33-15)/2 + 1 ≈ 11 ✓ */
+.schedule-modal .ant-select-single .ant-select-selector,
+.schedule-modal .multi-doctor .ant-select-selector { align-items: flex-start; }
+.schedule-modal .ant-select-single .ant-select-selection-item,
+.schedule-modal .ant-select-single .ant-select-selection-placeholder { line-height: 33px; }
+.schedule-modal .ant-select-single .ant-select-selection-placeholder { color: #BFBFBF; }
+/* 批量弹窗「全部医生」：IR 是 14px #262626（深色 = 已选项色，不是灰占位）+ ink 顶 = 盒顶 + 13 */
+.schedule-modal .multi-doctor .ant-select-selection-placeholder { font-size: 14px; color: #262626; line-height: 36px; }
+/* 弹窗 footer 的取消按钮：IR 文本 #595959（主题 colorText #1F2937 会让它变深） */
+.dept-modal .ant-modal-footer .ant-btn:not(.ant-btn-primary),
+.doctor-modal .ant-modal-footer .ant-btn:not(.ant-btn-primary) { color: #595959; }
+/* 批量弹窗：IR 卡片高 726（导出图 750 = 726 + 阴影 8/16）= 头 61 + body 606 + 脚 59；
+   footer 无上边线、高 59（按钮居中 14/14，IR 按钮 y=681）、body 底内距 0（末尾是预览容器，其底 = 667） */
+.schedule-modal.batch-modal .ant-modal-body { padding-bottom: 0; }
+.schedule-modal.batch-modal .ant-modal-footer { height: 59px; border-top: none; }
+
+/* doctor modal: 公共骨架见上方 .dept-modal 共享块 */
+
 
 /* list card header/toolbar (figma: card y255, header text y275-295, toolbar y293-321) */
 .ant-card .ant-card-head { min-height: 56px; padding: 12px 24px; }
@@ -233,3 +405,146 @@ body {
 /* table row height: figma data row 62px */
 .ant-table-tbody > tr > td { padding-top: 13px !important; padding-bottom: 13px !important; }
 .ant-table-thead > tr > th { padding-top: 12px !important; padding-bottom: 12px !important; }
+
+/* ===== 列表屏（科室/医生）表格几何，来自 Layout IR =====
+   卡 y255；卡头 72（标题 15/21 @y271 + 副标题 12/16.8 @y295）→ 表头 y327；
+   表头 37（12/16.8 500 #8C8C8C，pad 10）；数据行 62（pad 12）；
+   分页上距 28、item 28；卡底 padding 12 */
+.list-card > .ant-card-head {
+  height: 72px; min-height: 72px; padding: 16px 20px 0; border-bottom: none;
+  align-items: flex-start;
+  /* antd 的 .ant-card-head 是 column flex 且 justify-content:center（主=纵轴）→
+     会把 head-wrapper 在 56px 内容区里垂直居中，标题/副标题/按钮整体下沉 7.6px
+     （实测 ink 284 vs 原型 275）。列方向改 flex-start 后回到 padding 顶边 y=272。 */
+  justify-content: flex-start;
+}
+.list-card > .ant-card-head .ant-card-head-wrapper { align-items: flex-start; }
+.list-card > .ant-card-head .ant-card-head-title { padding: 0; flex: 1; }
+.list-card .card-title-main { font-size: 15px; font-weight: 500; color: #262626; line-height: 21px; }
+.list-card .card-title-sub { font-size: 12px; font-weight: 400; color: #8C8C8C; line-height: 16.8px; margin-top: 3px; }
+.list-card > .ant-card-head .ant-card-extra { padding: 0; }
+.list-card .ant-card-head .ant-btn { height: 31px; padding: 0 25px; font-size: 13px; border-radius: 6px; }
+.list-card > .ant-card-body { padding: 0 20px 12px; }
+
+.list-card .ant-table { border-radius: 0; }
+.list-card .ant-table-thead > tr > th {
+  height: 37px; padding: 10px 12px !important;
+  font-size: 12px; font-weight: 500; color: #8C8C8C; background: #FAFAFA;
+  border-bottom: 1px solid #F0F0F0; border-radius: 0;
+  /* 行高必须钉 16px：antd 继承 1.5715 → 12px 字变 18.86px 行框，
+     10+18.86+10+1=39.86 > height:37 → th 被撑高 2.86px，整表因此下移 3px。
+     16+10+10+1=37 恰好等于 IR 表头高（327..364）。 */
+  line-height: 16px;
+}
+.list-card .ant-table-thead > tr > th::before { display: none; }
+.list-card .ant-table-thead > tr > th:first-child { padding-left: 20px !important; }
+.list-card .ant-table-thead > tr > th:last-child { padding-right: 20px !important; text-align: right; }
+
+.list-card .ant-table-tbody > tr > td {
+  height: 62px; padding: 12px !important;
+  font-size: 13px; border-bottom: 1px solid #F0F0F0;
+}
+.list-card .ant-table-tbody > tr > td:first-child { padding-left: 20px !important; }
+.list-card .ant-table-tbody > tr > td:last-child { padding-right: 20px !important; text-align: right; }
+/* 末行保留 border-bottom：IR 每行（含「皮肤科」行）都有 border-bottom（y672），
+   底部横线是表格的正常收边，旧代码把它去掉导致列表底边缺一条线 */
+.list-card .ant-table-tbody > tr:last-child > td { border-bottom: 1px solid #F0F0F0; }
+
+/* 科室图标圆（IR：36x36 radius 18 = 正圆；底色逐科室不同，见 DEPT_ICON_BG）。
+   #EBF5FF 仅作未命中映射时的兜底 */
+.list-card .cell-icon { width: 36px; height: 36px; border-radius: 50%; background: #EBF5FF; display: inline-grid; place-items: center; }
+.list-card .cell-icon img { width: 21px; height: 21px; }
+.list-card .cell-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #E6F7FF; color: #1890FF;
+  display: inline-grid; place-items: center; font-size: 14px; font-weight: 400; flex: none;
+}
+.list-card .cell-name { display: flex; align-items: center; gap: 10px; }
+.list-card .cell-title { font-size: 14px; font-weight: 500; color: #262626; line-height: 19.6px; }
+.list-card .cell-desc { font-size: 12px; color: #8C8C8C; line-height: 16.8px; }
+.list-card .cell-text { font-size: 13px; color: #595959; line-height: 18.2px; }
+.list-card .cell-fee { font-size: 13px; color: #FA8C16; line-height: 18.2px; }
+.list-card .ant-tag { height: 22px; line-height: 20px; padding: 0 8px; margin: 0; font-size: 12px; border-radius: 4px; }
+.list-card .ant-tag.tag-blue { background: #E6F7FF; border-color: transparent; color: #1890FF; }
+.list-card .ant-tag.tag-green { background: #F6FFED; border-color: transparent; color: #52C41A; }
+.list-card .cell-op { font-size: 12px; line-height: 17px; color: #595959; }
+.list-card .cell-op-del { font-size: 12px; line-height: 17px; color: #FF4D4F; margin-left: 40px; }
+
+/* ===== 列表列内对齐（几何来自 Layout IR departments.json，逐列取 IR 文本左缘）=====
+   列左缘：科室 3304 / 医生数量 3703.45 / 排序 3858.08 / 状态 3961.16 / 操作 4103~4436
+   表头：医生数量 +12（与默认一致）、状态 x=3982 = 列左+21（与标签文字对齐）
+   数据：医生数量 x=3735 = 列左+32、排序 x=3874 = 列左+16
+   操作表头 x=4361 w=24 → 右对齐时右缘 4385，列右缘 4436 → padding-right 51 */
+.list-card .ant-table-thead > tr > th.col-status { padding-left: 21px !important; }
+.list-card .ant-table-thead > tr > th.col-actions { padding-right: 51px !important; }
+.list-card .ant-table-tbody > tr > td.col-doctor-count { padding-left: 32px !important; }
+.list-card .ant-table-tbody > tr > td.col-sort { padding-left: 16px !important; }
+
+.list-card .ant-table-pagination.ant-pagination { margin: 28px 0 0; font-size: 12px; }
+.list-card .ant-pagination .ant-pagination-item,
+.list-card .ant-pagination .ant-pagination-prev,
+.list-card .ant-pagination .ant-pagination-next { min-width: 28px; height: 28px; line-height: 26px; }
+.list-card .ant-pagination .ant-pagination-item a { font-size: 12px; line-height: 26px; }
+/* total 文本 antd 默认 line-height:30px/height:32px → 把分页行撑到 32（IR 为 28），
+   卡高连带 +4。钉成 28 与分页按钮同高（IR 分页行 702..730）。 */
+.list-card .ant-pagination .ant-pagination-total-text {
+  font-size: 12px; color: #8C8C8C; height: 28px; line-height: 28px;
+}
+
+/* 列表筛选条（医生屏：y327–391，搜索 280x40 / 下拉 160x40，下边框 #F0F0F0） */
+.list-card .list-toolbar { padding: 12px 0; margin: 0; border-bottom: 1px solid #F0F0F0; }
+.list-card .list-toolbar .ant-input-affix-wrapper,
+.list-card .list-toolbar .ant-select-selector { height: 40px !important; border-radius: 6px; }
+.list-card .list-toolbar .ant-input-search { width: 280px; }
+/* 独立 Input（非 Input.Search）不在 .ant-input-affix-wrapper 里，上面两条都命中不到 →
+   会退回 antd 默认 32px 高、宽度被 flex 压到 212px，并把后面的下拉整体左移 68px。
+   直接按 IR 钉：Space 的每个 item 里的裸 .ant-input = 280x40（下拉随后自然落在 556） */
+.list-card .list-toolbar .ant-space-item > .ant-input {
+  width: 280px; height: 40px !important; border-radius: 6px;
+}
+/* 下拉容器高度必须一起钉：antd 默认 .ant-select 高 32px，只把 .ant-select-selector
+   拉成 40 会让它从容器顶部溢出 4px（实测 selector @343 而非 IR 的 @339）。 */
+.list-card .list-toolbar .ant-select { width: 160px; height: 40px !important; }
+
+/* ===== 机构信息页（几何来自 Layout IR organization.json）=====
+   KPI 4 卡 281x92（y143-235）；主卡 1172x361（y255-616）；
+   双列表单：**列 = label 88 + 间距 12 + 输入框 454 = 554**，行距 56px；
+   地址/简介全宽：label 88 + 12 + 输入框 1032；保存按钮在卡头右上 112x31 */
+.org-card {
+  background: #FFFFFF; border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  margin-top: 20px; padding: 16px 20px 39px;
+}
+.org-card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.org-card-title { font-size: 15px; font-weight: 500; color: #262626; line-height: 21px; }
+.org-card .card-hint { margin-top: 3px; line-height: 17px; }
+.org-save { height: 31px; padding: 0 16px; border-radius: 6px; font-size: 13px; }
+
+/* 横向双列：IR 1132 内宽 = 左列 554 + 列距 24 + 右列 554（48.94% / 2.12% / 48.94%）。
+   注意 454 是**输入框**宽，列宽须把 label 88 + 间距 12 一起算进来——
+   早期误把 454 当列宽（40.11%），label 后又从列里扣掉 77 → 输入框缩成 377，
+   整个表单比原型窄 164px、右侧留白（2026-09-26 机构信息屏事故根因）。
+   用相对单位，1440 下与 IR 逐像素一致，更宽窗口按同一比例铺满 */
+.org-grid {
+  display: grid;
+  grid-template-columns: 48.94% 48.94%;
+  column-gap: 2.12%;
+  row-gap: 16px;
+  margin-top: 15px;
+}
+.org-grid .org-full { grid-column: 1 / -1; }
+
+.org-form .ant-form-item { margin-bottom: 0; }
+.org-form .ant-form-item-label { flex: 0 0 auto; padding-right: 0; }
+.org-form .ant-form-item-label > label {
+  /* 100 = label 88 + 距输入框 12（右内边距留白，文字右对齐到 352，输入框起 364，同 IR） */
+  width: 100px; box-sizing: border-box; padding-right: 12px;
+  justify-content: flex-end;
+  font-size: 13px; color: #595959; height: 40px;
+}
+.org-form .ant-input { height: 40px; border-radius: 6px; font-size: 15px; }
+.org-form .org-req { color: #FF4D4F; margin-left: 8px; }
+
+.org-intro .ant-form-item-control-input { min-height: 80px; }
+.org-intro textarea.ant-input { height: 80px; min-height: 80px; }
+/* 字数统计：原型 11px / #8C8C8C / 位于输入框下方右对齐（IR 157:311 = x2870 y581，字体 11） */
+.org-intro .ant-input-data-count { font-size: 11px; line-height: 16px; color: #8C8C8C; }

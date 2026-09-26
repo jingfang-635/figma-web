@@ -11,6 +11,26 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+/**
+ * 注入仓库根 .env 到 process.env（不覆盖已显式设置的值）。
+ * 读阈值的脚本（visual-gate / visual-compare）必须先调用：否则 .env 里的
+ * VISUAL_SSIM_MIN 不生效，静默落到代码默认值 → 闸门假阳性
+ * （2026-09-26 事故：.env 写 0.85，闸门实跑 0.55，首页 SSIM 0.807 却判通过）。
+ */
+export function loadRootEnv(root) {
+  const p = resolve(root, ".env");
+  if (!existsSync(p)) return {};
+  const loaded = {};
+  for (const line of readFileSync(p, "utf8").split(/\r?\n/)) {
+    const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    if (m && m[2] !== "" && process.env[m[1]] === undefined) {
+      process.env[m[1]] = m[2];
+      loaded[m[1]] = m[2];
+    }
+  }
+  return loaded;
+}
+
 export function resolveProject(root) {
   const fixturesDir = resolve(root, "fixtures");
   const candidates = existsSync(fixturesDir)
@@ -84,6 +104,43 @@ export function gateCredentials(root) {
     );
   }
   return { email, username, password, storageKey };
+}
+
+/**
+ * 弹窗外沿余量：Figma 弹窗导出图 = 卡片 + 阴影溢出（IR 卡片 RECTANGLE 的 shadow {r,x,y}），
+ * 四边余量 = 左 r-x、右 r+x、上 r-y、下 r+y（r=模糊半径，x/y=偏移）。
+ *
+ * 为什么必须这样补：运行时截图截的是 .ant-modal-content 本体，标杆图却含阴影余量。
+ * 若统一补 12px（旧实现），纵向会与标杆差 y（本设计 y=4）→ 卡片在两图里错位 4px，
+ * 位图逐像素比直接判「结构错位」（2026-09-26 四个弹窗 SSIM 0.55~0.64 的根因）。
+ * 余量从 IR 读，不按屏硬编码；无 IR/无阴影时回落到 0（不补，宁可比对失败也不假装对齐）。
+ */
+export function shadowPad(root, id) {
+  const zero = { left: 0, right: 0, top: 0, bottom: 0 };
+  const { slug } = resolveProject(root);
+  if (!slug) return zero;
+  const p = resolve(root, "fixtures", slug, "layout-ir", `${id}.json`);
+  if (!existsSync(p)) return zero;
+  let s = null;
+  const walk = (n) => {
+    if (!s && n?.shadow) s = n.shadow;
+    (n?.children || []).forEach(walk);
+  };
+  try {
+    walk(JSON.parse(readFileSync(p, "utf8")).tree);
+  } catch {
+    return zero;
+  }
+  if (!s) return zero;
+  const r = Number(s.r) || 0;
+  const x = Number(s.x) || 0;
+  const y = Number(s.y) || 0;
+  return {
+    left: Math.max(0, Math.round(r - x)),
+    right: Math.max(0, Math.round(r + x)),
+    top: Math.max(0, Math.round(r - y)),
+    bottom: Math.max(0, Math.round(r + y)),
+  };
 }
 
 /** 可选的闸门 mask 配置：fixtures/<slug>/gate-masks.json → { [screenId]: [{x,y,w,h}] } */

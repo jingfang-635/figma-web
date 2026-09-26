@@ -41,10 +41,15 @@ const targets = allFramesFor(root, summary).map((spec) => {
 
 const missing = targets.filter((t) => !t.frame);
 if (missing.length) {
-  console.warn(
+  // 2026-09-25 事故：missing 只 warn 后继续，schedules 屏 IR 静默缺失，
+  // 前端无几何支撑手写日历，还原度崩塌。IR 必须逐屏齐全，缺失直接失败。
+  console.error(
     "Missing frames:",
     missing.map((m) => m.id).join(", "),
   );
+  console.error("IR 必须逐屏齐全（缺屏的页面 codegen 无几何可用）。");
+  console.error("排查：fileKey 是否正确 / 屏名与 spec.screens 的 names 是否逐字一致 / 重跑后确认无本警告。");
+  process.exit(1);
 }
 
 const ready = targets.filter((t) => t.frame);

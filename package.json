@@ -18,12 +18,15 @@
     "visual:compare": "node scripts/visual-compare.mjs",
     "visual:gate": "node scripts/visual-gate.mjs",
     "visual:stats": "node scripts/field-stats.mjs",
-    "visual:all": "npm run visual:layout && npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets && npm run visual:fields && npm run visual:gate",
+    "visual:all": "npm run visual:layout && npm run visual:extract && npm run visual:shots && npm run visual:gen && npm run visual:assets && npm run visual:fields && npm run visual:gate && npm run visual:data && npm run visual:geom",
     "init:project": "node scripts/init-project.mjs",
     "visual:doctor": "node scripts/visual-doctor.mjs",
     "visual:bootstrap": "node scripts/visual-bootstrap.mjs",
     "visual:fields": "node scripts/check-field-consistency.mjs",
-    "visual:round": "npm run visual:doctor -- --quick && node scripts/capture-screens.mjs && node scripts/visual-compare.mjs"
+    "visual:data": "node scripts/check-config-api-closure.mjs && node scripts/check-data-backfill.mjs",
+    "visual:geom": "node scripts/check-geometry.mjs",
+    "visual:text": "node scripts/check-text.mjs",
+    "visual:round": "npm run visual:doctor -- --quick && node scripts/capture-screens.mjs && node scripts/visual-compare.mjs && node scripts/visual-gate.mjs --viewport-lock-only && npm run visual:data && npm run visual:geom"
   },
   "devDependencies": {
     "pixelmatch": "^5.3.0",

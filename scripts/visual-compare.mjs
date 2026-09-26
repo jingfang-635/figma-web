@@ -12,9 +12,12 @@
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { loadRootEnv } from "./lib/project.mjs";
+import { flatBgDrift, flatBgDriftOverlay } from "./lib/pixel-metrics.mjs";
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
+loadRootEnv(root);
 
 const pixelmatch = require("pixelmatch");
 const { PNG } = require("pngjs");
@@ -29,6 +32,9 @@ const round = roundArg ? roundArg.split('=')[1] : '1';
 // 阈值与 visual-gate.mjs 一致：SSIM（ssim.js）作结构崩塌检测，mismatch 作像素保真
 const SSIM_MIN = Number(process.env.VISUAL_SSIM_MIN || 0.55);
 const MISMATCH_MAX = Number(process.env.VISUAL_MISMATCH_MAX || 0.02);
+// 低对比度盲区腿（与 visual-gate 同源同参，见 lib/pixel-metrics.mjs）
+const FLATBG_MAX = Number(process.env.VISUAL_FLATBG_MAX || 0.025);
+const FLATBG_MODAL_MAX = Number(process.env.VISUAL_FLATBG_MODAL_MAX || 0.06);
 
 // 字段分类
 const CRITICAL_FIELDS = ['columns', 'formFields', 'modalFields', 'stats', 'actions', 'title', 'subtitle', 'sections', 'formCard'];
@@ -64,13 +70,33 @@ function loadManifest(round) {
   return JSON.parse(readFileSync(manifestPath, "utf-8"));
 }
 
+/** 合成到白底：Figma 标杆图带 alpha（阴影未预乘），运行时不透明；
+ *  不同域直接比会把阴影当深灰（弹窗实测 SSIM 0.91 → 0.83）。详见 visual-gate.mjs 同名函数 */
+function compositeOverWhite(png) {
+  const out = new PNG({ width: png.width, height: png.height });
+  for (let i = 0; i < png.data.length; i += 4) {
+    const a = png.data[i + 3] / 255;
+    if (a >= 1) {
+      out.data[i] = png.data[i];
+      out.data[i + 1] = png.data[i + 1];
+      out.data[i + 2] = png.data[i + 2];
+    } else {
+      out.data[i] = Math.round(png.data[i] * a + 255 * (1 - a));
+      out.data[i + 1] = Math.round(png.data[i + 1] * a + 255 * (1 - a));
+      out.data[i + 2] = Math.round(png.data[i + 2] * a + 255 * (1 - a));
+    }
+    out.data[i + 3] = 255;
+  }
+  return out;
+}
+
 // 加载 Figma 原图
 function loadExpectedPng(name) {
   const shotPath = resolve(root, `imports/figma/screens/${name}.png`);
   if (!existsSync(shotPath)) {
     return null;
   }
-  return PNG.sync.read(readFileSync(shotPath));
+  return compositeOverWhite(PNG.sync.read(readFileSync(shotPath)));
 }
 
 // 加载运行时截图
@@ -79,7 +105,7 @@ function loadActualPng(name, round) {
   if (!existsSync(actualPath)) {
     return null;
   }
-  return PNG.sync.read(readFileSync(actualPath));
+  return compositeOverWhite(PNG.sync.read(readFileSync(actualPath)));
 }
 
 // 填充矩形区域（用于 mask）
@@ -140,8 +166,10 @@ function compareImages(expected, actual, name) {
   const mismatch = pixelmatch(e.data, a.data, diff.data, width, height, { threshold });
   const ratio = mismatch / (width * height);
   const ssim = ssimScore(e, a);
+  // 低对比度盲区：平坦底色漂移（mismatch 对 <25% 色差失明，SSIM 又被整屏稀释）
+  const flat = flatBgDrift(e, a);
 
-  return { mismatch, ratio, ssim, diff };
+  return { mismatch, ratio, ssim, diff, flatbgRate: flat.rate, flatbgDrift: flat.drift };
 }
 
 // 生成热力图
@@ -184,6 +212,11 @@ function generateHeatmap(expected, actual, name, round) {
   mkdirSync(outDir, { recursive: true });
   
   writeFileSync(resolve(outDir, `${name}.diff.png`), PNG.sync.write(diff));
+  // 低对比底色错热力图（diff.png 只映高对比差异，看不到这一层）
+  writeFileSync(
+    resolve(outDir, `${name}.flatbg.png`),
+    PNG.sync.write(flatBgDriftOverlay(e, a, PNG)),
+  );
 }
 
 // 生成 HTML 报告
@@ -238,7 +271,7 @@ function generateHtmlReport(differences, round, screenResults = [], skippedScree
   </div>
   ${differences.length === 0 ? `
   <div class="banner-success">
-    ✅ 全部 ${screenResults.length} 个页面对比通过（SSIM ≥ ${SSIM_MIN} 或 mismatch < ${(MISMATCH_MAX * 100).toFixed(0)}%），未发现视觉差异。
+    ✅ 全部 ${screenResults.length} 个页面对比通过（AND：SSIM ≥ ${SSIM_MIN} 且 mismatch < ${(MISMATCH_MAX * 100).toFixed(0)}% 且 平坦底色漂移 ≤ 阈值），未发现视觉差异。
   </div>` : ''}
   
   <h2>逐屏对比结果</h2>
@@ -249,6 +282,7 @@ function generateHtmlReport(differences, round, screenResults = [], skippedScree
         <th>路由</th>
         <th>SSIM</th>
         <th>Mismatch</th>
+        <th>平坦底色漂移</th>
         <th>结果</th>
         <th>热力图</th>
       </tr>
@@ -260,6 +294,7 @@ function generateHtmlReport(differences, round, screenResults = [], skippedScree
           <td>${r.route}</td>
           <td>${r.ssim != null ? r.ssim.toFixed(3) : '-'}</td>
           <td>${r.mismatch != null ? (r.mismatch * 100).toFixed(1) + '%' : '-'}</td>
+          <td>${r.flatbgRate != null ? (r.flatbgRate * 100).toFixed(2) + '% / ≤' + (r.flatbgMax * 100).toFixed(1) + '%' : '-'}</td>
           <td>
             ${r.ssim != null
               ? (r.pass
@@ -267,13 +302,14 @@ function generateHtmlReport(differences, round, screenResults = [], skippedScree
                 : `<span class="status status-pending">🔴 未达标</span>`)
               : '<span class="status status-verified">⚠️ 已跳过</span>'}
           </td>
-          <td>${r.ssim != null && !r.pass ? `<a href="diff/${r.screen}.diff.png" target="_blank">查看热力图</a>` : '-'}</td>
+          <td>${r.ssim != null && !r.pass ? `<a href="diff/${r.screen}.diff.png" target="_blank">热力图</a>${r.flatbgPass === false ? ` / <a href="diff/${r.screen}.flatbg.png" target="_blank">底色错图</a>` : ''}` : '-'}</td>
         </tr>
       `).join('')}
       ${skippedScreens.map(s => `
         <tr>
           <td>${s.name}</td>
           <td>${s.route || '-'}</td>
+          <td>-</td>
           <td>-</td>
           <td>-</td>
           <td><span class="status status-verified">⚠️ 已跳过</span></td>
@@ -311,7 +347,7 @@ function generateHtmlReport(differences, round, screenResults = [], skippedScree
             </span>
           </td>
           <td><span class="status status-pending">${d.status}</span></td>
-          <td><a href="diff/${d.screen}.diff.png" target="_blank">查看热力图</a></td>
+          <td><a href="diff/${d.screen}.diff.png" target="_blank">查看热力图</a>${d.flatbgFile ? ` / <a href="diff/${d.screen}.flatbg.png" target="_blank">底色错图（低对比盲区）</a>` : ''}</td>
         </tr>
       `).join('')}
     </tbody>
@@ -385,28 +421,42 @@ async function main() {
 
     console.log(`📊 对比：${name}`);
 
-    const { ssim, ratio, mismatch } = compareImages(expected, actual, name);
-    const pass = ssim >= SSIM_MIN || ratio < MISMATCH_MAX;
-    screenResults.push({ screen: name, route: screenshot.route, ssim, mismatch: ratio, pass });
+    const { ssim, ratio, mismatch, flatbgRate } = compareImages(expected, actual, name);
+    // —— 3. SSIM 结构基线（AND 条件，杀 mismatch 假阳性：机构页事故 SSIM 0.768 却 mismatch 1.7% 过闸）——
+// 完全一致=1.0；结构崩塌（行错位/单列错排）<0.75。VISUAL_SSIM_MIN 可按 --calibrate 校准覆盖。
+// —— 4. 低对比度盲区腿（2026-09-26 关键指标事故）：mismatch(threshold=0.25) 对
+//        #FFFFFF vs #F5F7FA（3.9% 色差）结构性失明，SSIM 亦被稀释 → 独立判据。
+const flatMax = screenshot.modal ? FLATBG_MODAL_MAX : FLATBG_MAX;
+const flatPass = flatbgRate <= flatMax;
+const pass = ssim >= SSIM_MIN && ratio < MISMATCH_MAX && flatPass;
+    screenResults.push({ screen: name, route: screenshot.route, ssim, mismatch: ratio, flatbgRate, flatbgMax: flatMax, flatbgPass: flatPass, pass });
     console.log(`   SSIM: ${ssim.toFixed(3)} (${pass ? '✅' : '🔴'})`);
     console.log(`   Mismatch: ${(ratio * 100).toFixed(1)}%`);
+    console.log(`   平坦底色漂移: ${(flatbgRate * 100).toFixed(2)}% (≤${(flatMax * 100).toFixed(1)}%) ${flatPass ? '✅' : '🔴 低对比盲区未还原'}`);
     
     if (!pass) {
       // 生成热力图
       generateHeatmap(expected, actual, name, round);
       
       // 添加差异记录
+      const reasons = [];
+      if (ssim < SSIM_MIN) reasons.push(`SSIM ${ssim.toFixed(3)} < ${SSIM_MIN}`);
+      if (ratio >= MISMATCH_MAX) reasons.push(`mismatch ${(ratio * 100).toFixed(2)}% ≥ ${(MISMATCH_MAX * 100).toFixed(0)}%`);
+      if (!flatPass) reasons.push(`低对比底色漂移 ${(flatbgRate * 100).toFixed(2)}% > ${(flatMax * 100).toFixed(1)}%`);
       differences.push({
         screen: name,
         type: 'visual',
-        category: ssim < 0.9 ? 'critical' : 'non-critical',
-        region: '整体页面',
-        expected: `SSIM ≥ ${SSIM_MIN}`,
-        actual: `SSIM ${ssim.toFixed(3)}`,
+        category: ssim < 0.9 || !flatPass ? 'critical' : 'non-critical',
+        region: flatPass ? '整体页面' : '低对比底色（卡片底/容器填充）',
+        expected: !flatPass ? `平坦底色漂移 ≤ ${(flatMax * 100).toFixed(1)}%` : `SSIM ≥ ${SSIM_MIN}`,
+        actual: !flatPass ? `漂移 ${(flatbgRate * 100).toFixed(2)}%` : `SSIM ${ssim.toFixed(3)}`,
+        reasons,
         ssim,
         mismatch: ratio,
+        flatbgRate,
         status: 'pending',
-        file: `artifacts/visual-diff/round-${round}/diff/${name}.diff.png`
+        file: `artifacts/visual-diff/round-${round}/diff/${name}.diff.png`,
+        ...(!flatPass ? { flatbgFile: `artifacts/visual-diff/round-${round}/diff/${name}.flatbg.png` } : {}),
       });
     }
   }

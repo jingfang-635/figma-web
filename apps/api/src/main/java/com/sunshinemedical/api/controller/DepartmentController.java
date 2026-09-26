@@ -3,6 +3,7 @@ package com.sunshinemedical.api.controller;
 import com.sunshinemedical.api.common.CrudController;
 import com.sunshinemedical.api.entity.Department;
 import com.sunshinemedical.api.repository.DepartmentRepository;
+import com.sunshinemedical.api.repository.DoctorRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +18,11 @@ import java.util.Map;
 public class DepartmentController extends CrudController<Department> {
 
   private final DepartmentRepository repo;
+  private final DoctorRepository doctorRepo;
 
-  public DepartmentController(DepartmentRepository repo) {
+  public DepartmentController(DepartmentRepository repo, DoctorRepository doctorRepo) {
     this.repo = repo;
+    this.doctorRepo = doctorRepo;
   }
 
   @Override
@@ -30,11 +33,14 @@ public class DepartmentController extends CrudController<Department> {
   @Override
   protected Map<String, Object> toMap(Department e) {
     Map<String, Object> m = new LinkedHashMap<>();
+    m.put("id", e.getId());
     m.put("name", nz(e.getName()));
     m.put("icon", nz(e.getIcon()));
     m.put("description", nz(e.getDescription()));
     m.put("sort", nz(e.getSort()));
     m.put("status", nz(e.getStatus()));
+    // 派生列「医生数量」：按科室实时统计，避免前端写死
+    m.put("doctorCount", e.getId() == null ? 0L : doctorRepo.countByDeptId(String.valueOf(e.getId())));
     return m;
   }
 

@@ -30,6 +30,7 @@ public class DoctorController extends CrudController<Doctor> {
   @Override
   protected Map<String, Object> toMap(Doctor e) {
     Map<String, Object> m = new LinkedHashMap<>();
+    m.put("id", e.getId());
     m.put("name", nz(e.getName()));
     m.put("avatar", nz(e.getAvatar()));
     m.put("title", nz(e.getTitle()));

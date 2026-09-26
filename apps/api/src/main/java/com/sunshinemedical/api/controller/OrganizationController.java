@@ -30,6 +30,7 @@ public class OrganizationController extends CrudController<Organization> {
   @Override
   protected Map<String, Object> toMap(Organization e) {
     Map<String, Object> m = new LinkedHashMap<>();
+    m.put("id", e.getId());
     m.put("name", nz(e.getName()));
     m.put("phone", nz(e.getPhone()));
     m.put("subtitle", nz(e.getSubtitle()));

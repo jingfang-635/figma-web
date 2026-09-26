@@ -1,8 +1,10 @@
 package com.sunshinemedical.api.controller;
 
 import com.sunshinemedical.api.entity.Department;
+import com.sunshinemedical.api.entity.Doctor;
 import com.sunshinemedical.api.entity.Schedule;
 import com.sunshinemedical.api.repository.DepartmentRepository;
+import com.sunshinemedical.api.repository.DoctorRepository;
 import com.sunshinemedical.api.repository.ScheduleRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +23,12 @@ public class DashboardController {
 
   private final ScheduleRepository schedules;
   private final DepartmentRepository departments;
+  private final DoctorRepository doctors;
 
-  public DashboardController(ScheduleRepository schedules, DepartmentRepository departments) {
+  public DashboardController(ScheduleRepository schedules, DepartmentRepository departments, DoctorRepository doctors) {
     this.schedules = schedules;
     this.departments = departments;
+    this.doctors = doctors;
   }
 
   /** KPI：本月预约量 / 就诊率 / 爽约率 / 本月收入（与 Figma 文本口径一致） */
@@ -46,6 +50,15 @@ public class DashboardController {
     m.put("visitRate", pct(booked, quota));
     m.put("noshowRate", pct(quota - booked, quota));
     m.put("revenue", "¥" + String.format("%,d", revenue));
+
+    // 机构信息页 KPI：启用科室 / 在诊医生 / 待就诊 / 今日订单（与 Figma 文本口径一致）
+    m.put("departments", departments.findAll().stream().filter(d -> "active".equals(d.getStatus())).count());
+    m.put("doctors", doctors.count());
+    String today = now.toString();
+    m.put("pending", schedules.findAll().stream()
+        .filter(s -> today.equals(s.getWorkDate()) && "open".equals(s.getStatus()))
+        .mapToInt(s -> Math.max(0, nz(s.getQuota()) - nz(s.getBooked()))).sum());
+    m.put("ordersToday", 0);
     return m;
   }
 
