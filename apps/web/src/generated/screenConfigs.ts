@@ -1,4 +1,4 @@
-/* Generated from Visual IR. Re-run: node scripts/generate-screen-configs.mjs */
+/* Generated from Visual IR + app-spec.json (brand / screens[].sample). Re-run: node scripts/generate-screen-configs.mjs */
 export type TemplateKind = 'dashboard' | 'list' | 'form' | 'schedule' | 'content';
 export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'password' | 'boolean';
 export type ColumnKind = 'text' | 'status' | 'datetime' | 'relation' | 'boolean' | 'title-desc';
@@ -73,7 +73,17 @@ export interface ScreenConfig {
   stats?: Array<{ key: string; label: string }>;
   statusMap?: Record<string, { label: string; color?: string }>;
   sections?: ScreenSection[];
+  /**
+   * 闸门冻结样本：**spec 声明**（app-spec.json → screens[].sample），由生成器原样下发。
+   * gate 模式下页面用它替代接口数据，保证与原型标杆逐字一致；页面不得自带副本。
+   */
+  sample?: Record<string, unknown>;
 }
+
+export const brand = {
+  "title": "阳光医疗门诊",
+  "subtitle": "预约挂号管理后台"
+};
 
 export const screenConfigs: ScreenConfig[] = [
   {
@@ -83,6 +93,72 @@ export const screenConfigs: ScreenConfig[] = [
     "template": "dashboard",
     "resource": "dashboard",
     "needsReview": false,
+    "sample": {
+      "stats": {
+        "appointments": 106,
+        "visitRate": "96.2%",
+        "noshowRate": "3.8%",
+        "revenue": "¥5,280"
+      },
+      "charts": {
+        "trend": {
+          "labels": [
+            "8/1",
+            "8/2",
+            "8/3",
+            "8/4",
+            "8/5",
+            "8/6",
+            "今日"
+          ],
+          "values": [
+            12,
+            8,
+            15,
+            10,
+            18,
+            22,
+            5
+          ]
+        },
+        "deptBars": {
+          "labels": [
+            "内科",
+            "妇科",
+            "儿科",
+            "口腔科",
+            "皮肤科"
+          ],
+          "values": [
+            38,
+            25,
+            20,
+            15,
+            8
+          ]
+        },
+        "income": {
+          "labels": [
+            "8/1",
+            "8/2",
+            "8/3",
+            "8/4",
+            "8/5",
+            "8/6",
+            "今日"
+          ],
+          "values": [
+            360,
+            240,
+            450,
+            300,
+            540,
+            660,
+            150
+          ]
+        }
+      }
+    },
     "title": "首页",
     "subtitle": "预约数据、就诊数据与收入的运营分析",
     "filters": [],
@@ -127,6 +203,28 @@ export const screenConfigs: ScreenConfig[] = [
     "template": "form",
     "resource": "organization",
     "needsReview": false,
+    "sample": {
+      "stats": {
+        "departments": 6,
+        "doctors": 6,
+        "pending": 0,
+        "ordersToday": 0
+      },
+      "blankStats": {
+        "departments": 0,
+        "doctors": 0,
+        "pending": 0,
+        "ordersToday": 0
+      },
+      "org": {
+        "name": "阳光医疗门诊",
+        "phone": "010-8888 8888",
+        "subtitle": "以患者为中心 · 专业守护健康",
+        "hours": "周一至周日 08:00-17:30",
+        "address": "北京市示范区健康路 88 号",
+        "intro": "正规医疗机构，拥有专业医疗团队，为患者提供贴心、便捷的门诊服务。"
+      }
+    },
     "title": "机构信息",
     "subtitle": "管理门诊基础资料、排班与预约信息",
     "formCard": {
@@ -200,6 +298,56 @@ export const screenConfigs: ScreenConfig[] = [
     "template": "list",
     "resource": "departments",
     "needsReview": false,
+    "sample": {
+      "stats": {
+        "departments": 6,
+        "doctors": 6,
+        "pending": 0,
+        "ordersToday": 0
+      },
+      "rows": [
+        {
+          "id": 1,
+          "name": "内科",
+          "description": "重症、发热、咳嗽等",
+          "sort": 1,
+          "status": "active",
+          "doctorCount": 2
+        },
+        {
+          "id": 2,
+          "name": "儿科",
+          "description": "儿童保健、常见疾病",
+          "sort": 2,
+          "status": "active",
+          "doctorCount": 10
+        },
+        {
+          "id": 3,
+          "name": "妇科",
+          "description": "妇科炎症、月经不调",
+          "sort": 3,
+          "status": "active",
+          "doctorCount": 6
+        },
+        {
+          "id": 4,
+          "name": "口腔科",
+          "description": "牙痛、龋齿、牙周炎",
+          "sort": 4,
+          "status": "active",
+          "doctorCount": 1
+        },
+        {
+          "id": 5,
+          "name": "皮肤科",
+          "description": "皮炎、湿疹、过敏等",
+          "sort": 5,
+          "status": "active",
+          "doctorCount": 1
+        }
+      ]
+    },
     "title": "科室管理",
     "subtitle": "管理门诊基础资料、排班与预约信息",
     "cardTitle": "科室列表",
@@ -276,6 +424,60 @@ export const screenConfigs: ScreenConfig[] = [
     "template": "list",
     "resource": "doctors",
     "needsReview": false,
+    "sample": {
+      "stats": {
+        "departments": 6,
+        "doctors": 6,
+        "pending": 0,
+        "ordersToday": 0
+      },
+      "rows": [
+        {
+          "id": 1,
+          "name": "张伟",
+          "title": "副主任医师",
+          "deptId": "1",
+          "specialty": "高血压、糖尿病、冠心病等慢性病...",
+          "years": 15,
+          "goodRate": 99,
+          "fee": 30,
+          "status": "active"
+        },
+        {
+          "id": 2,
+          "name": "李娜",
+          "title": "主任医师 副教授",
+          "deptId": "3",
+          "specialty": "妇科炎症、月经不调、宫颈疾病、...",
+          "years": 16,
+          "goodRate": 99,
+          "fee": 30,
+          "status": "active"
+        },
+        {
+          "id": 3,
+          "name": "王磊",
+          "title": "主治医师",
+          "deptId": "2",
+          "specialty": "儿童感冒、咳嗽、发热等常见病",
+          "years": 10,
+          "goodRate": 98,
+          "fee": 25,
+          "status": "active"
+        },
+        {
+          "id": 4,
+          "name": "王磊",
+          "title": "主治医师",
+          "deptId": "4",
+          "specialty": "牙体牙髓、牙周疾病",
+          "years": 9,
+          "goodRate": 98,
+          "fee": 35,
+          "status": "active"
+        }
+      ]
+    },
     "title": "医生管理",
     "subtitle": "管理门诊基础资料、排班与预约信息",
     "cardTitle": "医生列表",
@@ -370,6 +572,185 @@ export const screenConfigs: ScreenConfig[] = [
     "template": "schedule",
     "resource": "schedules",
     "needsReview": false,
+    "sample": {
+      "month": "2026-08",
+      "today": "2026-08-10",
+      "schedules": [
+        {
+          "id": 1,
+          "doctorId": 1,
+          "doctorName": "张伟",
+          "workDate": "2026-08-10",
+          "slot": "am",
+          "quota": 30,
+          "booked": 12,
+          "status": "open"
+        },
+        {
+          "id": 2,
+          "doctorId": 1,
+          "doctorName": "张伟",
+          "workDate": "2026-08-10",
+          "slot": "pm",
+          "quota": 20,
+          "booked": 20,
+          "status": "open"
+        },
+        {
+          "id": 3,
+          "doctorId": 2,
+          "doctorName": "李娜",
+          "workDate": "2026-08-10",
+          "slot": "am",
+          "quota": 40,
+          "booked": 15,
+          "status": "open",
+          "tone": "open"
+        },
+        {
+          "id": 4,
+          "doctorId": 3,
+          "doctorName": "王磊",
+          "workDate": "2026-08-11",
+          "slot": "am",
+          "quota": 25,
+          "booked": 5,
+          "status": "open"
+        },
+        {
+          "id": 5,
+          "doctorId": 2,
+          "doctorName": "李娜",
+          "workDate": "2026-08-11",
+          "slot": "am",
+          "quota": 20,
+          "booked": 8,
+          "status": "open"
+        },
+        {
+          "id": 6,
+          "doctorId": 3,
+          "doctorName": "陈静",
+          "workDate": "2026-08-11",
+          "slot": "am",
+          "quota": 30,
+          "booked": 10,
+          "status": "open",
+          "tone": "open"
+        },
+        {
+          "id": 7,
+          "doctorId": 4,
+          "doctorName": "刘洋",
+          "workDate": "2026-08-12",
+          "slot": "am",
+          "quota": 20,
+          "booked": 0,
+          "status": "open"
+        },
+        {
+          "id": 8,
+          "doctorId": 5,
+          "doctorName": "赵强",
+          "workDate": "2026-08-12",
+          "slot": "pm",
+          "quota": 15,
+          "booked": 7,
+          "status": "open"
+        },
+        {
+          "id": 9,
+          "doctorId": 1,
+          "doctorName": "张伟",
+          "workDate": "2026-08-14",
+          "slot": "am",
+          "quota": 50,
+          "booked": 30,
+          "status": "open",
+          "tone": "open"
+        },
+        {
+          "id": 10,
+          "doctorId": 4,
+          "doctorName": "刘洋",
+          "workDate": "2026-08-10",
+          "slot": "pm",
+          "quota": 20,
+          "booked": 3,
+          "status": "open"
+        },
+        {
+          "id": 11,
+          "doctorId": 5,
+          "doctorName": "赵强",
+          "workDate": "2026-08-10",
+          "slot": "am",
+          "quota": 20,
+          "booked": 6,
+          "status": "open"
+        },
+        {
+          "id": 12,
+          "doctorId": 3,
+          "doctorName": "王磊",
+          "workDate": "2026-08-10",
+          "slot": "pm",
+          "quota": 25,
+          "booked": 9,
+          "status": "open"
+        },
+        {
+          "id": 13,
+          "doctorId": 2,
+          "doctorName": "李娜",
+          "workDate": "2026-08-10",
+          "slot": "pm",
+          "quota": 40,
+          "booked": 11,
+          "status": "open"
+        }
+      ],
+      "doctorOptions": [
+        {
+          "id": 1,
+          "name": "张伟"
+        },
+        {
+          "id": 2,
+          "name": "李娜"
+        },
+        {
+          "id": 3,
+          "name": "王磊"
+        },
+        {
+          "id": 4,
+          "name": "陈静"
+        },
+        {
+          "id": 5,
+          "name": "刘洋"
+        },
+        {
+          "id": 6,
+          "name": "赵强"
+        }
+      ],
+      "createModal": {
+        "workDate": "2026-08-10"
+      },
+      "batchModal": {
+        "dates": [
+          "2026-08-09",
+          "2026-08-10",
+          "2026-08-11",
+          "2026-08-12",
+          "2026-08-13"
+        ],
+        "slotLabel": "上午",
+        "note": "预计生成 30 条排班记录（6 位医生 × 5 天）"
+      }
+    },
     "title": "排班管理",
     "subtitle": "管理医生出诊时间表，支持单日/批量排班，用户端根据排班展示可预约时段",
     "filters": [
@@ -415,6 +796,63 @@ export const screenConfigs: ScreenConfig[] = [
   }
 ];
 
+export const sidebarItems: Array<{ label: string; icon: string; route: string | null; badge: string | null }> = [
+  {
+    "label": "首页",
+    "icon": "首页",
+    "route": "/",
+    "badge": null
+  },
+  {
+    "label": "机构信息",
+    "icon": "机构信息",
+    "route": "/organization",
+    "badge": null
+  },
+  {
+    "label": "科室管理",
+    "icon": "科室管理",
+    "route": "/departments",
+    "badge": null
+  },
+  {
+    "label": "医生管理",
+    "icon": "医生管理",
+    "route": "/doctors",
+    "badge": null
+  },
+  {
+    "label": "排班管理",
+    "icon": "排班管理",
+    "route": "/schedules",
+    "badge": null
+  },
+  {
+    "label": "预约记录",
+    "icon": "预约记录",
+    "route": null,
+    "badge": "3"
+  },
+  {
+    "label": "患者管理",
+    "icon": "患者管理",
+    "route": null,
+    "badge": null
+  },
+  {
+    "label": "订单管理",
+    "icon": "订单管理",
+    "route": null,
+    "badge": null
+  },
+  {
+    "label": "评价管理",
+    "icon": "评价管理",
+    "route": null,
+    "badge": null
+  }
+];
+
 export const sidebarChrome = {
   "nodeId": "280:2024",
   "width": 1440,
@@ -435,32 +873,11 @@ export const sidebarChrome = {
         "订单管理",
         "评价管理"
       ]
-    },
-    {
-      "id": "operations",
-      "label": "系统运营",
-      "items": [
-        "地址管理",
-        "广告图管理",
-        "公告管理",
-        "新闻列表",
-        "新闻分类",
-        "导航栏",
-        "意见反馈",
-        "预约规则",
-        "消息通知"
-      ]
-    },
-    {
-      "id": "system",
-      "label": "系统管理",
-      "items": [
-        "用户管理",
-        "角色管理",
-        "操作日志"
-      ]
     }
-  ]
+  ],
+  "badges": {
+    "预约记录": "3"
+  }
 };
 
 export const modalConfigs = [

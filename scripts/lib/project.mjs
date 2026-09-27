@@ -65,7 +65,7 @@ export function slugOrDefault(root, fileKey) {
  * 全屏清单（spec.screens 即闸门全集，无标杆屏双轨）→ 与 BENCHMARK_FRAMES 兼容的形状。
  * spec.screens: [{ id, type, route, name, description, modal? }]
  * type: chart|list|form|detail|modal|chrome
- * modal: { trigger: "新增科室", width?, height? }（type=modal 时）
+ * modal: { trigger: "<打开该弹窗的按钮文案>", width?, height? }（type=modal 时，trigger 从 spec 取）
  */
 export function allFrames(root) {
   const { spec } = resolveProject(root);
@@ -141,6 +141,28 @@ export function shadowPad(root, id) {
     top: Math.max(0, Math.round(r - y)),
     bottom: Math.max(0, Math.round(r + y)),
   };
+}
+
+/**
+ * 屏视口：一律取 Layout IR 的 frame（禁止在脚本里写死视口，见 visual-fidelity「视口与坐标取 IR」）。
+ * 读不到 IR 时**报错**（宁可比对失败，也不假装按原型帧宽对齐）；modal 屏几何随宿主屏抽取，传宿主屏 id。
+ */
+export function viewportForScreen(root, screenId) {
+  const { slug } = resolveProject(root);
+  const p = slug ? resolve(root, "fixtures", slug, "layout-ir", `${screenId}.json`) : null;
+  if (p && existsSync(p)) {
+    try {
+      const f = JSON.parse(readFileSync(p, "utf8")).frame || {};
+      const w = Number(f.w);
+      const h = Number(f.h);
+      if (w > 0 && h > 0) return { width: w, height: h };
+    } catch {
+      /* fall through to error */
+    }
+  }
+  throw new Error(
+    `无 Layout IR 视口：fixtures/<slug>/layout-ir/${screenId}.json 缺 frame.w/h —— 先跑 npm run visual:layout`,
+  );
 }
 
 /** 可选的闸门 mask 配置：fixtures/<slug>/gate-masks.json → { [screenId]: [{x,y,w,h}] } */

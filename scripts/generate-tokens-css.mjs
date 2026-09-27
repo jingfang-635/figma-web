@@ -74,7 +74,7 @@ function collectNodes(tree, acc = []) {
 
 /**
  * 表格行高：找 h 相同且 y 等差（公差=h）的矩形群（≥3 个），取众数高度。
- * departments IR：x 不限，h=62 群，y 364→426→488。
+ * 行高值由 IR 实测得出，不在此复述具体数值（改 IR 后注释不会漂移）。
  */
 function inferTableRowHeight(irFiles) {
   const candidates = [];
@@ -152,6 +152,120 @@ function loadIrFiles() {
 const irFiles = loadIrFiles();
 const rowH = inferTableRowHeight(irFiles);
 const modalGeo = inferModalGeometry(irFiles);
+
+// ============ 从 Layout IR 派生「图表 / 调色板」token ============
+// 页面里出现过的每个色值都必须能溯源到 IR：具名节点（bar-* / axis / grid / label）
+// 与「等距方形图标组」（列表行的头像/图标圆）。这里只做派生，不写死任何色值，
+// 也不按屏名特判；派生不出就输出 null，让页面/闸门显式失败，而不是偷偷回落。
+
+const { spec } = resolveProject(root);
+const routeById = new Map((spec?.screens || []).map((s) => [s.id, s.route]));
+
+const allNodes = irFiles.flatMap(({ tree }) => collectNodes(tree));
+
+/** 众数（并列取首次出现的），无值返回 null */
+function modeValue(values) {
+  const m = new Map();
+  for (const v of values) m.set(v, (m.get(v) || 0) + 1);
+  let bestValue = null;
+  let bestCount = -1;
+  for (const [v, c] of m) {
+    if (c > bestCount) {
+      bestCount = c;
+      bestValue = v;
+    }
+  }
+  return bestValue;
+}
+
+// 系列色：具名 `bar-*`，按 x 排（即原型图例顺序），保序去重
+const seriesColors = [];
+for (const n of allNodes.filter((n) => /^bar-/.test(n.name)).sort((a, b) => a.x - b.x)) {
+  if (n.fill && !seriesColors.includes(n.fill)) seriesColors.push(n.fill);
+}
+
+// 轴线 / 网格线 / 刻度文字：轴线的色值会被 0 值网格线复用，故网格统计时排除该色
+const chartAxis = modeValue(allNodes.filter((n) => n.name === "axis" && n.fill).map((n) => n.fill));
+const chartGrid = modeValue(
+  allNodes.filter((n) => n.name === "grid" && n.fill && n.fill !== chartAxis).map((n) => n.fill),
+);
+const chartLabel = modeValue(
+  allNodes.filter((n) => n.type === "TEXT" && n.name === "label" && n.fill).map((n) => n.fill),
+);
+
+/**
+ * 行内方形图标/头像调色板（按屏）：方形矩形按 x 分组 → 取「≥3 个且 y 等距」的组（即列表行），
+ * 按 y 排序；每格的前景色取「中心落在该方格里」的 TEXT 的 fill（没有则 null，如纯图标格）。
+ */
+function inferTonePalettes(files) {
+  const out = {};
+  for (const { file, tree } of files) {
+    const id = file.replace(/\.json$/, "");
+    const route = routeById.get(id);
+    if (!route) continue;
+    const nodes = collectNodes(tree);
+    const squares = nodes.filter(
+      (n) => n.type === "RECTANGLE" && n.w === n.h && n.w >= 24 && n.w <= 48 && n.fill,
+    );
+    const byX = new Map();
+    for (const s of squares) {
+      if (!byX.has(s.x)) byX.set(s.x, []);
+      byX.get(s.x).push(s);
+    }
+    let best = [];
+    for (const list of byX.values()) {
+      if (list.length < 3) continue;
+      const ys = list.map((n) => n.y).sort((a, b) => a - b);
+      const gaps = ys.slice(1).map((y, i) => y - ys[i]);
+      if (!gaps.every((g) => Math.abs(g - gaps[0]) <= 2)) continue;
+      if (list.length <= best.length) continue;
+      best = [...list].sort((a, b) => a.y - b.y).map((s) => {
+        const cx = s.x + s.w / 2;
+        const cy = s.y + s.h / 2;
+        const inner = nodes.find(
+          (t) =>
+            t.type === "TEXT" &&
+            t.fill &&
+            Math.abs(t.x + t.w / 2 - cx) < 20 &&
+            Math.abs(t.y + t.h / 2 - cy) < 20,
+        );
+        return { bg: s.fill, fg: inner ? inner.fill : null };
+      });
+    }
+    if (best.length) out[route] = best;
+  }
+  return out;
+}
+
+const tonePalettes = inferTonePalettes(irFiles);
+
+// ============ 生成 apps/web/src/generated/tokens.ts（页面消费，避免页面写死色值） ============
+
+const tokensTs = `/* Generated from Visual IR / Layout IR. Re-run: node scripts/generate-tokens-css.mjs */
+export const color = ${JSON.stringify(color, null, 2)} as const;
+
+/** 图表：全部由 Layout IR 派生（系列色取具名 bar-*，轴/网格/刻度取同名节点） */
+export const chart: { series: string[]; grid: string | null; axis: string | null; label: string | null } = {
+  series: ${JSON.stringify(seriesColors)},
+  grid: ${JSON.stringify(chartGrid)},
+  axis: ${JSON.stringify(chartAxis)},
+  label: ${JSON.stringify(chartLabel)},
+};
+
+export type Tone = { bg: string; fg: string | null };
+
+/** 列表行内图标/头像调色板，按路由分组（同一原型文件里的等距方形组） */
+export const tonePalette: Record<string, Tone[]> = ${JSON.stringify(tonePalettes, null, 2)};
+`;
+
+const genDir = resolve(root, "apps/web/src/generated");
+mkdirSync(genDir, { recursive: true });
+const tokensTsOut = resolve(genDir, "tokens.ts");
+writeFileSync(tokensTsOut, tokensTs, "utf8");
+console.log("Wrote", tokensTsOut);
+console.log(
+  `[ir-tokens] series=${seriesColors.length} grid=${chartGrid ?? "-"} axis=${chartAxis ?? "-"} label=${chartLabel ?? "-"} tonePalettes=${Object.keys(tonePalettes).length}`,
+);
 
 // antd 默认 cellPaddingBlock=16，行高 = fontSize(14)+lineHeight(22)+padding*2 ≈ 65
 // Figma 行高 62 → padding = (62 - 36) / 2 = 13

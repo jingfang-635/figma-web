@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { Button, Card, Form, Input, Modal, Select, Space, Table, Tag, App } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { api } from '../api/client';
-import { screenConfigs } from '../generated/screenConfigs';
+import { getScreenByRoute } from '../generated/screenConfigs';
+import { color as token, tonePalette } from '../generated/tokens';
 
 interface Doctor {
   id: number;
@@ -16,17 +17,15 @@ interface Doctor {
   status: string;
 }
 
-/** visualGate=1 冻结 sample 数据（与原型逐字一致） */
-const GATE_ROWS: Doctor[] = [
-  { id: 1, name: '张伟', title: '副主任医师', deptId: '1', specialty: '高血压、糖尿病、冠心病等慢性病...', years: 15, goodRate: 99, fee: 30, status: 'active' },
-  { id: 2, name: '李娜', title: '主任医师 副教授', deptId: '3', specialty: '妇科炎症、月经不调、宫颈疾病、...', years: 16, goodRate: 99, fee: 30, status: 'active' },
-  { id: 3, name: '王磊', title: '主治医师', deptId: '2', specialty: '儿童感冒、咳嗽、发热等常见病', years: 10, goodRate: 98, fee: 25, status: 'active' },
-  { id: 4, name: '王磊', title: '主治医师', deptId: '4', specialty: '牙体牙髓、牙周疾病', years: 9, goodRate: 98, fee: 35, status: 'active' },
-];
-const GATE_STATS = { departments: 6, doctors: 6, pending: 0, ordersToday: 0 };
+/** gate 冻结样本来自 spec（app-spec.json → screens[].sample → 生成物），页面不自带副本 */
+type DoctorSample = { stats?: Record<string, any>; rows?: Doctor[] };
+
+/** 头像圆形底色/字色：按本屏路由取 IR 派生的调色板（按行序取用），页面不写死色值 */
+const avatarTones = tonePalette[window.location.pathname] ?? [];
+const avatarTone = (i: number) => (avatarTones.length ? avatarTones[i % avatarTones.length] : null);
 
 export default function DoctorsPage() {
-  const config = screenConfigs.find((s) => s.name === '医生管理');
+  const config = getScreenByRoute(window.location.pathname);
   const gate = new URLSearchParams(window.location.search).get('visualGate') === '1';
   const [data, setData] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,8 +50,9 @@ export default function DoctorsPage() {
 
   useEffect(() => {
     if (gate) {
-      setData(GATE_ROWS);
-      setStats(GATE_STATS);
+      const sample = (config?.sample ?? {}) as DoctorSample;
+      setData(sample.rows ?? []);
+      setStats(sample.stats ?? null);
     } else {
       load();
       api<Record<string, any>>('/dashboard/stats').then(setStats).catch(() => {});
@@ -60,10 +60,12 @@ export default function DoctorsPage() {
     api<{ id: number; name: string }[]>('/departments')
       .then((list) => setDepts(Array.isArray(list) ? list : []))
       .catch(() => setDepts([]));
-  }, [gate, load]);
+  }, [gate, load, config]);
 
   const deptOptions = depts.map((d) => ({ value: String(d.id), label: d.name }));
-  /** 列表筛选「全部科室」默认选中：IR 157:617 是深色值 #333333（非占位符灰），
+  /** 科室名从 /departments 真实数据解析（不写死 id→名称映射） */
+  const deptName = (id: string) => depts.find((d) => String(d.id) === String(id))?.name || '';
+  /** 列表筛选「全部科室」默认选中：IR 该处是深色**值**（不是占位符灰），色值走 tokens；
       与排班屏筛选同款，选项与新增弹窗同源（无 onChange，仅按原型呈现默认值） */
   const filterDeptOpts = [{ value: 'all', label: '全部科室' }, ...deptOptions];
   /** 默认选中「内科」（原型弹窗取值）；接口未就绪时退回第一项，不写死 id */
@@ -82,9 +84,18 @@ export default function DoctorsPage() {
       title: '医生',
       key: 'name',
       width: 223,
-      render: (_: any, r: Doctor) => (
+      render: (_: any, r: Doctor, i: number) => (
         <div className="cell-name">
-          <span className="cell-avatar">{String(r.name || '').charAt(0)}</span>
+          <span
+            className="cell-avatar"
+            style={
+              avatarTone(i)
+                ? { background: avatarTone(i)!.bg, color: avatarTone(i)!.fg ?? undefined }
+                : undefined
+            }
+          >
+            {String(r.name || '').charAt(0)}
+          </span>
           <span>
             <div className="cell-title">{r.name}</div>
             <div className="cell-desc">{r.title}</div>
@@ -97,7 +108,7 @@ export default function DoctorsPage() {
       key: 'deptName',
       width: 105,
       render: (_: any, r: Doctor) => (
-        <Tag className="tag-blue">{({ '1': '内科', '2': '儿科', '3': '妇科', '4': '口腔科', '5': '皮肤科' } as Record<string, string>)[r.deptId] || ''}</Tag>
+        <Tag className="tag-blue">{deptName(r.deptId)}</Tag>
       ),
     },
     { title: '擅长', dataIndex: 'specialty', key: 'specialty', width: 307, ellipsis: true, render: (v: string) => <span className="cell-text">{v}</span> },
@@ -119,6 +130,7 @@ export default function DoctorsPage() {
       title: '操作',
       key: 'actions',
       width: 209,
+      className: 'col-actions',
       render: () => (
         <>
           <a className="cell-op">编辑</a>
@@ -132,7 +144,7 @@ export default function DoctorsPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <div className="page-title">{config?.title || '医生管理'}</div>
+          <div className="page-title">{config?.title}</div>
           <div className="page-subtitle">{config?.subtitle}</div>
         </div>
       </div>
@@ -192,7 +204,7 @@ export default function DoctorsPage() {
                 <div className="upload-text">上传头像</div>
               </div>
               <div className="upload-hints">
-                <div style={{ color: '#595959', fontWeight: 500 }}>建议尺寸 200×200px</div>
+                <div style={{ color: token.textSecondary, fontWeight: 500 }}>建议尺寸 200×200px</div>
                 <div>支持 JPG、PNG，最大 2MB</div>
               </div>
             </div>

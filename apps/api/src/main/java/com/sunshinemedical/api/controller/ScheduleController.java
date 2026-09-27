@@ -1,10 +1,10 @@
 package com.sunshinemedical.api.controller;
 
 import com.sunshinemedical.api.common.CrudController;
-import com.sunshinemedical.api.entity.Doctor;
 import com.sunshinemedical.api.entity.Schedule;
-import com.sunshinemedical.api.repository.DoctorRepository;
 import com.sunshinemedical.api.repository.ScheduleRepository;
+import com.sunshinemedical.api.entity.Doctor;
+import com.sunshinemedical.api.repository.DoctorRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +19,11 @@ import java.util.Map;
 public class ScheduleController extends CrudController<Schedule> {
 
   private final ScheduleRepository repo;
-  private final DoctorRepository doctors;
+  private final DoctorRepository doctorRepo;
 
-  public ScheduleController(ScheduleRepository repo, DoctorRepository doctors) {
+  public ScheduleController(ScheduleRepository repo, DoctorRepository doctorRepo) {
     this.repo = repo;
-    this.doctors = doctors;
+    this.doctorRepo = doctorRepo;
   }
 
   @Override
@@ -34,15 +34,23 @@ public class ScheduleController extends CrudController<Schedule> {
   @Override
   protected Map<String, Object> toMap(Schedule e) {
     Map<String, Object> m = new LinkedHashMap<>();
+    m.put("id", e.getId());
     m.put("doctorId", nz(e.getDoctorId()));
-    m.put("doctorName", e.getDoctorId() == null || e.getDoctorId().isBlank() ? ""
-        : doctors.findById(Long.valueOf(e.getDoctorId())).map(d -> nz(d.getName())).orElse(""));
     m.put("workDate", nz(e.getWorkDate()));
     m.put("slot", nz(e.getSlot()));
     m.put("quota", nz(e.getQuota()));
     m.put("booked", nz(e.getBooked()));
+    m.put("visited", nz(e.getVisited()));
     m.put("status", nz(e.getStatus()));
     m.put("remark", nz(e.getRemark()));
+    String rel0 = "";
+    String src0 = e.getDoctorId() == null ? null : String.valueOf(e.getDoctorId());
+    if (src0 != null) {
+      for (Doctor t : doctorRepo.findAll()) {
+        if (src0.equals(String.valueOf(t.getId()))) { rel0 = nz(t.getName()); break; }
+      }
+    }
+    m.put("doctorName", rel0);
     return m;
   }
 
@@ -58,6 +66,7 @@ public class ScheduleController extends CrudController<Schedule> {
     if (b.containsKey("slot")) e.setSlot(strOrNull(b.get("slot")));
     if (b.containsKey("quota")) e.setQuota(intOrNull(b.get("quota")));
     if (b.containsKey("booked")) e.setBooked(intOrNull(b.get("booked")));
+    if (b.containsKey("visited")) e.setVisited(intOrNull(b.get("visited")));
     if (b.containsKey("status")) e.setStatus(strOrNull(b.get("status")));
     if (b.containsKey("remark")) e.setRemark(strOrNull(b.get("remark")));
   }

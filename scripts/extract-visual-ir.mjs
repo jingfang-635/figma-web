@@ -202,13 +202,36 @@ if (existsSync(sidebarLayoutPath)) {
   sidebarTexts = JSON.parse(readFileSync(sidebarLayoutPath, "utf8")).texts || [];
 }
 
+const sidebarGroups = inferSidebarGroups(sidebarTexts);
+
+/** 侧栏徽标：IR 文本是树序遍历的扁平序列，导航项标签**紧随其后的纯数字文本**即该项徽标
+ * （Figma 里徽标是该导航项的子节点）。纯位置 + 形态推断，无业务字面量。 */
+function inferSidebarBadges(texts, labels) {
+  const known = new Set(labels);
+  const badges = {};
+  let current = null;
+  for (const t of texts) {
+    const s = String(t ?? "").trim();
+    if (known.has(s)) {
+      current = s;
+      continue;
+    }
+    if (current && /^\d+$/.test(s)) {
+      badges[current] = s;
+      current = null;
+    }
+  }
+  return badges;
+}
+
 const chrome = {
   sidebar: {
     nodeId: sidebarFrame?.id || "4:63",
     width: tokens.space?.sidebar || sidebarFrame?.size?.w || 220,
     brandTitle: spec?.brand?.title || summary.name || "",
     brandSubtitle: spec?.brand?.subtitle || "",
-    groups: inferSidebarGroups(sidebarTexts),
+    groups: sidebarGroups,
+    badges: inferSidebarBadges(sidebarTexts, sidebarGroups.flatMap((g) => g.items)),
   },
   header: {
     height: tokens.space?.header || 56,

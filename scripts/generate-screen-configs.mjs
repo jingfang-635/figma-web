@@ -5,14 +5,14 @@ import { resolve } from "node:path";
 import { resolveProject } from "./lib/project.mjs";
 
 const root = resolve(process.cwd());
-const { slug } = resolveProject(root);
+const { slug, spec } = resolveProject(root);
 const irPath = existsSync(resolve(root, "apps/web/src/generated/visual-ir.json"))
   ? resolve(root, "apps/web/src/generated/visual-ir.json")
   : resolve(root, "fixtures", slug, "visual-ir.json");
 
 const ir = JSON.parse(readFileSync(irPath, "utf8"));
 
-const header = `/* Generated from Visual IR. Re-run: node scripts/generate-screen-configs.mjs */
+const header = `/* Generated from Visual IR + app-spec.json (brand / screens[].sample). Re-run: node scripts/generate-screen-configs.mjs */
 export type TemplateKind = 'dashboard' | 'list' | 'form' | 'schedule' | 'content';
 export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'password' | 'boolean';
 export type ColumnKind = 'text' | 'status' | 'datetime' | 'relation' | 'boolean' | 'title-desc';
@@ -87,9 +87,19 @@ export interface ScreenConfig {
   stats?: Array<{ key: string; label: string }>;
   statusMap?: Record<string, { label: string; color?: string }>;
   sections?: ScreenSection[];
+  /**
+   * 闸门冻结样本：**spec 声明**（app-spec.json → screens[].sample），由生成器原样下发。
+   * gate 模式下页面用它替代接口数据，保证与原型标杆逐字一致；页面不得自带副本。
+   */
+  sample?: Record<string, unknown>;
 }
 
 `;
+
+/** 闸门冻结样本按屏名取自 spec（app-spec.json → screens[].sample），生成物原样下发 */
+const sampleByName = new Map(
+  (spec?.screens || []).filter((s) => s.sample).map((s) => [s.name, s.sample]),
+);
 
 const screens = ir.screens.map((s) => {
   const r = s.regions || {};
@@ -100,6 +110,7 @@ const screens = ir.screens.map((s) => {
     template: s.template,
     resource: s.resource,
     needsReview: s.needsReview || false,
+    sample: sampleByName.get(s.name),
     title: r.title || s.name,
     subtitle: r.subtitle,
     cardTitle: r.cardTitle,
@@ -125,9 +136,29 @@ const screens = ir.screens.map((s) => {
   };
 });
 
+/**
+ * 侧栏条目：标签/顺序/徽标取自 chrome.sidebar（Layout IR），路由按屏名回查 ir.screens。
+ * 组件不做「标签→路由」推导（推导属 codegen）；未画出路由的项保留外观但不可跳转。
+ * 键一律存在（缺省为 null），避免生成物出现联合类型导致消费方取属性报错。
+ */
+const routeByName = new Map((ir.screens || []).map((s) => [s.name, s.route]));
+const sidebar = ir.chrome?.sidebar || {};
+const sidebarBadges = sidebar.badges || {};
+const sidebarItems = (sidebar.groups || [])
+  .flatMap((g) => g.items || [])
+  .map((label) => ({
+    label,
+    // 图标资产按 IR 条目标签命名（export-assets 约定），与标签同源
+    icon: label,
+    route: routeByName.get(label) ?? null,
+    badge: sidebarBadges[label] ?? null,
+  }));
+
 const body =
   header +
+  `export const brand = ${JSON.stringify(spec?.brand || {}, null, 2)};\n\n` +
   `export const screenConfigs: ScreenConfig[] = ${JSON.stringify(screens, null, 2)};\n\n` +
+  `export const sidebarItems: Array<{ label: string; icon: string; route: string | null; badge: string | null }> = ${JSON.stringify(sidebarItems, null, 2)};\n\n` +
   `export const sidebarChrome = ${JSON.stringify(ir.chrome.sidebar, null, 2)};\n\n` +
   `export const modalConfigs = ${JSON.stringify(ir.modals, null, 2)};\n\n` +
   `export function getScreenByRoute(route: string): ScreenConfig | undefined {\n` +

@@ -3,6 +3,7 @@ package com.sunshinemedical.api.controller;
 import com.sunshinemedical.api.common.CrudController;
 import com.sunshinemedical.api.entity.Department;
 import com.sunshinemedical.api.repository.DepartmentRepository;
+import com.sunshinemedical.api.entity.Doctor;
 import com.sunshinemedical.api.repository.DoctorRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,14 @@ public class DepartmentController extends CrudController<Department> {
     m.put("description", nz(e.getDescription()));
     m.put("sort", nz(e.getSort()));
     m.put("status", nz(e.getStatus()));
-    // 派生列「医生数量」：按科室实时统计，避免前端写死
-    m.put("doctorCount", e.getId() == null ? 0L : doctorRepo.countByDeptId(String.valueOf(e.getId())));
+    long rel0 = 0L;
+    String src0 = e.getId() == null ? null : String.valueOf(e.getId());
+    if (src0 != null) {
+      for (Doctor t : doctorRepo.findAll()) {
+        if (src0.equals(String.valueOf(t.getDeptId()))) rel0++;
+      }
+    }
+    m.put("doctorCount", (int) rel0);
     return m;
   }
 

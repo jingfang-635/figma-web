@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /** Seed：闸门账号 + 各实体种子数据（值来自 spec.entities[].seedRows 或占位） */
@@ -32,6 +33,7 @@ public class SeedConfig {
       PasswordEncoder encoder,
       @Value("${app.seed-admin.email}") String adminEmail,
       @Value("${app.seed-admin.username}") String adminUsername,
+      @Value("${app.seed-admin.name:}") String adminName,
       @Value("${app.seed-admin.password}") String adminPassword) {
     return args -> {
       if (adminUsers.count() == 0) {
@@ -39,7 +41,7 @@ public class SeedConfig {
         admin.setEmail(adminEmail);
         admin.setUsername(adminUsername);
         admin.setPassword(encoder.encode(adminPassword));
-        admin.setName("管理员");
+        admin.setName(adminName == null || adminName.isEmpty() ? "管理员" : adminName);
         admin.setStatus("active");
         adminUsers.save(admin);
       }
@@ -147,69 +149,274 @@ public class SeedConfig {
         row3.setStatus("active");
         doctorRepo.save(row3);
       }
+      {
+        Doctor row4 = new Doctor();
+        row4.setName("陈静");
+        row4.setAvatar("");
+        row4.setTitle("副主任医师");
+        row4.setDeptId("3");
+        row4.setSpecialty("妇科内分泌、备孕指导");
+        row4.setYears(12);
+        row4.setGoodRate(98);
+        row4.setFee(30);
+        row4.setStatus("active");
+        doctorRepo.save(row4);
+      }
+      {
+        Doctor row5 = new Doctor();
+        row5.setName("刘洋");
+        row5.setAvatar("");
+        row5.setTitle("主治医师");
+        row5.setDeptId("1");
+        row5.setSpecialty("呼吸系统感染、慢性咳嗽");
+        row5.setYears(8);
+        row5.setGoodRate(97);
+        row5.setFee(25);
+        row5.setStatus("active");
+        doctorRepo.save(row5);
+      }
+      {
+        Doctor row6 = new Doctor();
+        row6.setName("赵强");
+        row6.setAvatar("");
+        row6.setTitle("副主任医师");
+        row6.setDeptId("2");
+        row6.setSpecialty("儿童哮喘、过敏性疾病");
+        row6.setYears(13);
+        row6.setGoodRate(98);
+        row6.setFee(30);
+        row6.setStatus("active");
+        doctorRepo.save(row6);
+      }
+      {
+        Doctor row7 = new Doctor();
+        row7.setName("周敏");
+        row7.setAvatar("");
+        row7.setTitle("主治医师");
+        row7.setDeptId("2");
+        row7.setSpecialty("儿童生长发育评估");
+        row7.setYears(7);
+        row7.setGoodRate(97);
+        row7.setFee(25);
+        row7.setStatus("active");
+        doctorRepo.save(row7);
+      }
+      {
+        Doctor row8 = new Doctor();
+        row8.setName("吴桐");
+        row8.setAvatar("");
+        row8.setTitle("主治医师");
+        row8.setDeptId("2");
+        row8.setSpecialty("新生儿黄疸、喂养指导");
+        row8.setYears(6);
+        row8.setGoodRate(96);
+        row8.setFee(25);
+        row8.setStatus("active");
+        doctorRepo.save(row8);
+      }
+      {
+        Doctor row9 = new Doctor();
+        row9.setName("郑凯");
+        row9.setAvatar("");
+        row9.setTitle("副主任医师");
+        row9.setDeptId("2");
+        row9.setSpecialty("儿童消化系统疾病");
+        row9.setYears(11);
+        row9.setGoodRate(98);
+        row9.setFee(30);
+        row9.setStatus("active");
+        doctorRepo.save(row9);
+      }
+      {
+        Doctor row10 = new Doctor();
+        row10.setName("孙悦");
+        row10.setAvatar("");
+        row10.setTitle("主治医师");
+        row10.setDeptId("2");
+        row10.setSpecialty("儿童呼吸道感染");
+        row10.setYears(9);
+        row10.setGoodRate(97);
+        row10.setFee(25);
+        row10.setStatus("active");
+        doctorRepo.save(row10);
+      }
+      {
+        Doctor row11 = new Doctor();
+        row11.setName("马超");
+        row11.setAvatar("");
+        row11.setTitle("主治医师");
+        row11.setDeptId("2");
+        row11.setSpecialty("儿童急诊常见病");
+        row11.setYears(8);
+        row11.setGoodRate(96);
+        row11.setFee(25);
+        row11.setStatus("active");
+        doctorRepo.save(row11);
+      }
+      {
+        Doctor row12 = new Doctor();
+        row12.setName("朱琳");
+        row12.setAvatar("");
+        row12.setTitle("医师");
+        row12.setDeptId("2");
+        row12.setSpecialty("儿童保健与疫苗接种");
+        row12.setYears(5);
+        row12.setGoodRate(96);
+        row12.setFee(20);
+        row12.setStatus("active");
+        doctorRepo.save(row12);
+      }
+      {
+        Doctor row13 = new Doctor();
+        row13.setName("胡兵");
+        row13.setAvatar("");
+        row13.setTitle("主治医师");
+        row13.setDeptId("2");
+        row13.setSpecialty("儿童泌尿系统疾病");
+        row13.setYears(10);
+        row13.setGoodRate(97);
+        row13.setFee(25);
+        row13.setStatus("active");
+        doctorRepo.save(row13);
+      }
+      {
+        Doctor row14 = new Doctor();
+        row14.setName("高翔");
+        row14.setAvatar("");
+        row14.setTitle("副主任医师");
+        row14.setDeptId("2");
+        row14.setSpecialty("儿童心血管疾病");
+        row14.setYears(14);
+        row14.setGoodRate(98);
+        row14.setFee(35);
+        row14.setStatus("active");
+        doctorRepo.save(row14);
+      }
+      {
+        Doctor row15 = new Doctor();
+        row15.setName("林芳");
+        row15.setAvatar("");
+        row15.setTitle("主治医师");
+        row15.setDeptId("3");
+        row15.setSpecialty("妇科常见病、宫颈筛查");
+        row15.setYears(9);
+        row15.setGoodRate(97);
+        row15.setFee(25);
+        row15.setStatus("active");
+        doctorRepo.save(row15);
+      }
+      {
+        Doctor row16 = new Doctor();
+        row16.setName("何静");
+        row16.setAvatar("");
+        row16.setTitle("副主任医师");
+        row16.setDeptId("3");
+        row16.setSpecialty("围产期保健");
+        row16.setYears(12);
+        row16.setGoodRate(98);
+        row16.setFee(30);
+        row16.setStatus("active");
+        doctorRepo.save(row16);
+      }
+      {
+        Doctor row17 = new Doctor();
+        row17.setName("罗敏");
+        row17.setAvatar("");
+        row17.setTitle("医师");
+        row17.setDeptId("3");
+        row17.setSpecialty("计划生育咨询");
+        row17.setYears(5);
+        row17.setGoodRate(96);
+        row17.setFee(20);
+        row17.setStatus("active");
+        doctorRepo.save(row17);
+      }
+      {
+        Doctor row18 = new Doctor();
+        row18.setName("谢婷");
+        row18.setAvatar("");
+        row18.setTitle("主治医师");
+        row18.setDeptId("3");
+        row18.setSpecialty("妇科肿瘤筛查");
+        row18.setYears(8);
+        row18.setGoodRate(97);
+        row18.setFee(25);
+        row18.setStatus("active");
+        doctorRepo.save(row18);
+      }
+      {
+        Doctor row19 = new Doctor();
+        row19.setName("徐蕾");
+        row19.setAvatar("");
+        row19.setTitle("主治医师");
+        row19.setDeptId("5");
+        row19.setSpecialty("皮炎、湿疹、荨麻疹");
+        row19.setYears(9);
+        row19.setGoodRate(97);
+        row19.setFee(25);
+        row19.setStatus("active");
+        doctorRepo.save(row19);
+      }
       }
 
       // —— Schedule ——
       if (scheduleRepo.count() == 0) {
-      // 日期相对化：spec 种子日期写死会让「本月/近7天」聚合在原型日期之后恒为 0；
-      // 保持 quota/booked/status 不变，映射到 今天-6..今天-2（趋势形态与原型一致）
-      java.time.LocalDate __today = java.time.LocalDate.now();
-      final String D1 = __today.minusDays(6).toString();
-      final String D2 = __today.minusDays(5).toString();
-      final String D3 = __today.minusDays(4).toString();
-      final String D4 = __today.minusDays(3).toString();
-      final String D5 = __today.minusDays(2).toString();
       {
         Schedule row0 = new Schedule();
         row0.setDoctorId("1");
-        row0.setWorkDate(D1);
+        row0.setWorkDate(LocalDate.now().plusDays(-9).toString());
         row0.setSlot("am");
         row0.setQuota(30);
-        row0.setBooked(12);
+        row0.setBooked(8);
+        row0.setVisited(8);
         row0.setStatus("open");
         row0.setRemark("");
         scheduleRepo.save(row0);
       }
       {
         Schedule row1 = new Schedule();
-        row1.setDoctorId("1");
-        row1.setWorkDate(D2);
-        row1.setSlot("am");
-        row1.setQuota(20);
-        row1.setBooked(20);
+        row1.setDoctorId("2");
+        row1.setWorkDate(LocalDate.now().plusDays(-7).toString());
+        row1.setSlot("pm");
+        row1.setQuota(30);
+        row1.setBooked(8);
+        row1.setVisited(8);
         row1.setStatus("open");
         row1.setRemark("");
         scheduleRepo.save(row1);
       }
       {
         Schedule row2 = new Schedule();
-        row2.setDoctorId("2");
-        row2.setWorkDate(D1);
-        row2.setSlot("pm");
-        row2.setQuota(40);
-        row2.setBooked(15);
+        row2.setDoctorId("1");
+        row2.setWorkDate(LocalDate.now().plusDays(-6).toString());
+        row2.setSlot("am");
+        row2.setQuota(20);
+        row2.setBooked(6);
+        row2.setVisited(5);
         row2.setStatus("open");
         row2.setRemark("");
         scheduleRepo.save(row2);
       }
       {
         Schedule row3 = new Schedule();
-        row3.setDoctorId("3");
-        row3.setWorkDate(D2);
-        row3.setSlot("am");
-        row3.setQuota(25);
-        row3.setBooked(5);
+        row3.setDoctorId("2");
+        row3.setWorkDate(LocalDate.now().plusDays(-6).toString());
+        row3.setSlot("pm");
+        row3.setQuota(20);
+        row3.setBooked(2);
+        row3.setVisited(2);
         row3.setStatus("open");
         row3.setRemark("");
         scheduleRepo.save(row3);
       }
       {
         Schedule row4 = new Schedule();
-        row4.setDoctorId("2");
-        row4.setWorkDate(D2);
-        row4.setSlot("pm");
-        row4.setQuota(20);
-        row4.setBooked(8);
+        row4.setDoctorId("3");
+        row4.setWorkDate(LocalDate.now().plusDays(-6).toString());
+        row4.setSlot("am");
+        row4.setQuota(25);
+        row4.setBooked(4);
+        row4.setVisited(4);
         row4.setStatus("open");
         row4.setRemark("");
         scheduleRepo.save(row4);
@@ -217,46 +424,230 @@ public class SeedConfig {
       {
         Schedule row5 = new Schedule();
         row5.setDoctorId("3");
-        row5.setWorkDate(D3);
+        row5.setWorkDate(LocalDate.now().plusDays(-5).toString());
         row5.setSlot("am");
-        row5.setQuota(30);
-        row5.setBooked(10);
+        row5.setQuota(20);
+        row5.setBooked(5);
+        row5.setVisited(5);
         row5.setStatus("open");
         row5.setRemark("");
         scheduleRepo.save(row5);
       }
       {
         Schedule row6 = new Schedule();
-        row6.setDoctorId("4");
-        row6.setWorkDate(D3);
+        row6.setDoctorId("20");
+        row6.setWorkDate(LocalDate.now().plusDays(-5).toString());
         row6.setSlot("pm");
-        row6.setQuota(20);
-        row6.setBooked(0);
-        row6.setStatus("closed");
+        row6.setQuota(15);
+        row6.setBooked(3);
+        row6.setVisited(3);
+        row6.setStatus("open");
         row6.setRemark("");
         scheduleRepo.save(row6);
       }
       {
         Schedule row7 = new Schedule();
-        row7.setDoctorId("4");
-        row7.setWorkDate(D4);
+        row7.setDoctorId("1");
+        row7.setWorkDate(LocalDate.now().plusDays(-4).toString());
         row7.setSlot("am");
-        row7.setQuota(15);
+        row7.setQuota(30);
         row7.setBooked(7);
+        row7.setVisited(7);
         row7.setStatus("open");
         row7.setRemark("");
         scheduleRepo.save(row7);
       }
       {
         Schedule row8 = new Schedule();
-        row8.setDoctorId("1");
-        row8.setWorkDate(D5);
-        row8.setSlot("am");
-        row8.setQuota(50);
-        row8.setBooked(30);
+        row8.setDoctorId("2");
+        row8.setWorkDate(LocalDate.now().plusDays(-4).toString());
+        row8.setSlot("pm");
+        row8.setQuota(25);
+        row8.setBooked(5);
+        row8.setVisited(4);
         row8.setStatus("open");
         row8.setRemark("");
         scheduleRepo.save(row8);
+      }
+      {
+        Schedule row9 = new Schedule();
+        row9.setDoctorId("4");
+        row9.setWorkDate(LocalDate.now().plusDays(-4).toString());
+        row9.setSlot("am");
+        row9.setQuota(15);
+        row9.setBooked(3);
+        row9.setVisited(3);
+        row9.setStatus("open");
+        row9.setRemark("");
+        scheduleRepo.save(row9);
+      }
+      {
+        Schedule row10 = new Schedule();
+        row10.setDoctorId("5");
+        row10.setWorkDate(LocalDate.now().plusDays(-3).toString());
+        row10.setSlot("am");
+        row10.setQuota(25);
+        row10.setBooked(6);
+        row10.setVisited(6);
+        row10.setStatus("open");
+        row10.setRemark("");
+        scheduleRepo.save(row10);
+      }
+      {
+        Schedule row11 = new Schedule();
+        row11.setDoctorId("7");
+        row11.setWorkDate(LocalDate.now().plusDays(-3).toString());
+        row11.setSlot("pm");
+        row11.setQuota(20);
+        row11.setBooked(4);
+        row11.setVisited(4);
+        row11.setStatus("open");
+        row11.setRemark("");
+        scheduleRepo.save(row11);
+      }
+      {
+        Schedule row12 = new Schedule();
+        row12.setDoctorId("6");
+        row12.setWorkDate(LocalDate.now().plusDays(-2).toString());
+        row12.setSlot("am");
+        row12.setQuota(30);
+        row12.setBooked(8);
+        row12.setVisited(7);
+        row12.setStatus("open");
+        row12.setRemark("");
+        scheduleRepo.save(row12);
+      }
+      {
+        Schedule row13 = new Schedule();
+        row13.setDoctorId("3");
+        row13.setWorkDate(LocalDate.now().plusDays(-2).toString());
+        row13.setSlot("am");
+        row13.setQuota(25);
+        row13.setBooked(6);
+        row13.setVisited(6);
+        row13.setStatus("open");
+        row13.setRemark("");
+        scheduleRepo.save(row13);
+      }
+      {
+        Schedule row14 = new Schedule();
+        row14.setDoctorId("20");
+        row14.setWorkDate(LocalDate.now().plusDays(-2).toString());
+        row14.setSlot("pm");
+        row14.setQuota(20);
+        row14.setBooked(4);
+        row14.setVisited(4);
+        row14.setStatus("open");
+        row14.setRemark("");
+        scheduleRepo.save(row14);
+      }
+      {
+        Schedule row15 = new Schedule();
+        row15.setDoctorId("1");
+        row15.setWorkDate(LocalDate.now().plusDays(-1).toString());
+        row15.setSlot("am");
+        row15.setQuota(40);
+        row15.setBooked(10);
+        row15.setVisited(9);
+        row15.setStatus("open");
+        row15.setRemark("");
+        scheduleRepo.save(row15);
+      }
+      {
+        Schedule row16 = new Schedule();
+        row16.setDoctorId("2");
+        row16.setWorkDate(LocalDate.now().plusDays(-1).toString());
+        row16.setSlot("pm");
+        row16.setQuota(30);
+        row16.setBooked(7);
+        row16.setVisited(7);
+        row16.setStatus("open");
+        row16.setRemark("");
+        scheduleRepo.save(row16);
+      }
+      {
+        Schedule row17 = new Schedule();
+        row17.setDoctorId("7");
+        row17.setWorkDate(LocalDate.now().plusDays(-1).toString());
+        row17.setSlot("am");
+        row17.setQuota(20);
+        row17.setBooked(5);
+        row17.setVisited(5);
+        row17.setStatus("open");
+        row17.setRemark("");
+        scheduleRepo.save(row17);
+      }
+      {
+        Schedule row18 = new Schedule();
+        row18.setDoctorId("1");
+        row18.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row18.setSlot("am");
+        row18.setQuota(20);
+        row18.setBooked(2);
+        row18.setVisited(2);
+        row18.setStatus("open");
+        row18.setRemark("");
+        scheduleRepo.save(row18);
+      }
+      {
+        Schedule row19 = new Schedule();
+        row19.setDoctorId("2");
+        row19.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row19.setSlot("am");
+        row19.setQuota(20);
+        row19.setBooked(1);
+        row19.setVisited(1);
+        row19.setStatus("open");
+        row19.setRemark("");
+        scheduleRepo.save(row19);
+      }
+      {
+        Schedule row20 = new Schedule();
+        row20.setDoctorId("3");
+        row20.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row20.setSlot("am");
+        row20.setQuota(20);
+        row20.setBooked(1);
+        row20.setVisited(1);
+        row20.setStatus("open");
+        row20.setRemark("");
+        scheduleRepo.save(row20);
+      }
+      {
+        Schedule row21 = new Schedule();
+        row21.setDoctorId("4");
+        row21.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row21.setSlot("am");
+        row21.setQuota(15);
+        row21.setBooked(1);
+        row21.setVisited(1);
+        row21.setStatus("open");
+        row21.setRemark("");
+        scheduleRepo.save(row21);
+      }
+      {
+        Schedule row22 = new Schedule();
+        row22.setDoctorId("5");
+        row22.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row22.setSlot("pm");
+        row22.setQuota(20);
+        row22.setBooked(0);
+        row22.setVisited(0);
+        row22.setStatus("open");
+        row22.setRemark("");
+        scheduleRepo.save(row22);
+      }
+      {
+        Schedule row23 = new Schedule();
+        row23.setDoctorId("20");
+        row23.setWorkDate(LocalDate.now().plusDays(0).toString());
+        row23.setSlot("am");
+        row23.setQuota(15);
+        row23.setBooked(0);
+        row23.setVisited(0);
+        row23.setStatus("open");
+        row23.setRemark("");
+        scheduleRepo.save(row23);
       }
       }
 

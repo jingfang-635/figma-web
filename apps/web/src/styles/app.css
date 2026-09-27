@@ -30,9 +30,9 @@ body {
 .nav-item.nav-top { padding-left: 26px; }
 .nav-item.nav-top .nav-ic { width: 24px; margin-right: 7px; }
 .nav-item:hover { background: #F5F5F5; }
-.nav-top.active { background: #E6F4FF; color: #262626; font-weight: 500; }
-.nav-disabled { color: #BFBFBF; }
-.nav-disabled .nav-label { color: #BFBFBF; }
+/* 选中态只换底色：IR 里选中项文字仍是 #595959 / 常规字重（157:161 首页 vs 157:171 机构信息同色） */
+.nav-top.active { background: #E6F4FF; }
+.nav-inactive { cursor: default; }
 .nav-ic { width: 20px; display: inline-flex; justify-content: center; margin-right: 10px; }
 .nav-badge {
   position: absolute; right: 25px; top: 50%; transform: translateY(-50%);
@@ -40,34 +40,25 @@ body {
   color: #fff; font-size: 11px; display: grid; place-items: center; padding: 0 6px;
 }
 
-.nav-divider { width: 163px; height: 1px; background: #F0F0F0; margin: 6px 0 11px 28px; }
-.nav-item.nav-group {
-  font-size: 14px; font-weight: 500; color: #8C8C8C; height: 38px; padding-left: 24px;
-}
-.nav-item.nav-group .nav-arrow { margin-left: auto; margin-right: 4px; font-size: 12px; color: #BFBFBF; }
-.nav-item.nav-sub { height: 38px; font-size: 14px; padding-left: 39px; color: #595959; }
-.nav-item.nav-sub .nav-ic { width: 21px; margin-right: 14px; }
-.nav-item.nav-sub2 { height: 31px; font-size: 13px; padding-left: 77px; color: #595959; }
-.nav-item.nav-sub:hover, .nav-item.nav-sub2:hover, .nav-item.nav-group:hover { background: transparent; cursor: default; }
-.nav-item.nav-sub.nav-disabled, .nav-item.nav-sub2.nav-disabled { color: #595959; }
-.nav-item.nav-sub.nav-disabled .nav-label, .nav-item.nav-sub2.nav-disabled .nav-label { color: #595959; }
-
 /* ===== 头部（Figma: �?52，右侧头�?两行用户+退出） ===== */
 .app-header {
   height: 52px; line-height: normal;
   background: #FFFFFF;
   border-bottom: 1px solid #F0F0F0;
   display: flex; justify-content: flex-end; align-items: center;
-  padding: 0 26px;
+  /* IR：头像 ink y=17、名称 ink y=8、角色 ink y=27 —— 整组内容比 52 居中低 2px，
+     padding-top 4 让 52px 内容盒的居中点下移 2（border-box） */
+  padding: 4px 24px 0;
 }
-.header-right { display: flex; gap: 12px; align-items: center; }
+/* 间距一律取 IR：头像右缘→名称左缘 10.5、角色右缘→退出左缘 20（右缘 1416 = 1440-24） */
+.header-right { display: flex; gap: 0; align-items: center; }
 .header-avatar {
-  background: #E6F4FF; color: #1890FF; font-weight: 500;
+  background: #E6F4FF; color: #1890FF; font-weight: 500; margin-right: 10px;
 }
 .header-user-meta { line-height: 1.35; }
 .header-user-name { font-size: 14px; font-weight: 500; color: #333333; }
 .header-user-role { font-size: 13px; color: #8C8C8C; }
-.header-logout { font-size: 13px; color: #8C8C8C; }
+.header-logout { font-size: 13px; color: #8C8C8C; margin-left: 20px; }
 .header-logout:hover { color: #1890FF; }
 
 /* 内容区按比例自适应：宽度一律由相对单位推导，不写死像素上限。
@@ -107,7 +98,8 @@ body {
 .metric-card { background: transparent; }
 /* 原型标题/图标相对区块左缘内缩 26px（IR 关键指标 icon x=864 = 838+26），
    而 .chart-card padding 为 20px → 补 6px 对齐。 */
-.metric-card .chart-head { margin-left: 6px; }
+/* 「关键指标」不是白卡，其 chart-head 在 IR 里比同类右列卡多缩进 4、且低 6（IR 标题 888,554） */
+.metric-card .chart-head { margin-left: 10px; position: relative; top: 6px; }
 .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; }
 .metric-cell {
   background: #FFFFFF; border-radius: 6px; height: 78px; padding: 14px 0;
@@ -151,6 +143,7 @@ body {
 .today-link { font-size: 12px; color: #595959; cursor: pointer; margin-left: 17px; }
 .today-link:hover { color: #1890FF; }
 .schedule-toolbar .ant-btn { height: 31px; padding: 0 25px; font-size: 13px; border-radius: 6px; }
+.schedule-toolbar .ant-btn-default { color: #595959; }
 
 /* 分段控件：#F5F5F5 底 203x31 + 白色活动块 101x27 */
 .view-switch {
@@ -215,13 +208,14 @@ body {
   font-size: 11px;
 }
 .cell-doctor { font-weight: 500; line-height: 1; }
-.cell-count { font-size: 11px; line-height: 1; }
+/* IR 的药丸里 10px 计数比 11px 医生名高 3（计数 ink 537 / 医生名 539，非同一居中基线） */
+.cell-count { font-size: 10px; line-height: 1; position: relative; top: -3px; }
 .cell-item.pill-am { background: #E6FFFA; color: #13C2C2; }
 .cell-item.pill-pm { background: #FFF0F6; color: #EB2F96; }
 .cell-item.pill-full { background: #FFF7E6; color: #FA8C16; }
 .cell-item.pill-stopped { background: #FFF1F0; color: #FF4D4F; }
 .cell-item.pill-open { background: #E6F7FF; color: #1890FF; }
-.cell-more { font-size: 11px; color: #1890FF; line-height: 16px; margin-top: 2px; }
+.cell-more { font-size: 11px; color: #1890FF; line-height: 16px; margin-top: 2px; padding: 0 5px; }
 
 /* 登录�?*/
 .login-page {
@@ -457,6 +451,7 @@ body {
 .list-card .cell-avatar {
   width: 36px; height: 36px; border-radius: 50%; background: #E6F7FF; color: #1890FF;
   display: inline-grid; place-items: center; font-size: 14px; font-weight: 400; flex: none;
+  margin-right: 0; /* antd Avatar 自带 8px 外边距，会与 .cell-name 的 gap 10 叠加成 18（IR 为 10） */
 }
 .list-card .cell-name { display: flex; align-items: center; gap: 10px; }
 .list-card .cell-title { font-size: 14px; font-weight: 500; color: #262626; line-height: 19.6px; }
@@ -468,6 +463,8 @@ body {
 .list-card .ant-tag.tag-green { background: #F6FFED; border-color: transparent; color: #52C41A; }
 .list-card .cell-op { font-size: 12px; line-height: 17px; color: #595959; }
 .list-card .cell-op-del { font-size: 12px; line-height: 17px; color: #FF4D4F; margin-left: 40px; }
+/* 医生数量列：IR 单值 695 / 双值 691 → 二者中心都落在 699（列左 663 + 72/2）＝数值居中 */
+.list-card .cell-num { display: inline-block; width: 72px; text-align: center; }
 
 /* ===== 列表列内对齐（几何来自 Layout IR departments.json，逐列取 IR 文本左缘）=====
    列左缘：科室 3304 / 医生数量 3703.45 / 排序 3858.08 / 状态 3961.16 / 操作 4103~4436
@@ -476,18 +473,24 @@ body {
    操作表头 x=4361 w=24 → 右对齐时右缘 4385，列右缘 4436 → padding-right 51 */
 .list-card .ant-table-thead > tr > th.col-status { padding-left: 21px !important; }
 .list-card .ant-table-thead > tr > th.col-actions { padding-right: 51px !important; }
-.list-card .ant-table-tbody > tr > td.col-doctor-count { padding-left: 32px !important; }
+.list-card .ant-table-tbody > tr > td.col-doctor-count { padding-left: 0 !important; }
 .list-card .ant-table-tbody > tr > td.col-sort { padding-left: 16px !important; }
 
 .list-card .ant-table-pagination.ant-pagination { margin: 28px 0 0; font-size: 12px; }
 .list-card .ant-pagination .ant-pagination-item,
 .list-card .ant-pagination .ant-pagination-prev,
-.list-card .ant-pagination .ant-pagination-next { min-width: 28px; height: 28px; line-height: 26px; }
+.list-card .ant-pagination .ant-pagination-next { min-width: 28px; height: 28px; line-height: 26px; border-radius: 4px; }
 .list-card .ant-pagination .ant-pagination-item a { font-size: 12px; line-height: 26px; }
+/* IR 分页三键 1300 / 1334 / 1368（各 28 宽，间距 6，行右缘 1396）；选中项为蓝底白字 */
+.list-card .ant-pagination .ant-pagination-prev { margin-inline-end: 6px; }
+.list-card .ant-pagination .ant-pagination-item { margin-inline-end: 6px; }
+.list-card .ant-pagination .ant-pagination-next { margin-inline-end: 0; }
+.list-card .ant-pagination .ant-pagination-item-active { background: #1890FF; border-color: #1890FF; }
+.list-card .ant-pagination .ant-pagination-item-active a { color: #FFFFFF; }
 /* total 文本 antd 默认 line-height:30px/height:32px → 把分页行撑到 32（IR 为 28），
    卡高连带 +4。钉成 28 与分页按钮同高（IR 分页行 702..730）。 */
 .list-card .ant-pagination .ant-pagination-total-text {
-  font-size: 12px; color: #8C8C8C; height: 28px; line-height: 28px;
+  font-size: 12px; color: #8C8C8C; height: 28px; line-height: 28px; margin-right: 14px;
 }
 
 /* 列表筛选条（医生屏：y327–391，搜索 280x40 / 下拉 160x40，下边框 #F0F0F0） */
@@ -499,7 +502,7 @@ body {
    会退回 antd 默认 32px 高、宽度被 flex 压到 212px，并把后面的下拉整体左移 68px。
    直接按 IR 钉：Space 的每个 item 里的裸 .ant-input = 280x40（下拉随后自然落在 556） */
 .list-card .list-toolbar .ant-space-item > .ant-input {
-  width: 280px; height: 40px !important; border-radius: 6px;
+  width: 280px; height: 40px !important; border-radius: 6px; font-size: 15px;
 }
 /* 下拉容器高度必须一起钉：antd 默认 .ant-select 高 32px，只把 .ant-select-selector
    拉成 40 会让它从容器顶部溢出 4px（实测 selector @343 而非 IR 的 @339）。 */
@@ -537,12 +540,26 @@ body {
 .org-form .ant-form-item-label { flex: 0 0 auto; padding-right: 0; }
 .org-form .ant-form-item-label > label {
   /* 100 = label 88 + 距输入框 12（右内边距留白，文字右对齐到 352，输入框起 364，同 IR） */
-  width: 100px; box-sizing: border-box; padding-right: 12px;
+  width: 100px; box-sizing: border-box; padding-right: 10px;
   justify-content: flex-end;
-  font-size: 13px; color: #595959; height: 40px;
+  /* IR ink y=335（行顶 327 + 7 基线偏移），故不居中而显式对齐到内容顶部 */
+  align-items: flex-start; height: auto; padding-top: 7px;
+  font-size: 13px; color: #595959;
 }
-.org-form .ant-input { height: 40px; border-radius: 6px; font-size: 15px; }
-.org-form .org-req { color: #FF4D4F; margin-left: 8px; }
+/* 必填星号：antd 画在文字**前**（::before），IR 画在文字**后**（star 347 vs 文字右缘 339）→
+   关掉 ::before、改用 ::after；且 ::after 的占位（no-colon 的 content:' ' + margin 2/8≈13px）
+   会顶掉文字右缘（实测文字左移 13px），必须一并清零。
+   两处选择器都写满 3 个类名才压得住 antd 运行时注入的同权重规则 */
+.org-form .ant-form-item-label > label.ant-form-item-required::before,
+.org-form .ant-form-item-label > label.ant-form-item-required-mark-optional::before { content: none; }
+.org-form .ant-form-item-label > label.ant-form-item-no-colon::after { content: none; margin: 0; }
+.org-form .ant-form-item-label > label.ant-form-item-required.ant-form-item-no-colon::after {
+  content: '*'; color: #FF4D4F; margin: 0 0 0 8px;
+}
+.org-form .ant-input { height: 40px; border-radius: 6px; font-size: 15px; color: #333333; }
+/* 简介用 TextArea（带 showCount 时 antd 会套 affix-wrapper），内层 textarea 不在上面的选择器里 */
+.org-form .ant-input-affix-wrapper textarea.ant-input,
+.org-form textarea.ant-input { font-size: 15px; color: #333333; }
 
 .org-intro .ant-form-item-control-input { min-height: 80px; }
 .org-intro textarea.ant-input { height: 80px; min-height: 80px; }

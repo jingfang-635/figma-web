@@ -18,6 +18,7 @@ public class DoctorController extends CrudController<Doctor> {
 
   private final DoctorRepository repo;
 
+
   public DoctorController(DoctorRepository repo) {
     this.repo = repo;
   }
@@ -40,6 +41,7 @@ public class DoctorController extends CrudController<Doctor> {
     m.put("goodRate", nz(e.getGoodRate()));
     m.put("fee", nz(e.getFee()));
     m.put("status", nz(e.getStatus()));
+
     return m;
   }
 

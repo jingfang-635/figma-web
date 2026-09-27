@@ -4,7 +4,7 @@
  * 
  * 用法：
  *   node scripts/capture-screens.mjs --round=1
- *   node scripts/capture-screens.mjs --round=2 --screens=home,departments
+ *   node scripts/capture-screens.mjs --round=<n> --screens=<id>,<id>   # 屏 id 取 spec.screens[].id
  * 
  * 输出：artifacts/visual-diff/round-N/actuals/*.png
  */

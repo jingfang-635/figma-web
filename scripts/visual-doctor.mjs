@@ -11,13 +11,14 @@
  */
 import { createRequire } from "node:module";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "./lib/env.mjs";
 import { resolveProject, gateCredentials, gateMasks } from "./lib/project.mjs";
 import { flatBgDrift, FLATBG_DEFAULTS } from "./lib/pixel-metrics.mjs";
 import { loadTargets } from "./check-geometry.mjs";
 import { loadTargets as loadTextTargets } from "./check-text.mjs";
+import { scanDocs, sampleLiterals } from "./check-doc-hardcode.mjs";
 
 const root = resolve(process.cwd());
 loadEnv(resolve(root, ".env"));
@@ -48,6 +49,87 @@ checkSync("app-spec 解析", () => {
   if (!slug) throw new Error("未找到 fixtures/<slug>/app-spec.json，先跑 init:project");
   const bms = spec?.screens?.filter((s) => s.type !== "chrome").length || 0;
   return `slug=${slug} screens(非chrome)=${bms}`;
+});
+
+// 1b. 流程文档零硬编码（流程文档自身不得复述业务标识 / 设计几何 / 凭证——
+//     否则后续 agent 会把它当模板复制进新项目，文档就从「规范」退化成了「硬编码分发器」。
+//     判据见 scripts/check-doc-hardcode.mjs：结构字面量 + 从 app-spec 派生的业务字面量。）
+checkSync("流程文档零硬编码", () => {
+  const { files, violations, literals } = scanDocs(root);
+  if (violations.length) {
+    const head = violations
+      .slice(0, 5)
+      .map((v) => `${v.file}:${v.line} [${v.rule}] «${v.token}»`)
+      .join("; ");
+    throw new Error(
+      `${violations.length} 处命中（${head}${violations.length > 5 ? " …" : ""}）— 跑 npm run docs:lint 看全部`,
+    );
+  }
+  return `${files.length} 个文档干净（结构字面量 + ${literals.length} 条业务字面量判据）`;
+});
+
+// 1c. 页面层零硬编码（页面/组件只允许「消费生成物」：
+//     色值 → generated/tokens（IR 派生）；冻结样本 → spec → screenConfigs[].sample；
+//     屏名/品牌/侧栏文案 → generated/screenConfigs（Layout IR + app-spec 派生）。
+//     这三条正是「页面自带副本」事故的入口——写完 CSS/常量不是证据，生成物才是。）
+checkSync("页面层零硬编码", () => {
+  const { spec } = resolveProject(root);
+  const files = [];
+  const walk = (dir) => {
+    if (!existsSync(dir)) return;
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = resolve(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.tsx?$/.test(e.name)) files.push(p);
+    }
+  };
+  for (const d of ["apps/web/src/pages", "apps/web/src/components"]) walk(resolve(root, d));
+  if (!files.length) throw new Error("未找到页面/组件源文件 —— 判据已失明");
+
+  // 侧栏条目标签取自页面实际消费的那份生成物（chrome.sidebar → sidebarItems）
+  const irPath = resolve(root, "apps/web/src/generated/visual-ir.json");
+  const sidebarLabels = existsSync(irPath)
+    ? ((JSON.parse(readFileSync(irPath, "utf-8")).chrome?.sidebar?.groups || []).flatMap(
+        (g) => g.items || [],
+      ))
+    : [];
+
+  const literals = [
+    ...new Set(
+      [
+        ...sampleLiterals(spec),
+        // chrome（sidebar/header 等）名是结构件标识，会与 `sidebarItems` 之类的标识符撞车 → 排除
+        ...(spec?.screens || []).filter((s) => s?.type !== "chrome").map((s) => s?.name),
+        spec?.brand?.title,
+        spec?.brand?.subtitle,
+        ...sidebarLabels,
+      ].filter((t) => typeof t === "string" && t.trim().length >= 3),
+    ),
+  ];
+  if (!literals.length) throw new Error("未派生出任何文案判据 —— 判据已失明");
+
+  const hits = [];
+  const push = (f, i, rule, token) =>
+    hits.push(`${relative(root, f).replace(/\\/g, "/")}:${i + 1} [${rule}] «${token}»`);
+
+  for (const f of files) {
+    const lines = readFileSync(f, "utf-8").split(/\r?\n/);
+    lines.forEach((line, i) => {
+      const hex = line.match(/#[0-9a-fA-F]{3,8}\b/);
+      if (hex) push(f, i, "色值字面量", hex[0]);
+      const byName = line.match(/screenConfigs\.find\(\s*\(?\w+\)?\s*=>\s*\w+\.name\s*===\s*['"]/);
+      if (byName) push(f, i, "按屏名取配置", byName[0]);
+      for (const s of literals) if (line.includes(s)) push(f, i, "文案副本", s);
+    });
+  }
+
+  if (hits.length) {
+    const head = hits.slice(0, 5).join("; ");
+    throw new Error(
+      `${hits.length} 处命中（${head}${hits.length > 5 ? " …" : ""}）— 色值/文案一律从生成物取`,
+    );
+  }
+  return `${files.length} 个页面/组件文件干净（${literals.length} 条文案判据 + 色值 + 屏名查找）`;
 });
 
 // 2. 依赖可加载
@@ -183,7 +265,7 @@ checkSync("低对比度盲区闸门（flatBg）", () => {
   return `flatBg 漂移 ≤ ${val("VISUAL_FLATBG_MAX")}（弹窗 ≤ ${val("VISUAL_FLATBG_MODAL_MAX")}），参数 rad=${FLATBG_DEFAULTS.rad} flatTol=${FLATBG_DEFAULTS.flatTol} driftTol=${FLATBG_DEFAULTS.driftTol}`;
 });
 
-// 6e. 几何闸门（2026-09-26 机构信息屏事故：三条像素腿全过，页面却比原型窄 164px。
+// 6e. 几何闸门（像素三腿全过、页面却比原型窄一截的事故根因：
 //     像素统计量对「尺寸/位置」偏差结构性失明 → 必须另有一条几何腿：
 //     Layout IR 控件框 ↔ 运行时 DOM 框，逐框断言 x/y/w/h。判据从 IR 派生，无业务硬编码。
 //     本项同时是「判据未失明」自检——form 屏存在却解析不出控件框 = 判据坏了。）
@@ -240,6 +322,32 @@ checkSync("文本闸门（IR TEXT ↔ DOM 文本盒）", () => {
   return targets.length
     ? `${targets.length} 屏 / ${nodes} 个文本节点待断言（含 ${modals} 个弹窗；容差 ${(raw.match(/^VISUAL_TEXT_TOL=(.*)$/m) || [])[1]?.trim()}px，字号 ${(raw.match(/^VISUAL_TEXT_SIZE_TOL=(.*)$/m) || [])[1]?.trim()}px）`
     : "无含 TEXT 节点的屏（文本腿空转）";
+});
+
+// 6g. 活数据闸门（2026-09-27 事故：时间窗口类种子钉死在过去的日期 + 映射层只映射实体自身列、
+//     没按 spec 的 relations 产出派生字段 + 前端样例兜底 → 统计屏 KPI/图表全空、列表屏关联列整列空、
+//     日历屏无关联名称；而像素腿 / 几何腿 / 文本腿全 PASS——它们都在 gate 模式跑、冻结 Blueprint sample，
+//     与真实接口/数据库无关）。
+//     本项校验：脚本存在 + **已挂入 visual:data**（脚本存在但不跑 = 闸门失效）
+//     + 判据未失明（spec 声明了 relations/dashboard 却无可打开的路由屏即报错）。）
+checkSync("活数据闸门（spec 派生聚合 / 关联字段）", () => {
+  const { spec } = resolveProject(root);
+  const rels = (spec?.relations || []).length;
+  const charts = (spec?.dashboard?.charts || []).length;
+  if (!rels && !charts) return "spec 未声明 relations/dashboard（本项空转，不假装通过）";
+  const scriptRel = "scripts/check-live-data.mjs";
+  if (!existsSync(resolve(root, scriptRel))) {
+    throw new Error(`缺 ${scriptRel}（spec 声明了 relations/dashboard，活数据却无断言）`);
+  }
+  const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+  if (!String(pkg.scripts?.["visual:data"] || "").includes("check-live-data.mjs")) {
+    throw new Error("check-live-data.mjs 未挂入 npm run visual:data（脚本存在但不跑 = 闸门失效）");
+  }
+  const screens = (spec?.screens || []).filter((s) => s.route && !s.modal);
+  if (!screens.length) {
+    throw new Error("spec 有 dashboard/relations 却无可打开的路由屏 —— 判据已失明（DOM 侧无从断言）");
+  }
+  return `relations=${rels} charts=${charts}，路由屏 ${screens.length} 个（序列非空/非平坦 + 派生字段交叉验证 + DOM 渲染）`;
 });
 
 // 7. gate-masks.json 可解析（可选）

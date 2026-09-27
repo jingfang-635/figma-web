@@ -17,6 +17,7 @@ app:
   seed-admin:
     email: admin@sunshine.com
     username: admin
+    name: 系统管理员
     password: Admin@123456
 server:
   port: 3001

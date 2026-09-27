@@ -39,11 +39,12 @@ public class AuthController {
       return ResponseEntity.status(403).body(Map.of("message", "账号已禁用"));
     }
     String token = jwtUtil.issue(user.getUsername());
+    String displayName = user.getName() == null ? "" : user.getName();
     return ResponseEntity.ok(Map.of(
         "token", token,
         "user", Map.of(
             "username", user.getUsername(),
-            "name", user.getName()
+            "name", displayName
         )
     ));
   }

@@ -1,11 +1,11 @@
 package com.sunshinemedical.api.controller;
 
-import com.sunshinemedical.api.entity.Department;
-import com.sunshinemedical.api.entity.Doctor;
 import com.sunshinemedical.api.entity.Schedule;
-import com.sunshinemedical.api.repository.DepartmentRepository;
-import com.sunshinemedical.api.repository.DoctorRepository;
 import com.sunshinemedical.api.repository.ScheduleRepository;
+import com.sunshinemedical.api.entity.Department;
+import com.sunshinemedical.api.repository.DepartmentRepository;
+import com.sunshinemedical.api.entity.Doctor;
+import com.sunshinemedical.api.repository.DoctorRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,97 +21,137 @@ import java.util.Map;
 @RequestMapping("/api/dashboard")
 public class DashboardController {
 
-  private final ScheduleRepository schedules;
-  private final DepartmentRepository departments;
-  private final DoctorRepository doctors;
+  private static final DateTimeFormatter MD = DateTimeFormatter.ofPattern("M/d");
 
-  public DashboardController(ScheduleRepository schedules, DepartmentRepository departments, DoctorRepository doctors) {
-    this.schedules = schedules;
-    this.departments = departments;
-    this.doctors = doctors;
+  private final ScheduleRepository scheduleRepo;
+  private final DepartmentRepository departmentRepo;
+  private final DoctorRepository doctorRepo;
+
+  public DashboardController(ScheduleRepository scheduleRepo, DepartmentRepository departmentRepo, DoctorRepository doctorRepo) {
+    this.scheduleRepo = scheduleRepo;
+    this.departmentRepo = departmentRepo;
+    this.doctorRepo = doctorRepo;
   }
 
-  /** KPI：本月预约量 / 就诊率 / 爽约率 / 本月收入（与 Figma 文本口径一致） */
+  /** KPI：按库内数据实时聚合（窗口/字段来自 spec.dashboard，禁止前端兜底造假） */
   @GetMapping("/stats")
   public Map<String, Object> stats() {
-    LocalDate now = LocalDate.now();
-    String ym = now.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-    List<Schedule> rows = schedules.findAll().stream()
-        .filter(s -> s.getWorkDate() != null && s.getWorkDate().startsWith(ym))
-        .toList();
-
-    int quota = rows.stream().mapToInt(s -> nz(s.getQuota())).sum();
-    int booked = rows.stream().mapToInt(s -> nz(s.getBooked())).sum();
-    // 收入口径：与挂号费相关；demo 数据按预约人次 × ¥30 估算（真实计费接入后替换）
-    long revenue = booked * 30L;
-
+    LocalDate today = LocalDate.now();
+    String ym = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    List<Schedule> rows = scheduleRepo.findAll();
     Map<String, Object> m = new LinkedHashMap<>();
-    m.put("appointments", booked);
-    m.put("visitRate", pct(booked, quota));
-    m.put("noshowRate", pct(quota - booked, quota));
-    m.put("revenue", "¥" + String.format("%,d", revenue));
-
-    // 机构信息页 KPI：启用科室 / 在诊医生 / 待就诊 / 今日订单（与 Figma 文本口径一致）
-    m.put("departments", departments.findAll().stream().filter(d -> "active".equals(d.getStatus())).count());
-    m.put("doctors", doctors.count());
-    String today = now.toString();
-    m.put("pending", schedules.findAll().stream()
-        .filter(s -> today.equals(s.getWorkDate()) && "open".equals(s.getStatus()))
-        .mapToInt(s -> Math.max(0, nz(s.getQuota()) - nz(s.getBooked()))).sum());
-    m.put("ordersToday", 0);
+    int appointments = rows.stream().filter(s -> inMonth(s, ym)).mapToInt(s -> num(s.getBooked())).sum();
+    m.put("appointments", appointments);
+    int visited = rows.stream().filter(s -> inMonth(s, ym)).mapToInt(s -> num(s.getVisited())).sum();
+    m.put("visited", visited);
+    int noshow = rows.stream().filter(s -> inMonth(s, ym)).mapToInt(s -> num(s.getBooked()) - num(s.getVisited())).sum();
+    m.put("noshow", noshow);
+    m.put("departments", (int) departmentRepo.findAll().stream().filter(t -> "active".equals(String.valueOf(t.getStatus()))).count());
+    m.put("doctors", (int) rows.stream().filter(s -> isToday(s)).filter(s -> "open".equals(String.valueOf(s.getStatus()))).map(s -> s.getDoctorId()).distinct().count());
+    int pending = rows.stream().filter(s -> isToday(s)).mapToInt(s -> num(s.getBooked()) - num(s.getVisited())).sum();
+    m.put("pending", pending);
+    int ordersToday = rows.stream().filter(s -> isToday(s)).mapToInt(s -> num(s.getBooked())).sum();
+    m.put("ordersToday", ordersToday);
+    m.put("visitRate", pct(visited, appointments));
+    m.put("noshowRate", pct(noshow, appointments));
+    long revenue = rows.stream().filter(s -> inMonth(s, ym)).mapToInt(s -> num(s.getBooked()) * relValue0(s.getDoctorId())).sum();
+    m.put("revenue", money(revenue, "¥", true));
     return m;
   }
 
-  /** 图表：近7天预约趋势 / 各科室预约量（近7天）/ 近7天挂号收入 */
+  /** 图表：窗口内逐日 / 按关联实体分组聚合 */
   @GetMapping("/charts")
   public Map<String, Object> charts() {
     LocalDate today = LocalDate.now();
-    DateTimeFormatter md = DateTimeFormatter.ofPattern("M/d");
-    List<Schedule> all = schedules.findAll();
-
-    // 近 7 天（含今日）标签
-    List<String> days = new ArrayList<>();
-    for (int i = 6; i >= 0; i--) days.add(today.minusDays(i).format(md));
-
+    String ym = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    List<Schedule> rows = scheduleRepo.findAll();
     Map<String, Object> m = new LinkedHashMap<>();
-
-    // 1) 预约量趋势：按 workDate 聚合 booked
-    List<Integer> trend = new ArrayList<>();
+    List<String> trendLabels = new ArrayList<>();
+    List<Integer> trendValues = new ArrayList<>();
     for (int i = 6; i >= 0; i--) {
-      String d = today.minusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-      final String day = d;
-      trend.add(all.stream().filter(s -> day.equals(s.getWorkDate())).mapToInt(s -> nz(s.getBooked())).sum());
+      LocalDate day = today.minusDays(i);
+      final String dayStr = day.toString();
+      trendLabels.add(day.format(MD));
+      trendValues.add(rows.stream().filter(s -> dayStr.equals(s.getWorkDate())).mapToInt(s -> num(s.getBooked())).sum());
     }
-    m.put("trend", Map.of("labels", days, "values", trend));
-
-    // 2) 各科室预约量：booked 按 doctor → dept 聚合（demo 简化：按 schedule 分布折算）
-    Map<String, Integer> byDept = new LinkedHashMap<>();
-    for (Department d : departments.findAll()) byDept.put(d.getName(), 0);
-    int idx = 0;
-    for (Map.Entry<String, Integer> e : byDept.entrySet()) {
-      // 无 doctor→dept 关联查询时按科室顺序近似均分；真实关联接入后替换
-      byDept.put(e.getKey(), Math.round(all.size() > 0 ? bookedSum(all) / (float) byDept.size() : 0));
-      idx++;
+    m.put("trend", Map.of("labels", trendLabels, "values", trendValues));
+    List<String> incomeLabels = new ArrayList<>();
+    List<Integer> incomeValues = new ArrayList<>();
+    for (int i = 6; i >= 0; i--) {
+      LocalDate day = today.minusDays(i);
+      final String dayStr = day.toString();
+      incomeLabels.add(day.format(MD));
+      incomeValues.add(rows.stream().filter(s -> dayStr.equals(s.getWorkDate())).mapToInt(s -> num(s.getBooked()) * relValue0(s.getDoctorId())).sum());
     }
-    m.put("deptBars", Map.of("labels", new ArrayList<>(byDept.keySet()), "values", new ArrayList<>(byDept.values())));
-
-    // 3) 收入趋势：预约量 × ¥30
-    List<Integer> income = trend.stream().map(v -> v * 30).toList();
-    m.put("income", Map.of("labels", days, "values", income));
-
+    m.put("income", Map.of("labels", incomeLabels, "values", incomeValues));
+    List<String> deptBarsLabels = new ArrayList<>();
+    List<Integer> deptBarsValues = new ArrayList<>();
+    for (Department g : departmentRepo.findAll()) {
+      final String gid = String.valueOf(g.getId());
+      deptBarsLabels.add(str(g.getName()));
+      deptBarsValues.add(rows.stream().filter(s -> inLast7(s)).filter(s -> gid.equals(relKey0(s.getDoctorId()))).mapToInt(s -> num(s.getBooked())).sum());
+    }
+    m.put("deptBars", Map.of("labels", deptBarsLabels, "values", deptBarsValues));
     return m;
   }
 
-  private int nz(Integer v) {
+  // —— 窗口 ——
+  private boolean inMonth(Schedule s, String ym) {
+    return s.getWorkDate() != null && s.getWorkDate().startsWith(ym);
+  }
+
+  private boolean inLast7(Schedule s) {
+    LocalDate d = parseDate(s.getWorkDate());
+    if (d == null) return false;
+    LocalDate today = LocalDate.now();
+    return !d.isBefore(today.minusDays(6)) && !d.isAfter(today);
+  }
+
+  private boolean isToday(Schedule s) {
+    return LocalDate.now().toString().equals(s.getWorkDate());
+  }
+
+  private LocalDate parseDate(String v) {
+    if (v == null || v.isEmpty()) return null;
+    try {
+      return LocalDate.parse(v);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private int num(Integer v) {
     return v == null ? 0 : v;
   }
 
-  private int bookedSum(List<Schedule> rows) {
-    return rows.stream().mapToInt(s -> nz(s.getBooked())).sum();
+  private String str(Object v) {
+    return v == null ? "" : String.valueOf(v);
   }
 
   private String pct(int part, int whole) {
     if (whole <= 0) return "0%";
     return Math.round(part * 1000f / whole) / 10f + "%";
+  }
+
+  private String money(long v, String prefix, boolean grouped) {
+    return prefix + (grouped ? String.format("%,d", v) : String.valueOf(v));
+  }
+
+  /** Doctor.fee（经 doctorId 关联） */
+  private int relValue0(String relId) {
+    if (relId == null) return 0;
+    for (Doctor t : doctorRepo.findAll()) {
+      if (relId.equals(String.valueOf(t.getId()))) return num(t.getFee());
+    }
+    return 0;
+  }
+
+  /** Doctor.deptId（经 doctorId 关联） */
+  private String relKey0(String relId) {
+    if (relId == null) return null;
+    for (Doctor t : doctorRepo.findAll()) {
+      if (relId.equals(String.valueOf(t.getId()))) return String.valueOf(t.getDeptId());
+    }
+    return null;
   }
 }

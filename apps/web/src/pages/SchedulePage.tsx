@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Checkbox, Form, Input, InputNumber, Modal, Select, App } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { api } from '../api/client';
-import { screenConfigs } from '../generated/screenConfigs';
+import { getScreenByRoute } from '../generated/screenConfigs';
 
 interface Schedule {
   id: number;
@@ -21,29 +22,15 @@ interface Schedule {
 
 const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六'];
 
-/** visualGate=1 冻结 sample 数据（与原型 2026年8月 视图逐字逐色一致） */
-const GATE_SCHEDULES: Schedule[] = [
-  { id: 1, doctorId: 1, doctorName: '张伟', workDate: '2026-08-10', slot: 'am', quota: 30, booked: 12, status: 'open' },
-  { id: 2, doctorId: 1, doctorName: '张伟', workDate: '2026-08-10', slot: 'pm', quota: 20, booked: 20, status: 'open' },
-  { id: 3, doctorId: 2, doctorName: '李娜', workDate: '2026-08-10', slot: 'am', quota: 40, booked: 15, status: 'open', tone: 'open' },
-  { id: 4, doctorId: 3, doctorName: '王磊', workDate: '2026-08-11', slot: 'am', quota: 25, booked: 5, status: 'open' },
-  { id: 5, doctorId: 2, doctorName: '李娜', workDate: '2026-08-11', slot: 'am', quota: 20, booked: 8, status: 'open' },
-  { id: 6, doctorId: 3, doctorName: '陈静', workDate: '2026-08-11', slot: 'am', quota: 30, booked: 10, status: 'open', tone: 'open' },
-  { id: 7, doctorId: 4, doctorName: '刘洋', workDate: '2026-08-12', slot: 'am', quota: 20, booked: 0, status: 'open' },
-  { id: 8, doctorId: 5, doctorName: '赵强', workDate: '2026-08-12', slot: 'pm', quota: 15, booked: 7, status: 'open' },
-  { id: 9, doctorId: 1, doctorName: '张伟', workDate: '2026-08-14', slot: 'am', quota: 50, booked: 30, status: 'open', tone: 'open' },
-  // 8/10 当天共 7 条（原型日历格显示「+ 4 更多...」）
-  { id: 10, doctorId: 4, doctorName: '刘洋', workDate: '2026-08-10', slot: 'pm', quota: 20, booked: 3, status: 'open' },
-  { id: 11, doctorId: 5, doctorName: '赵强', workDate: '2026-08-10', slot: 'am', quota: 20, booked: 6, status: 'open' },
-  { id: 12, doctorId: 3, doctorName: '王磊', workDate: '2026-08-10', slot: 'pm', quota: 25, booked: 9, status: 'open' },
-  { id: 13, doctorId: 2, doctorName: '李娜', workDate: '2026-08-10', slot: 'pm', quota: 40, booked: 11, status: 'open' },
-];
-
-/** visualGate=1 冻结的下拉选项（与原型逐字一致；原型弹窗截图为「已填写态」） */
-const GATE_DOCTORS = [
-  { id: 1, name: '张伟' }, { id: 2, name: '李娜' }, { id: 3, name: '王磊' },
-  { id: 4, name: '陈静' }, { id: 5, name: '刘洋' }, { id: 6, name: '赵强' },
-];
+/** gate 冻结样本来自 spec（app-spec.json → screens[].sample → 生成物），页面不自带副本 */
+type ScheduleSample = {
+  month?: string;
+  today?: string;
+  schedules?: Schedule[];
+  doctorOptions?: { id: number; name: string }[];
+  createModal?: { workDate?: string };
+  batchModal?: { dates?: string[]; slotLabel?: string; note?: string };
+};
 
 /** 药丸条配色：上午=青 / 下午=品红 / 已约满=橙 / 停诊=红 / 其余=可预约蓝（与 Figma 图例一致） */
 function pillTone(s: Schedule): string {
@@ -56,11 +43,13 @@ function pillTone(s: Schedule): string {
 }
 
 export default function SchedulePage() {
-  const config = screenConfigs.find((s) => s.name === '排班管理');
+  const config = getScreenByRoute(window.location.pathname);
   const gate = new URLSearchParams(window.location.search).get('visualGate') === '1';
-  const todayStr = gate ? '2026-08-10' : dayjs().format('YYYY-MM-DD');
+  const sample = (config?.sample ?? {}) as ScheduleSample;
+  const todayStr = gate ? (sample.today ?? '') : dayjs().format('YYYY-MM-DD');
+  const createWorkDate = gate ? (sample.createModal?.workDate ?? '') : dayjs().format('YYYY-MM-DD');
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [month, setMonth] = useState(gate ? '2026-08' : dayjs().format('YYYY-MM'));
+  const [month, setMonth] = useState(gate ? (sample.month ?? '') : dayjs().format('YYYY-MM'));
   const [createOpen, setCreateOpen] = useState(false);
   const [batchOpen, setBatchOpen] = useState(false);
   const [createForm] = Form.useForm();
@@ -74,9 +63,9 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (gate) {
-      setSchedules(GATE_SCHEDULES);
-      setMonth('2026-08');
-      setDoctorOpts(GATE_DOCTORS.map((d) => ({ value: String(d.id), label: d.name })));
+      setSchedules(sample.schedules ?? []);
+      setMonth(sample.month ?? '');
+      setDoctorOpts((sample.doctorOptions ?? []).map((d) => ({ value: String(d.id), label: d.name })));
       return;
     }
     api<Schedule[]>('/schedules')
@@ -99,7 +88,7 @@ export default function SchedulePage() {
       .catch(() => setDeptOpts([]));
   }, [gate]);
 
-  /** 6×7=42 格：从本月 1 号所在周的周日开始，含跨月首尾 */
+  /** 月历网格：从本月 1 号所在周的周日开始，含跨月首尾（行列数照 layout-ir） */
   const cells = useMemo(() => {
     const first = dayjs(`${month}-01`);
     const gridStart = first.subtract(first.day(), 'day');
@@ -109,13 +98,14 @@ export default function SchedulePage() {
   const filterDeptOpts = [{ value: 'all', label: '全部科室' }, ...deptOpts];
   const filterDoctorOpts = [{ value: 'all', label: '全部医生' }, ...doctorOpts];
 
-  /** 批量排班预览（IR 176:105~120 的 5 行 + 汇总）。
-   *  gate 下钉死原型样例；非 gate 由表单实时推导（行数上限 5，与原型一致）。 */
+  /** 批量排班预览：行数与汇总照 layout-ir 弹窗。
+   *  gate 下取 spec 声明的 sample；非 gate 由表单实时推导。 */
   const batchPreview = useMemo(() => {
     if (gate) {
-      const rows = ['2026-08-09', '2026-08-10', '2026-08-11', '2026-08-12', '2026-08-13']
-        .map((dt) => `${dt} — 张伟、李娜、王磊、陈静、刘洋、赵强（上午）`);
-      return { rows, note: '预计生成 30 条排班记录（6 位医生 × 5 天）' };
+      const bm = sample.batchModal ?? {};
+      const names = (sample.doctorOptions ?? []).map((d) => d.name);
+      const rows = (bm.dates ?? []).map((dt) => `${dt} — ${names.join('、')}（${bm.slotLabel ?? ''}）`);
+      return { rows, note: bm.note ?? '' };
     }
     const dateMap: Record<string, number> = { '周日': 0, '周一': 1, '周二': 2, '周三': 3, '周四': 4, '周五': 5, '周六': 6 };
     const base = dayjs(`${month}-01`);
@@ -137,7 +127,7 @@ export default function SchedulePage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <div className="page-title">{config?.title || '排班管理'}</div>
+          <div className="page-title">{config?.title}</div>
           <div className="page-subtitle">{config?.subtitle}</div>
         </div>
       </div>
@@ -155,14 +145,14 @@ export default function SchedulePage() {
                 className="month-arrow"
                 onClick={() => setMonth(dayjs(`${month}-01`).subtract(1, 'month').format('YYYY-MM'))}
               >
-                ◀
+                <LeftOutlined />
               </span>
               <span className="month-label">{dayjs(`${month}-01`).format('YYYY年M月')}</span>
               <span
                 className="month-arrow"
                 onClick={() => setMonth(dayjs(`${month}-01`).add(1, 'month').format('YYYY-MM'))}
               >
-                ▶
+                <RightOutlined />
               </span>
             </span>
             <span className="today-link" onClick={() => setMonth(dayjs().format('YYYY-MM'))}>今天</span>
@@ -220,7 +210,7 @@ export default function SchedulePage() {
         </div>
       </Card>
 
-      {/* 新增排班弹窗 */}
+      {/* create-schedule modal：布局逐项照 layout-ir/modal-create-schedule.json */}
       <Modal
         title="新增排班"
         open={createOpen}
@@ -240,8 +230,8 @@ export default function SchedulePage() {
           <Form.Item label="选择医生" name="doctorId" className="row-h38" rules={[{ required: true, message: '请选择医生' }]}>
             <Select placeholder="请选择医生" options={doctorOpts} />
           </Form.Item>
-          <Form.Item label="排班日期" name="workDate" className="row-h42" rules={[{ required: true, message: '请选择排班日期' }]} initialValue={gate ? '2026-08-10' : dayjs().format('YYYY-MM-DD')}>
-            <Input placeholder={gate ? '2026-08-10' : dayjs().format('YYYY-MM-DD')} />
+          <Form.Item label="排班日期" name="workDate" className="row-h42" rules={[{ required: true, message: '请选择排班日期' }]} initialValue={createWorkDate}>
+            <Input placeholder={createWorkDate} />
           </Form.Item>
           <Form.Item label="时段" name="slot" rules={[{ required: true, message: '请选择时段' }]} initialValue="am">
             <Select options={[{ value: 'am', label: '上午 (08:00 - 12:00)' }, { value: 'pm', label: '下午 (14:00 - 18:00)' }]} />
@@ -263,7 +253,7 @@ export default function SchedulePage() {
         </Form>
       </Modal>
 
-      {/* 批量排班弹窗 */}
+      {/* batch-schedule modal：布局逐项照 layout-ir/modal-batch-schedule.json */}
       <Modal
         title="批量排班"
         open={batchOpen}
@@ -276,7 +266,7 @@ export default function SchedulePage() {
           // Checkbox.Group 的 value 即中文标签（周一…周日）；dateMap 按中文键映射到 dayjs .day() 索引
           const dateMap: Record<string, number> = { '周日': 0, '周一': 1, '周二': 2, '周三': 3, '周四': 4, '周五': 5, '周六': 6 };
           const doctorIds = String(v.doctorIds || '').split(',').filter(Boolean);
-          // deptId 仅作 IR 原型还原（176:60 科室下拉），不写入排班记录
+          // deptId 仅作原型还原（IR 弹窗里的科室下拉），不写入排班记录
           const weekdays = (v.weekdays || []) as string[];
           const base = dayjs(`${month}-01`);
           const rows: Schedule[] = [];

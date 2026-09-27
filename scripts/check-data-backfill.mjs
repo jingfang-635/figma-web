@@ -12,7 +12,7 @@
  *
  * Usage (repo root, with api+web running):
  *   node scripts/check-data-backfill.mjs                # 全部 form/detail 屏
- *   node scripts/check-data-backfill.mjs --screen=organization
+ *   node scripts/check-data-backfill.mjs --screen=<spec.screens[].id>
  * Env: WEB_URL (default http://localhost:5173)
  */
 import { createRequire } from "node:module";

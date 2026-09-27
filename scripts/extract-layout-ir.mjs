@@ -127,7 +127,7 @@ for (const t of targets) {
   console.log("Wrote", dest, `regions=${regions.length} exportables=${exportables.length}`);
 }
 
-// token 提取页 = 全部非 chrome 页面（不再写死 home/organization/departments/schedules/modal）
+// token 提取页 = 全部非 chrome 页面（按 spec.screens 派生，不写死屏 id）
 const pages = targets
   .map((t) => (t.type === "chrome" ? null : simplified[t.id]))
   .filter(Boolean);

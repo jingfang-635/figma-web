@@ -20,6 +20,8 @@ export function generateSpringJpa(ctx) {
   const apiDir = resolve(outDir, "api");
   const pkg = `com.${(spec.slug || "app").replace(/[^a-z0-9]/gi, "").toLowerCase() || "app"}.api`;
   const pkgPath = pkg.replace(/\./g, "/");
+  // 派生字段声明（list 页的关联计数/关联名称），由 spec 描述、脚本不识业务
+  const relations = spec.relations || [];
   const files = [];
   const w = (rel, content) => {
     // Java 源文件（src/main/java/<pkg>/...）的 package 声明须与子目录一致，否则编译失败
@@ -412,11 +414,12 @@ public class AuthController {
       return ResponseEntity.status(403).body(Map.of("message", "账号已禁用"));
     }
     String token = jwtUtil.issue(user.getUsername());
+    String displayName = user.getName() == null ? "" : user.getName();
     return ResponseEntity.ok(Map.of(
         "token", token,
         "user", Map.of(
             "username", user.getUsername(),
-            "name", user.getName()
+            "name", displayName
         )
     ));
   }
@@ -514,9 +517,45 @@ public interface ${e.name}Repository extends JpaRepository<${e.name}, Long> {
   }
 
   function controller(e) {
-    const toMap = e.fields
-      .map((f) => `    m.put("${f.name}", nz(e.get${cap(f.name)}()));`)
+    // 契约：toMap 必须返回 id（前端单条屏取 list[0] 后按 PUT /{id} 回写）
+    const toMap = [
+      `    m.put("id", e.getId());`,
+      ...e.fields.map((f) => `    m.put("${f.name}", nz(e.get${cap(f.name)}()));`),
+    ].join("\n");
+    // 派生字段（spec.relations）：list 页的「医生数量」「医生姓名」等不落库，按关联实时算
+    const rels = relations.filter((r) => cap(r.entity) === e.name);
+    const relRepos = [...new Set(rels.map((r) => cap(r.target)))];
+    const relLines = rels
+      .map((r, i) => {
+        const target = cap(r.target);
+        const repoVar = `${target.toLowerCase()}Repo`;
+        const src = `String src${i} = e.get${cap(r.sourceField)}() == null ? null : String.valueOf(e.get${cap(r.sourceField)}());`;
+        if (r.kind === "count") {
+          return `    long rel${i} = 0L;
+    ${src}
+    if (src${i} != null) {
+      for (${target} t : ${repoVar}.findAll()) {
+        if (src${i}.equals(String.valueOf(t.get${cap(r.targetField)}()))) rel${i}++;
+      }
+    }
+    m.put("${r.field}", (int) rel${i});`;
+        }
+        return `    String rel${i} = "";
+    ${src}
+    if (src${i} != null) {
+      for (${target} t : ${repoVar}.findAll()) {
+        if (src${i}.equals(String.valueOf(t.get${cap(r.targetField)}()))) { rel${i} = nz(t.get${cap(r.valueField)}()); break; }
+      }
+    }
+    m.put("${r.field}", rel${i});`;
+      })
       .join("\n");
+    const relImports = relRepos
+      .map((t) => `import ${pkg}.entity.${t};\nimport ${pkg}.repository.${t}Repository;`)
+      .join("\n");
+    const ctorParams = [`${e.name}Repository repo`, ...relRepos.map((t) => `${t}Repository ${t.toLowerCase()}Repo`)].join(", ");
+    const ctorAssign = [`    this.repo = repo;`, ...relRepos.map((t) => `    this.${t.toLowerCase()}Repo = ${t.toLowerCase()}Repo;`)].join("\n");
+    const relFields = relRepos.map((t) => `  private final ${t}Repository ${t.toLowerCase()}Repo;`).join("\n");
     const apply = e.fields
       .map((f) => {
         const t = toJavaType(f.type);
@@ -537,7 +576,7 @@ public interface ${e.name}Repository extends JpaRepository<${e.name}, Long> {
 import ${pkg}.common.CrudController;
 import ${pkg}.entity.${e.name};
 import ${pkg}.repository.${e.name}Repository;
-import org.springframework.data.jpa.repository.JpaRepository;
+${relImports ? relImports + "\n" : ""}import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -551,9 +590,10 @@ import java.util.Map;
 public class ${e.name}Controller extends CrudController<${e.name}> {
 
   private final ${e.name}Repository repo;
+${relFields}
 
-  public ${e.name}Controller(${e.name}Repository repo) {
-    this.repo = repo;
+  public ${e.name}Controller(${ctorParams}) {
+${ctorAssign}
   }
 
   @Override
@@ -565,6 +605,7 @@ public class ${e.name}Controller extends CrudController<${e.name}> {
   protected Map<String, Object> toMap(${e.name} e) {
     Map<String, Object> m = new LinkedHashMap<>();
 ${toMap}
+${relLines}
     return m;
   }
 
@@ -606,7 +647,7 @@ ${apply}
           .map(
             (r, i) => `      {
         ${e.name} row${i} = new ${e.name}();
-${e.fields.map((f) => `        row${i}.set${cap(f.name)}(${javaLit(f.type, r[f.name])});`).join("\n")}
+${e.fields.map((f) => `        row${i}.set${cap(f.name)}(${seedLit(f.type, r[f.name])});`).join("\n")}
         ${e.name.toLowerCase()}Repo.save(row${i});
       }`,
           )
@@ -630,6 +671,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /** Seed：闸门账号 + 各实体种子数据（值来自 spec.entities[].seedRows 或占位） */
@@ -643,6 +685,7 @@ public class SeedConfig {
       PasswordEncoder encoder,
       @Value("\${app.seed-admin.email}") String adminEmail,
       @Value("\${app.seed-admin.username}") String adminUsername,
+      @Value("\${app.seed-admin.name:}") String adminName,
       @Value("\${app.seed-admin.password}") String adminPassword) {
     return args -> {
       if (adminUsers.count() == 0) {
@@ -650,7 +693,7 @@ public class SeedConfig {
         admin.setEmail(adminEmail);
         admin.setUsername(adminUsername);
         admin.setPassword(encoder.encode(adminPassword));
-        admin.setName("管理员");
+        admin.setName(adminName == null || adminName.isEmpty() ? "管理员" : adminName);
         admin.setStatus("active");
         adminUsers.save(admin);
       }
@@ -663,20 +706,180 @@ ${blocks}
     );
   }
 
+  /**
+   * 仪表盘聚合：读 spec.dashboard 声明式生成（脚本不识业务数值，也不写死窗口/字段名）
+   *
+   * 声明语义：
+   *   window: month | last7 | today | all
+   *   op:     sum（求字段和）| diff（field − minusField）| count（实体计数 + where）
+   *           | countDistinct（窗口内该字段去重计数 + where）
+   *   times:  { entity, via, field } → 逐行乘关联实体数值字段（如挂号费）
+   *   rates:  分子/分母取 metrics 的 key → 百分比字符串
+   *   amounts: 同 sum/times，附加 prefix / grouped 输出货币串
+   *   charts: groupBy "day"（窗口内逐日）或 { entity, via, field, labelEntity, labelField, labelMatch }
+   *           （按关联实体字段分组，用 labelEntity.labelField 作标签）
+   */
   function dashboard() {
-    const dash = (spec.screens || []).find((s) => s.type === "dashboard");
-    const statKeys = (dash?.stats || []).map((s) => s.key).filter(Boolean);
-    const statLines = statKeys.length
-      ? statKeys.map((k) => `    m.put("${k}", 0);`).join("\n")
-      : `    m.put("total", 0);`;
+    const d = spec.dashboard || {};
+    const src = entities.find((e) => e.name === cap(d.entity));
+    if (!src) return;
+    const dateField = cap(d.dateField || "workDate");
+    const metrics = d.metrics || [];
+    const rates = d.rates || [];
+    const amounts = d.amounts || [];
+    const charts = d.charts || [];
+
+    // —— 用到的关联实体 → repository 字段 ——
+    const refEntities = new Set();
+    const addRef = (n) => n && refEntities.add(cap(n));
+    for (const m of metrics) {
+      if (m.entity) addRef(m.entity);
+      if (m.times) addRef(m.times.entity);
+    }
+    for (const a of amounts) if (a.times) addRef(a.times.entity);
+    for (const c of charts) {
+      if (c.times) addRef(c.times.entity);
+      if (c.groupBy && typeof c.groupBy === "object") {
+        addRef(c.groupBy.entity);
+        addRef(c.groupBy.labelEntity);
+      }
+    }
+    if (refEntities.has(src.name)) refEntities.delete(src.name);
+    const refs = [...refEntities];
+    const repoOf = (name) => (cap(name) === src.name ? `${src.name.toLowerCase()}Repo` : `${cap(name).toLowerCase()}Repo`);
+
+    // —— times / groupBy 去重编号，供逐行表达式复用 ——
+    const factorFns = [];
+    const keyFns = [];
+    const factorIdx = (t) => {
+      const sig = JSON.stringify(t);
+      let i = factorFns.findIndex((x) => JSON.stringify(x) === sig);
+      if (i < 0) { factorFns.push(t); i = factorFns.length - 1; }
+      return i;
+    };
+    const keyIdx = (g) => {
+      const sig = JSON.stringify(g);
+      let i = keyFns.findIndex((x) => JSON.stringify(x) === sig);
+      if (i < 0) { keyFns.push(g); i = keyFns.length - 1; }
+      return i;
+    };
+
+    const windowPred = (w, v) =>
+      w === "month" ? `inMonth(${v}, ym)`
+      : w === "last7" ? `inLast7(${v})`
+      : w === "today" ? `isToday(${v})`
+      : "true";
+    const wherePred = (where, v) =>
+      where
+        ? Object.entries(where)
+            .map(([k, val]) => `.filter(${v} -> ${JSON.stringify(String(val))}.equals(String.valueOf(${v}.get${cap(k)}())))`)
+            .join("")
+        : "";
+    const rowFilter = (met) =>
+      [met.window ? windowPred(met.window, "s") : null, met.where ? wherePred(met.where, "s").replace(/\.filter\(s -> /g, "").replace(/\)$/, "") : null]
+        .filter(Boolean)
+        .map((p) => `.filter(s -> ${p})`)
+        .join("");
+    const valueExpr = (met) => {
+      const f = `num(s.get${cap(met.field)}())`;
+      if (met.op === "diff") return `${f} - num(s.get${cap(met.minusField)}())`;
+      return met.times ? `${f} * relValue${factorIdx(met.times)}(s.get${cap(met.times.via)}())` : f;
+    };
+    const sumExpr = (met) => `rows.stream()${rowFilter(met)}.mapToInt(s -> ${valueExpr(met)}).sum()`;
+
+    // —— stats ——
+    const statLines = metrics
+      .map((met) => {
+        const key = met.key;
+        if (met.op === "count") {
+          return `    m.put("${key}", (int) ${repoOf(met.entity)}.findAll().stream()${wherePred(met.where, "t")}.count());`;
+        }
+        if (met.op === "countDistinct") {
+          return `    m.put("${key}", (int) rows.stream()${rowFilter(met)}.map(s -> s.get${cap(met.field)}()).distinct().count());`;
+        }
+        return `    int ${key} = ${sumExpr(met)};\n    m.put("${key}", ${key});`;
+      })
+      .join("\n");
+    const rateLines = rates
+      .map((r) => `    m.put("${r.key}", pct(${r.numerator}, ${r.denominator}));`)
+      .join("\n");
+    const amountLines = amounts
+      .map((a) => `    long ${a.key} = ${sumExpr(a)};\n    m.put("${a.key}", money(${a.key}, ${JSON.stringify(a.prefix || "")}, ${a.grouped ? "true" : "false"}));`)
+      .join("\n");
+
+    // —— charts ——
+    const chartLines = charts
+      .map((ch) => {
+        const key = ch.key;
+        const agg = valueExpr({ ...ch, op: "sum" });
+        if (ch.groupBy === "day") {
+          return `    List<String> ${key}Labels = new ArrayList<>();
+    List<Integer> ${key}Values = new ArrayList<>();
+    for (int i = 6; i >= 0; i--) {
+      LocalDate day = today.minusDays(i);
+      final String dayStr = day.toString();
+      ${key}Labels.add(day.format(MD));
+      ${key}Values.add(rows.stream().filter(s -> dayStr.equals(s.get${dateField}())).mapToInt(s -> ${agg}).sum());
+    }
+    m.put("${key}", Map.of("labels", ${key}Labels, "values", ${key}Values));`;
+        }
+        const g = ch.groupBy;
+        const labelRepo = repoOf(g.labelEntity || g.entity);
+        const labelType = cap(g.labelEntity || g.entity);
+        const matchField = cap(g.labelMatch || "id");
+        return `    List<String> ${key}Labels = new ArrayList<>();
+    List<Integer> ${key}Values = new ArrayList<>();
+    for (${labelType} g : ${labelRepo}.findAll()) {
+      final String gid = String.valueOf(g.get${matchField}());
+      ${key}Labels.add(str(g.get${cap(g.labelField)}()));
+      ${key}Values.add(rows.stream().filter(s -> ${windowPred(ch.window, "s")}).filter(s -> gid.equals(relKey${keyIdx(g)}(s.get${cap(g.via)}()))).mapToInt(s -> ${agg}).sum());
+    }
+    m.put("${key}", Map.of("labels", ${key}Labels, "values", ${key}Values));`;
+      })
+      .join("\n");
+
+    // —— 关联取值/分组键 helper（逐行乘挂号费、按科室分组）——
+    const helperFns = [
+      ...factorFns.map(
+        (t, i) => `  /** ${t.entity}.${t.field}（经 ${t.via} 关联） */
+  private int relValue${i}(String relId) {
+    if (relId == null) return 0;
+    for (${cap(t.entity)} t : ${repoOf(t.entity)}.findAll()) {
+      if (relId.equals(String.valueOf(t.getId()))) return num(t.get${cap(t.field)}());
+    }
+    return 0;
+  }`,
+      ),
+      ...keyFns.map(
+        (g, i) => `  /** ${g.entity}.${g.field}（经 ${g.via} 关联） */
+  private String relKey${i}(String relId) {
+    if (relId == null) return null;
+    for (${cap(g.entity)} t : ${repoOf(g.entity)}.findAll()) {
+      if (relId.equals(String.valueOf(t.getId()))) return String.valueOf(t.get${cap(g.field)}());
+    }
+    return null;
+  }`,
+      ),
+    ].join("\n\n");
+
+    const srcRepo = `${src.name.toLowerCase()}Repo`;
+    const ctorParams = [`${src.name}Repository ${srcRepo}`, ...refs.map((r) => `${r}Repository ${r.toLowerCase()}Repo`)].join(", ");
+    const ctorAssign = [`    this.${srcRepo} = ${srcRepo};`, ...refs.map((r) => `    this.${r.toLowerCase()}Repo = ${r.toLowerCase()}Repo;`)].join("\n");
+    const refFields = refs.map((r) => `  private final ${r}Repository ${r.toLowerCase()}Repo;`).join("\n");
+    const imports = [src.name, ...refs].map((n) => `import ${pkg}.entity.${n};\nimport ${pkg}.repository.${n}Repository;`).join("\n");
+
     w(
       P("controller/DashboardController.java"),
       `${pkgDecl}
 
+${imports}
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -685,22 +888,81 @@ import java.util.Map;
 @RequestMapping("/api/dashboard")
 public class DashboardController {
 
+  private static final DateTimeFormatter MD = DateTimeFormatter.ofPattern("M/d");
+
+  private final ${src.name}Repository ${srcRepo};
+${refFields}
+
+  public DashboardController(${ctorParams}) {
+${ctorAssign}
+  }
+
+  /** KPI：按库内数据实时聚合（窗口/字段来自 spec.dashboard，禁止前端兜底造假） */
   @GetMapping("/stats")
   public Map<String, Object> stats() {
+    LocalDate today = LocalDate.now();
+    String ym = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    List<${src.name}> rows = ${srcRepo}.findAll();
     Map<String, Object> m = new LinkedHashMap<>();
 ${statLines}
+${rateLines}
+${amountLines}
     return m;
   }
 
-  /** 图表数据：闸门后按 screen.stats / visual-ir 补充聚合逻辑 */
+  /** 图表：窗口内逐日 / 按关联实体分组聚合 */
   @GetMapping("/charts")
   public Map<String, Object> charts() {
+    LocalDate today = LocalDate.now();
+    String ym = today.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    List<${src.name}> rows = ${srcRepo}.findAll();
     Map<String, Object> m = new LinkedHashMap<>();
-    m.put("labels", List.of());
-    m.put("values", List.of());
+${chartLines}
     return m;
   }
-}
+
+  // —— 窗口 ——
+  private boolean inMonth(${src.name} s, String ym) {
+    return s.get${dateField}() != null && s.get${dateField}().startsWith(ym);
+  }
+
+  private boolean inLast7(${src.name} s) {
+    LocalDate d = parseDate(s.get${dateField}());
+    if (d == null) return false;
+    LocalDate today = LocalDate.now();
+    return !d.isBefore(today.minusDays(6)) && !d.isAfter(today);
+  }
+
+  private boolean isToday(${src.name} s) {
+    return LocalDate.now().toString().equals(s.get${dateField}());
+  }
+
+  private LocalDate parseDate(String v) {
+    if (v == null || v.isEmpty()) return null;
+    try {
+      return LocalDate.parse(v);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private int num(Integer v) {
+    return v == null ? 0 : v;
+  }
+
+  private String str(Object v) {
+    return v == null ? "" : String.valueOf(v);
+  }
+
+  private String pct(int part, int whole) {
+    if (whole <= 0) return "0%";
+    return Math.round(part * 1000f / whole) / 10f + "%";
+  }
+
+  private String money(long v, String prefix, boolean grouped) {
+    return prefix + (grouped ? String.format("%,d", v) : String.valueOf(v));
+  }
+${helperFns ? "\n" + helperFns + "\n" : ""}}
 `,
     );
   }
@@ -813,6 +1075,7 @@ app:
   seed-admin:
     email: ${spec.seedAdmin?.email ?? ""}
     username: ${spec.seedAdmin?.username ?? spec.seedAdmin?.email ?? ""}
+    name: ${spec.seedAdmin?.name ?? ""}
     password: ${spec.seedAdmin?.password ?? ""}
 server:
   port: 3001
@@ -840,6 +1103,20 @@ public class ApiApplication {
 }
 
 /** seed 值 → Java 字面量 */
+/**
+ * seed 值 → Java 字面量。额外支持相对日期写法 `{ "$dayOffset": -6 }`：
+ * 种子里的日期若写成绝对值，仪表盘「本月/近 7 天」窗口会随运行日期漂移而全 0
+ * （2026-09-27 事故：seed 钉死 2026-08-10 → 首页 KPI/折线全 0），故相对今天表达。
+ */
+function seedLit(type, v) {
+  if (v && typeof v === "object" && v.$dayOffset !== undefined) {
+    const n = Number(v.$dayOffset) || 0;
+    if (type === "DateTime") return `LocalDate.now().plusDays(${n}).atStartOfDay()`;
+    return `LocalDate.now().plusDays(${n}).toString()`;
+  }
+  return javaLit(type, v);
+}
+
 function javaLit(type, v) {
   if (v == null) return "null";
   switch (type) {

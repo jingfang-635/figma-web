@@ -208,7 +208,7 @@ function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
 /**
  * 合成到白底：Figma 导出的弹窗标杆图带 alpha（阴影为「未预乘」——RGB 暗、alpha 低），
  * 而运行时截图恒为不透明。若直接逐通道比，SSIM 会把 alpha≈3 的阴影像素当成「深灰」，
- * 整条阴影带 SSIM 掉到 0.48（实测 modal-create-dept 顶部带），把弹窗从 0.91 拉到 0.83。
+ * 整条阴影带 SSIM 掉到 0.48（实测某弹窗顶部带），把弹窗 SSIM 从 0.91 拉到 0.83。
  * 两者先各自合成到白底再比，才是同域比较（2026-09-26 弹窗 SSIM 卡在 0.76~0.83 的根因之二）。
  */
 function compositeOverWhite(png) {

@@ -25,6 +25,9 @@ public class Schedule extends BaseEntity {
   @Column(name = "booked")
   private Integer booked;
 
+  @Column(name = "visited")
+  private Integer visited;
+
   @Column(name = "status")
   private String status;
 

@@ -337,7 +337,7 @@ export function tokensFromNamedNodes(sidebar, pages) {
   return tokens;
 }
 
-/** 通用区域推断（不再按 home/departments/organization/schedules 特判） */
+/** 通用区域推断（按屏 id 与 IR 结构推断，不按屏名特判） */
 export function inferRegions(id, root) {
   const { texts, frames } = collectByType(root);
   const regions = [];

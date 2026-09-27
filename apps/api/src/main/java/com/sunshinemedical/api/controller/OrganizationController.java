@@ -18,6 +18,7 @@ public class OrganizationController extends CrudController<Organization> {
 
   private final OrganizationRepository repo;
 
+
   public OrganizationController(OrganizationRepository repo) {
     this.repo = repo;
   }
@@ -37,6 +38,7 @@ public class OrganizationController extends CrudController<Organization> {
     m.put("hours", nz(e.getHours()));
     m.put("address", nz(e.getAddress()));
     m.put("intro", nz(e.getIntro()));
+
     return m;
   }
 

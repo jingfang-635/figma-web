@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -20,15 +19,7 @@ public class JwtUtil {
 
   public JwtUtil(@Value("${app.jwt.secret}") String secret,
                  @Value("${app.jwt.expires-in}") String expiresIn) {
-    // jjwt 要求 HMAC-SHA 密钥 ≥256 位；配置过短时用 SHA-256 派生 32 字节，保证任何环境可启动
-    byte[] raw = secret.getBytes(StandardCharsets.UTF_8);
-    if (raw.length < 32) {
-      try {
-        raw = MessageDigest.getInstance("SHA-256").digest(raw);
-      } catch (Exception ignored) {
-      }
-    }
-    this.key = Keys.hmacShaKeyFor(raw);
+    this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     this.expiresInMillis = parseExpires(expiresIn);
   }
 

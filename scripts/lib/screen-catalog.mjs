@@ -7,8 +7,8 @@ import { resolveProject } from "./project.mjs";
  *   1. fixtures/<slug>/screen-catalog.json（项目自带，权威）
  *   2. 无 → 空 catalog（字段由 figma-fields 回填流程提供，needsReview=true）
  *
- * 阳光医疗的内置 catalog 已导出到 fixtures/sunshine-medical/screen-catalog.json，
- * 不再作为所有项目的默认值（跨项目硬编码清除）。
+ * 项目自带的 catalog 若已导出到 fixtures/<slug>/screen-catalog.json 则优先使用，
+ * 不作为所有项目的默认值（跨项目硬编码已清除）。
  */
 
 const root = resolve(process.cwd());

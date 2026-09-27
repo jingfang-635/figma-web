@@ -13,20 +13,22 @@ description: >-
 **硬性规则：**
 
 - **禁止**从 Figma 节点直接吐最终代码；必须经 init-project → App Spec（人工闸门）→ **Layout IR → Visual IR → Screen Blueprint**。
+- **零硬编码**：屏名/路由/字段/文案/尺寸/坐标/百分比/颜色/样例数据/凭证一律从 `fixtures/<slug>/app-spec.json`、`fixtures/<slug>/layout-ir/*.json`、仓库根 `.env` 派生。**流程文档、脚本、生成物都不许写死业务或设计值**；文档与脚本的复查由 `npm run docs:lint`（`visual:doctor` 含「流程文档零硬编码」）强制。
+- **页面层只消费生成物**：页面/组件不得复述业务文案与设计值——色值走生成 tokens、冻结样本走 `screenConfigs[].sample`、屏名/品牌/侧栏条目走 `screenConfigs` 生成导出；「我写了一条 CSS / 一个常量」不是证据。`visual:doctor` 含「页面层零硬编码」逐行扫描页面/组件源码，命中即报错。
 - **默认启用**高还原流水线（Layout IR + Blueprint + 闸门组），但 **UI 技术栈由用户逐层选择，无默认**（见 `.cursor/rules/figma-visual-fidelity.mdc`）。
 - **字段级 100% 还原**：columns / formFields / filters / modalFields / stats / actions / title / subtitle / sections / formCard / hint 必须逐字对齐 `imports/figma/screens/*.png` 与 `fixtures/figma-fields.json`；禁止臆造、改名、增删、调序；弹窗字段以弹窗截图为准。
 - **闸门组（交付前必跑）**：
   1. `npm run visual:fields` — `screenConfigs.ts` 中 `needsReview: true` 数量 = 0，且逐屏字段与 figma-fields.json 逐字一致；
-  2. `npm run visual:gate` — 全屏**像素三腿 AND**（SSIM ≥ 阈值 且 mismatch < 阈值 且 平坦底色漂移 ≤ 阈值；无标杆/非标杆之分；1440×1068，报告 `artifacts/visual-diff/score.json`）；
-  3. `npm run visual:data` — config↔API 闭环 + 非 gate DOM 回填断言（form/detail 不许空）；
-  4. `npm run visual:geom` — **几何腿**：Layout IR 控件框 ↔ DOM 框逐框断言 `|dx| |dy| |dw| |dh| ≤ VISUAL_GEO_TOL`（像素三腿对「尺寸/位置」偏差结构性失明，见 visual-fidelity.md「表单几何换算」）。
-  5. `npm run visual:text` — **文本腿**：Layout IR `TEXT` 节点 ↔ DOM 文本盒/控件值逐节点断言（位置 ≤ 3px、字号 ≤ 0.6px、颜色全等、文本数量相等）——几何腿只认带 `stroke` 的 RECTANGLE，TEXT 不是 rect，弹窗文本全靠这条腿（见 visual-fidelity.md「文本级还原纪律与文本腿」）。
+  2. `npm run visual:gate` — 全屏**像素三腿 AND**（SSIM ≥ 阈值 且 mismatch < 阈值 且 平坦底色漂移 ≤ 阈值；阈值全部取 `.env`，无标杆/非标杆之分；视口取 IR frame，报告 `artifacts/visual-diff/score.json`）；
+  3. `npm run visual:data` — config↔API 闭环 + 非 gate DOM 回填断言（form/detail 不许空）+ **活数据**（图表序列非空/非平坦、`count` 与关联表交叉求和一致、`lookup` 与目标行一致、DOM 实际渲染）。前四条腿都在 gate 模式跑、冻结 Blueprint `sample`，与真实数据链路无关，故必须另开这条**非 gate** 腿；
+  4. `npm run visual:geom` — **几何腿**：Layout IR 控件框 ↔ DOM 框逐框断言 `≤ VISUAL_GEO_TOL`（像素三腿对「尺寸/位置」偏差结构性失明，见 visual-fidelity.md「表单几何换算」）。
+  5. `npm run visual:text` — **文本腿**：Layout IR `TEXT` 节点 ↔ DOM 文本盒/控件值逐节点断言（位置 / 字号 / 颜色 / 数量必须相等）——几何腿只认带 `stroke` 的 RECTANGLE，TEXT 不是 rect，弹窗文本全靠这条腿（见 visual-fidelity.md「文本级还原纪律与文本腿」）。
   未过任一闸门不得宣称完成。
-- **禁止**用通用 ResourcePage / 自制 UI 库冒充设计还原；图标必须来自 Layout IR 导出的 `public/assets`，禁止 emoji 冒充。
-- **Layout IR 完整性（写屏前置，2026-09-25 排班屏事故沉淀）**：每屏 codegen 前确认 `layout-ir/<id>.json` 存在且 `tree`/`texts` 非空；`visual:layout` 出现 `Missing frames:` 即失败（脚本已 exit 1），排查后重跑，禁止带缺失继续；还原轮次/闸门前必跑 `npm run visual:doctor -- --quick` 且必须看到「✅ Layout IR 完整性 — N 屏 IR 齐全」。没有 IR 几何不许写该屏样式（凭感觉写必挂闸门）。
+- **禁止**用通用 ResourcePage / 自制 UI 库冒充设计还原；图标必须来自 Layout IR 导出的 `public/assets`，禁止用组件库图标或 emoji 冒充。
+- **Layout IR 完整性（写屏前置）**：每屏 codegen 前确认 `layout-ir/<id>.json` 存在且 `tree`/`texts` 非空；`visual:layout` 出现 `Missing frames:` 即失败（脚本已 exit 1），排查后重跑，禁止带缺失继续；还原轮次/闸门前必跑 `npm run visual:doctor -- --quick` 且必须看到「✅ Layout IR 完整性」。没有 IR 几何不许写该屏样式（凭感觉写必挂闸门）。
 - 密钥只写仓库根 `.env`，永不写入 `.env.example`、聊天长文或提交内容。
 - 缺决策项就停，不要猜。
-- **第一版全栈完成后必须进入还原轮次**：`npm run visual:doctor -- --quick`（IR 完整性）→ `npm run visual:round`（Playwright 逐页截图对比 → 列差异表 → 修代码）→ **每轮必跑 `npm run visual:text`**（文本腿：像素 PASS 不等于文本还原到位）→ 询问「是否进入下一轮还原」→ 直至用户选择不进入。未跑完至少一轮、且用户未明确停止前，不得收尾。
+- **第一版全栈完成后必须进入还原轮次**：`npm run visual:doctor -- --quick`（IR 完整性 + 几何/文本闸门 + 文档/页面层零硬编码）→ `npm run visual:round`（Playwright 逐页截图对比 → 列差异表 → 修代码）→ **每轮必跑 `npm run visual:text`**（文本腿：像素 PASS 不等于文本还原到位）→ 收尾 `npm run dev:up`（幂等服务就绪闸：确认提问前 api + web 都在跑）→ 询问「是否进入下一轮还原」→ 直至用户选择不进入。未跑完至少一轮、且用户未明确停止前，不得收尾。
 - 用中文与用户沟通。
 
 被调用时**先读**（本仓库 bundled 副本与用户级 Skill 等价，优先读本仓库）：
@@ -50,7 +52,7 @@ description: >-
 4. **页面范围**：已画屏 / 导航全做
 5. **鉴权**：JWT / 无（无默认，必选）
 6. **产出路径**：`apps/web`+`apps/api` 或 `output/<runId>/`
-7. **数据库**：从仓库根 .env 预置连接中选择：mysql（MYSQL_URL）/ postgresql（POSTGRES_URL）/ sqlite（仅 Node 系）——不使用 Docker
+7. **数据库**：从仓库根 `.env` 预置连接中选择（mysql / postgresql / sqlite（仅 Node 系））——不使用 Docker
 8. **页面范围确认**：screens 全量即闸门全集（每屏必过）
 
 > 前端还原度按 visual-fidelity 方案验收（不作为可选项）；UI 技术栈由用户逐层选定，无默认。
@@ -67,7 +69,7 @@ description: >-
 - [ ] 6. gen:backend（DB+Seed+API+JWT，按 spec.stack 分发）+ 前端（按选定框架）
 - [ ] 7. 冒烟
 - [ ] 8. 闸门组：visual:fields + visual:gate + visual:data + visual:geom + visual:text
-- [ ] 9. 还原轮次（visual:round 含 data/geom + 每轮必跑 visual:text → 列差异 → 修 → 问是否下一轮）
+- [ ] 9. 还原轮次（visual:round 含 data/geom/dev:up + 每轮必跑 visual:text → 列差异 → 修 → dev:up 保证服务在跑 → 问是否下一轮）
 - [ ] 10. GENERATED.md
 ```
 
@@ -79,14 +81,16 @@ npm run visual:layout   # Layout IR + tokens
 npm run visual:extract  # Visual IR
 npm run visual:shots    # 全屏对照 PNG
 npm run visual:gen      # tokens.css / 主题文件 / blueprints / screenConfigs
-npm run gen:backend     # 后端 codegen：node→Nest+Prisma / java→Spring+JPA（按 spec.stack）
+npm run gen:backend     # 后端 codegen（按 spec.stack 分发 adapter）
 npm run visual:assets   # 图标原图
+npm run dev:up          # 服务就绪闸：api+web 已在跑则跳过；未跑则按端口清旧实例 → 后台启动 → 探活
 npm run visual:fields   # 字段一致性校验
 npm run visual:gate     # 像素三腿 AND 视觉闸门（需 api+web 已启动）
-npm run visual:data     # config↔API 闭环 + 非 gate DOM 回填断言
+npm run visual:data     # config↔API 闭环 + 非 gate DOM 回填断言 + 活数据（聚合非空/非平坦 + 派生字段交叉验证）
 npm run visual:geom     # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
-npm run visual:text     # 文本腿：Layout IR TEXT 节点 ↔ DOM 文本盒/控件值逐节点断言（含弹窗）
-npm run visual:round    # 还原轮次：capture + compare + data + geom
+npm run visual:text     # 文本腿：Layout IR TEXT 节点 ↔ DOM 文本盒/控件值（含弹窗）
+npm run visual:round    # 还原轮次：capture + compare + data + geom + dev:up（服务就绪闸）
+npm run docs:lint       # 流程文档零硬编码复查
 # 或 npm run visual:all（init 外全部，gate 需先启动服务）
 ```
 
@@ -97,7 +101,7 @@ npm run visual:round    # 还原轮次：capture + compare + data + geom
 1. 缺决策 → 只提问
 2. `--yes` → 可跳过 App Spec 人工闸门
 3. 顺序：init-project → Spec 闸门 → 视觉抽取 → 字段回填 → visual:gen → DB/API → 前端（按选定框架）→ 闸门组（第一版：fields + gate + data + geom + text）→ **还原轮次**
-4. 还原轮次：`npm run visual:doctor -- --quick`（必含「✅ Layout IR 完整性」「✅ 几何闸门（IR↔DOM 控件框）」「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」）→ Playwright 逐页截图对比 + **每轮必跑 `npm run visual:text`** → 列出差异并修代码（几何/字号/字色/文案逐项对照 `layout-ir/<id>.json`；像素 PASS ≠ 文本还原到位）→ 问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」→ 直至用户选择不进入
+4. 还原轮次：`npm run visual:doctor -- --quick`（必含「✅ Layout IR 完整性」「✅ 几何闸门（IR↔DOM 控件框）」「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」「✅ 活数据闸门」「✅ 流程文档零硬编码」「✅ 页面层零硬编码」）→ Playwright 逐页截图对比 + **每轮必跑 `npm run visual:text`** → 列出差异并修代码（几何/字号/字色/文案逐项对照 `layout-ir/<id>.json`；像素 PASS ≠ 文本还原到位）→ **收尾 `npm run dev:up`**（幂等：确保提问前 api + web 都在跑，否则用户点开打不开）→ 问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」→ 直至用户选择不进入
 5. 结束汇报：页面、账号、启动命令、冒烟、**闸门组结果**、**还原轮次数与用户是否停止**
 
 详见 `figma-to-fullstack/SKILL.md` 与 `visual-fidelity.md`。

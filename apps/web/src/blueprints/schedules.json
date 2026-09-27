@@ -6,6 +6,33 @@
     "title": "排班管理",
     "subtitle": ""
   },
+  "viewport": {
+    "x": 6080,
+    "y": 0,
+    "w": 1440,
+    "h": 1068
+  },
+  "regions": [
+    {
+      "id": "pageHeader",
+      "nodeId": "I281:3047;280:2023;157:4542",
+      "width": 60,
+      "height": 21,
+      "font": {
+        "title": 15,
+        "weight": 400,
+        "color": "#595959"
+      },
+      "color": "#595959"
+    },
+    {
+      "id": "mainCard",
+      "nodeId": "157:756",
+      "width": 1440,
+      "height": 1068,
+      "fill": "#F5F7FA"
+    }
+  ],
   "sample": {
     "figmaTexts": [
       "3",

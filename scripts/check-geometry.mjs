@@ -2,11 +2,10 @@
 /**
  * 几何闸门：Layout IR 的「控件框」↔ 运行时 DOM 框 逐框断言
  *
- * 为什么需要这条腿（2026-09-26 机构信息屏事故）：
+ * 为什么需要这条腿（「像素三腿全过、几何却错」的事故）：
  *   现有三条腿（SSIM / mismatch / flatBg）**全是全屏像素统计量**。表单列宽算错时，
- *   输入框只是「1px 灰边框位移 + 白底缩水」，影响的像素占比约 0.3%（实测 0.9% → 1.05%
- *   mismatch 反而更低、SSIM 0.868 仍在 0.85 之上、flatBg 只测「改色」不测「边缘位移」
- *   仅 1.38% < 2.5%）→ **三腿全过**，而页面比原型窄了 164px、地址框窄 226px。
+ *   输入框只是「1px 灰边框位移 + 白底缩水」，影响的像素占比极小（mismatch 反而更低、
+ *   SSIM 仍在线之上、flatBg 只测「改色」不测「边缘位移」）→ **三腿全过**，而页面明显窄于原型。
  *   结论：缺的不是更严的阈值，而是**判据的维度**——像素统计之外必须有「几何尺寸」这条腿。
  *
  * 判据（配置无关，全部从 Layout IR 派生）：
@@ -23,7 +22,7 @@
  *
  * Usage（仓库根，需 api + web 已启动）：
  *   npm run visual:geom
- *   node scripts/check-geometry.mjs --screen=organization   # 单屏
+ *   node scripts/check-geometry.mjs --screen=<spec.screens[].id>   # 单屏
  *   node scripts/check-geometry.mjs --probe                 # 打印每对框的实际偏移
  * Env: WEB_URL / VISUAL_GEO_TOL
  */
@@ -43,8 +42,8 @@ const screenArg = (process.argv.find((a) => a.startsWith("--screen=")) || "").sp
 const probe = process.argv.includes("--probe");
 
 /** 控件框判据：带描边的输入控件（输入框/选择器/日期框/下拉）。
- *  只看 `stroke` 不看 `fill`——原型里搜索框可能无填充（doctors.json 的搜索框 fill 为空），
- *  只认 #FFFFFF 会漏掉它。31px 高的描边按钮由 h≥36 排除；KPI/卡片无 stroke 天然排除。
+ *  只看 `stroke` 不看 `fill`——原型里搜索框可能无填充（IR 该节点 fill 为空），
+ *  只认白底会漏掉它。描边按钮由高度下限排除；KPI/卡片无 stroke 天然排除。
  *  **方形框排除**（|w−h| ≤ 4）：原型里的 80×80「上传图标/医生头像」投放区是无值的图片占位，
  *  不是输入控件，DOM 侧也没有对应控件（会把配对整体错位一格）。 */
 export const isControlRect = (n) =>

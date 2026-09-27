@@ -2,6 +2,8 @@
 
 Skill 配套说明：栈矩阵、环境变量、命令速查。
 
+> **零硬编码**：本参考只登记「键名 / 选项集 / 命令」，不复述任何业务或设计字面量。默认值与环境变量的**单一来源**是仓库根 `.env.example`（复制为 `.env`）；本文件出现 `<...>` 即为占位符。
+
 ## 前端还原
 
 **所有新项目启用** [visual-fidelity.md](visual-fidelity.md) 的验收标准（高还原 + 闸门组），无需用户勾选；但 UI 技术栈由用户逐层选择，无默认。
@@ -9,11 +11,11 @@ Skill 配套说明：栈矩阵、环境变量、命令速查。
 - UI 组件库/图表/日期库：**由用户在栈闸门逐层选定，无默认**（React 可选 antd/MUI/Mantine 等；Vue 可选 Element Plus 等）
 - 中间层：Layout IR → Visual IR → Screen Blueprint → `screenConfigs.ts` / `blueprints/`
 - 禁止：通用 ResourcePage、自制 UI 组件库
-- 验收：闸门组（`visual:fields` + `visual:gate` 像素三腿 + `visual:data` + `visual:geom` 几何腿）+ 还原轮次
+- 验收：闸门组（`visual:fields` + `visual:gate` 像素三腿 + `visual:data` 数据腿（闭环 + 非 gate DOM 回填 + **活数据**）+ `visual:geom` 几何腿 + `visual:text` 文本腿）+ 还原轮次
 
 ## 合法栈矩阵
 
-先选 **后端语言**（`node` / `java`），再选栈 ID。语言与框架必须一致。
+先选 **后端语言**（`node` / `java`），再选栈 ID。语言与框架必须一致。**每层单独一问，缺一项就停，不猜**；矩阵外的组合一律拒绝并提示本表。
 
 | ID | 语言 | 前端 | 后端框架 | DB | ORM |
 |---|---|---|---|---|---|
@@ -23,49 +25,65 @@ Skill 配套说明：栈矩阵、环境变量、命令速查。
 | C | java | react-vite | spring-boot | mysql | jpa |
 | D（二期） | java | vue-vite | spring-boot | mysql | mybatis |
 
-非法组合必须拒绝并提示矩阵。App Spec 的 `stack` 须含：`id`、`language`、`frontend`、`backend`、`database`、`orm`（**不要**带 `label`/`description`）。
+> ORM 随语言联动过滤：选 Java 时只列 JPA / MyBatis（Prisma 仅支持 Node 系）。
+> **不存在预设默认栈**；App Spec 的 `stack` 须含 `id`、`language`、`frontend`、`backend`、`database`、`orm`（**不要**带 `label`/`description`）。
 
 ## 环境变量（仓库根 `.env`）
 
-```bash
-FIGMA_ACCESS_TOKEN=
-FIGMA_API_BASE=https://api.figma.com
+**键名如下；默认值/校准值一律以 `.env.example` 为单一来源**（本文件不复述数值，避免与代码/校准结果漂移）。
 
-# 闸门凭证（或写 app-spec.seedAdmin）
+```bash
+# —— 必填 ——
+FIGMA_ACCESS_TOKEN=          # 只写 .env，永不进 .env.example / 提交
+FIGMA_API_BASE=
+
+# —— 闸门凭证（或写 app-spec.seedAdmin）——
 GATE_ADMIN_EMAIL=
 GATE_ADMIN_PASSWORD=
 
-# 闸门参数（可选覆盖）。0.85=还原目标线（像素三腿 AND，2026-09-25/26 校准；勿调回 0.97——真 MSSIM 下不可达）
-WEB_URL=http://localhost:5173
-VISUAL_SSIM_MIN=0.85
-VISUAL_MISMATCH_MAX=0.02
-# 低对比度盲区腿（平坦底色漂移）：mismatch 的 threshold=0.25 对 <25% 色差失明
-# （#FFFFFF vs #F5F7FA ≈3.9%），故需独立判据。校准：visual-gate --calibrate
-VISUAL_FLATBG_MAX=0.025
-VISUAL_FLATBG_MODAL_MAX=0.06
-# 宽视口自适应锁定（只许横向铺满、不许纵向重排）
-VISUAL_WIDE_WIDTH=1888
-VISUAL_WIDE_TOL=1.5
-VISUAL_FILL_TOL=2
-VISUAL_MODAL_CENTER_TOL=2
-# 几何腿（IR 控件框 ↔ DOM 框逐框断言；像素三腿对「尺寸/位置」偏差结构性失明）
-VISUAL_GEO_TOL=3
-FIGMA_SLUG=
+# —— 闸门参数（阈值语义见下；具体值取 .env.example 与 `visual-gate --calibrate`）——
+WEB_URL=
+VISUAL_SSIM_MIN=             # 像素腿 1：结构崩塌检测
+VISUAL_MISMATCH_MAX=         # 像素腿 2：高对比差异
+VISUAL_FLATBG_MAX=           # 像素腿 3：低对比度盲区（平坦底色漂移）
+VISUAL_FLATBG_MODAL_MAX=     # 弹窗用（固定尺寸对话框容差不同）
+VISUAL_WIDE_WIDTH=           # 宽视口自适应锁定：对照宽度
+VISUAL_WIDE_TOL=             # 宽视口纵向骨架容差
+VISUAL_FILL_TOL=             # 宽视口铺满容差
+VISUAL_MODAL_CENTER_TOL=     # 弹窗水平居中容差
+VISUAL_GEO_TOL=              # 几何腿：控件框 x/y/w/h 容差
+VISUAL_TEXT_TOL=             # 文本腿：文本位置/宽度容差
+VISUAL_TEXT_SIZE_TOL=        # 文本腿：字号容差
 
-DEFAULT_STACK_ID=A
-JWT_SECRET=change-me-in-dev
-JWT_EXPIRES_IN=7d
+FIGMA_SLUG=                  # 多项目时显式指定 fixtures/<slug>
+
+# —— 数据库连接（复制到 .env 并按本机实际服务填写；生成时只选数据库类型）——
+# mysql：Node/Prisma 用 MYSQL_URL，Java/JPA 用 MYSQL_JDBC_URL
+MYSQL_URL=
+MYSQL_JDBC_URL=
+MYSQL_USER=
+MYSQL_PASSWORD=
+# postgresql：Node/Prisma 用 POSTGRES_URL
+POSTGRES_URL=
+PG_USER=
+PG_PASSWORD=
+PG_DB=
+# sqlite：仅 Node 栈，无需连接信息（生成时直接写 file:./dev.db）
+
+JWT_SECRET=
+JWT_EXPIRES_IN=
 ```
 
 API 本地另需 `apps/api/.env`：
 
 ```bash
 DATABASE_URL=<从仓库根 .env 预置的 MYSQL_URL / POSTGRES_URL 中按所选数据库复制；SQLite 则 file:./dev.db>
-JWT_SECRET=...
-API_PORT=3001
+JWT_SECRET=<与根 .env 同源>
+API_PORT=<本地 API 端口>
 ```
 
 > 数据库连接信息预置在仓库根 `.env`（`MYSQL_URL` / `MYSQL_JDBC_URL` / `POSTGRES_URL`），生成时只选择数据库类型，不使用 Docker（用户偏好）。
+> 阈值必须经 `loadRootEnv` 真正加载；缺键即视为闸门失效（`visual:doctor` 校验全部阈值键在 `.env`，不得静默回落代码默认值）。
 
 ## 命令速查
 
@@ -79,30 +97,34 @@ npm run visual:layout / extract / shots / shots:all / assets
 # 2. 生成前端资产
 npm run visual:gen
 
-# 2.5 后端 codegen（按 spec.stack 分发：node→Nest+Prisma / java→Spring+JPA）
+# 2.5 后端 codegen（按 spec.stack 分发 adapter）
 npm run gen:backend
-npm run gen:backend -- --stack C         # 显式指定栈（须与 spec.stack 一致或 spec 未填）
-npm run gen:backend -- --out output/run1 # 产出路径重定向（默认 apps/）
+npm run gen:backend -- --stack <ID>          # 显式指定栈（须与 spec.stack 一致或 spec 未填）
+npm run gen:backend -- --out output/run1     # 产出路径重定向（默认 apps/）
 
 # 3. 字段提取与校验
 node scripts/extract-figma-texts.mjs
 npm run visual:fields
 
-# 4. 闸门组 + 轮次（需 api+web 已启动）
+# 4. 闸门组 + 轮次（先 npm run dev:up 确保 api+web 在跑）
+npm run dev:up                  # 服务就绪闸（幂等）：清旧实例 → 后台启动 → 探活
 npm run visual:gate
-npm run visual:data             # config↔API 闭环 + 非 gate DOM 回填断言
+npm run visual:data             # 闭环 + 非 gate DOM 回填断言 + 活数据（聚合非空/非平坦 + 派生字段交叉验证）
 npm run visual:geom             # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
-npm run visual:round            # capture-screens + visual-compare + data + geom
+npm run visual:text             # 文本腿：Layout IR TEXT ↔ DOM 文本盒
+npm run visual:round            # capture-screens + visual-compare + data + geom + dev:up
 npm run visual:all              # 全链路（init 外）
+npm run docs:lint               # 流程文档零硬编码复查
 
 # 5. 服务
 npm run api
 npm run web
+npm run dev:up                  # 轮次收尾：确保 api+web 在跑后才提问是否进入下一轮
 ```
 
 ## App Spec 最小字段
 
-`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], apis[], screens[], seedAdmin{email,username,password}, notes[]`
+`version, name, figma{fileKey,url}, slug, stack{...}, auth{mode,storageKey}, brand{title,subtitle}, entities[], relations[], dashboard{...}, apis[], screens[], seedAdmin{email,username,password}, notes[]`
 
 **`entities[]`**（gen:backend 的数据源，闸门环节回填；`fields[].type` 合法值 `String|Integer|Float|Decimal|Boolean|DateTime`）：
 
@@ -110,37 +132,35 @@ npm run web
 {
   "entities": [
     {
-      "name": "Department",
-      "table": "departments",
-      "route": "departments",
+      "name": "<Entity>",
+      "table": "<table>",
+      "route": "<route>",
       "fields": [
-        { "name": "name", "type": "String" },
-        { "name": "sort", "type": "Integer" },
-        { "name": "status", "type": "String" }
+        { "name": "<field>", "type": "String" },
+        { "name": "<field>", "type": "Integer" }
       ],
-      "seedRows": [{ "name": "内科", "sort": 1, "status": "active" }],
-      "seedCount": 6
+      "seedRows": [{ "<field>": "<原型逐字值>" }]
     }
   ]
 }
 ```
 
-- `table`/`route` 省略时按 `snake/kebab` 自动推导（`NewsCategory → news_categories / news-categories`）
-- `seedRows`：逐字种子数据（字段值来自原型）；省略则生成 `<Entity>示例N` 占位
-- `seedCount`：无 seedRows 时的占位行数（默认 6）
+- `table`/`route` 省略时按 `snake/kebab` 自动推导（`<EntityName> → <entity_names> / <entity-names>`）
+- `seedRows`：逐字种子数据（字段值来自原型，**不写占位/示例业务数据**）；省略则生成 `<Entity>示例N` 占位
+- `seedCount`：无 seedRows 时的占位行数（默认值见生成脚本）
 
 **`screens[]`**（全屏闸门：每屏都进 Layout IR 抽取 + Blueprint + 视觉闸门，无标杆/非标杆之分）：
 
 ```json
 {
   "screens": [
-    { "id": "home", "type": "chart", "route": "/", "name": "首页" },
-    { "id": "departments", "type": "list", "route": "/departments", "name": "科室管理" },
-    { "id": "appointment-form", "type": "form", "route": "/appointments/new", "name": "新增预约" },
-    { "id": "doctor-detail", "type": "detail", "route": "/doctors/1", "name": "医生详情" },
-    { "id": "modal-create-dept", "type": "modal", "route": "/departments", "name": "新增科室弹窗",
-      "modal": { "trigger": "新增" } },
-    { "id": "sidebar", "type": "chrome", "name": "sidebar" }
+    { "id": "<id>", "type": "chart", "route": "/", "name": "<Figma Frame 名>" },
+    { "id": "<id>", "type": "list", "route": "/<route>", "name": "<Figma Frame 名>" },
+    { "id": "<id>", "type": "form", "route": "/<route>/new", "name": "<Figma Frame 名>" },
+    { "id": "<id>", "type": "detail", "route": "/<route>/:id", "name": "<Figma Frame 名>" },
+    { "id": "<id>", "type": "modal", "route": "/<route>", "name": "<Figma Frame 名>",
+      "modal": { "trigger": "<打开弹窗的按钮文案>" } },
+    { "id": "<id>", "type": "chrome", "name": "<chrome 组件名>" }
   ]
 }
 ```
@@ -150,25 +170,57 @@ npm run web
 - `modal.trigger`：打开弹窗的按钮文案（正则或字符串）
 - `chrome`：侧栏等 chrome 组件（不单独跑闸门，参与 token 提取）
 
-**`screens[]` 每屏字段细节**（字段级还原的载体，闸门后回填、`needsReview: false`；清单字段见上）：
+**`screens[]` 每屏字段细节**（字段级还原的载体，闸门后回填、`needsReview: false`）：
 
 ```json
 {
-  "id": "departments",
-  "name": "科室管理",
-  "route": "/departments",
+  "id": "<id>",
+  "name": "<Figma Frame 名>",
+  "route": "/<route>",
   "type": "list",
-  "resource": "departments",
-  "subtitle": "管理门诊基础资料、排班与预约信息",
-  "stats": [{ "key": "departments", "label": "启用科室" }],
-  "filters": [{ "key": "search", "type": "search", "placeholder": "搜索科室" }],
-  "actions": [{ "label": "＋ 新增科室", "variant": "primary" }],
-  "table": { "columns": [{ "key": "name", "label": "科室" }], "rowActions": ["edit", "delete"] },
-  "formFields": [{ "key": "name", "label": "科室名称", "type": "text", "required": true }],
-  "statusMap": { "active": { "label": "启用", "color": "success" } },
+  "resource": "<resource>",
+  "subtitle": "<原型逐字>",
+  "stats": [{ "key": "<key>", "label": "<原型逐字>" }],
+  "filters": [{ "key": "<key>", "type": "search", "placeholder": "<原型逐字>" }],
+  "actions": [{ "label": "<原型逐字>", "variant": "primary" }],
+  "table": { "columns": [{ "key": "<key>", "label": "<原型逐字>" }], "rowActions": ["edit", "delete"] },
+  "formFields": [{ "key": "<key>", "label": "<原型逐字>", "type": "text", "required": true }],
+  "statusMap": { "<值>": { "label": "<原型逐字>", "color": "<组件库语义色>" } },
   "needsReview": false
 }
 ```
+
+**`relations[]` 与 `dashboard`**（数据链路契约：派生字段与统计聚合的单一来源；codegen 按此生成真实实现，前端不得自编样例）：
+
+```json
+{
+  "relations": [
+    { "entity": "<源实体>", "field": "<派生字段>", "kind": "count",
+      "target": "<目标实体>", "sourceField": "<外键>", "targetField": "<目标主键>" },
+    { "entity": "<源实体>", "field": "<派生字段>", "kind": "lookup",
+      "target": "<目标实体>", "sourceField": "<外键>", "targetField": "<目标主键>",
+      "valueField": "<取值字段>" }
+  ],
+  "dashboard": {
+    "entity": "<统计实体>", "dateField": "<日期字段>",
+    "metrics": [{ "key": "<key>", "op": "<sum|count|countDistinct|diff>", "field": "<字段>",
+                  "minusField": "<diff 的被减字段>", "window": "<month|last7|today|all>",
+                  "where": { "<字段>": "<值>" } }],
+    "rates":   [{ "key": "<key>", "numerator": "<metrics key>", "denominator": "<metrics key>" }],
+    "amounts": [{ "key": "<key>", "op": "<sum>", "field": "<字段>", "window": "<...>",
+                  "times": { "entity": "<目标实体>", "via": "<外键>", "field": "<乘数字段>" },
+                  "prefix": "<前缀>", "grouped": true }],
+    "charts":  [{ "key": "<key>", "window": "<...>", "op": "<sum>", "field": "<字段>",
+                  "groupBy": "<day | { entity, via, field, labelEntity, labelField, labelMatch }>",
+                  "times": { "entity": "<...>", "via": "<...>", "field": "<...>" } }]
+  }
+}
+```
+
+- `relations[].kind`：`count`（源行该字段 = 目标实体按 `targetField` 匹配的行数）| `lookup`（= 匹配行的 `valueField`）
+- `window`：以统计实体的 `dateField` 与**当前日期**比较；`all` 不过滤
+- **时间窗口类 `seedRows` 的日期字段必须用相对偏移**（如 `{ "$dayOffset": N }`），由 codegen 求值成「当前日期 + N」后落库；偏移**同时覆盖窗口内与窗口外**，否则窗口过滤本身未被验证
+- 活数据闸门（`scripts/check-live-data.mjs`，挂入 `visual:data`）按本块断言：图表序列非空 / 非平坦、`count` 与关联表交叉求和一致、`lookup` 与目标行一致、DOM 实际渲染
 
 ## Windows / PowerShell 注意
 
@@ -178,7 +230,7 @@ npm run web
 
 ## Figma REST 要点
 
-- `GET /v1/files/:key?depth=3` — 结构概览
+- `GET /v1/files/:key?depth=<n>` — 结构概览
 - 全量 `GET /v1/files/:key` — 抽 TEXT / 大 FRAME
 - `GET /v1/images/:key?ids=...` — 截图与图标导出
 - Header：`X-Figma-Token: <token>`
@@ -186,7 +238,7 @@ npm run web
 
 ## 评估权重（可选报告）
 
-`Score = 0.35×功能 + 0.35×视觉还原 + 0.20×可维护 + 0.10×性能`；及格 ≥70。
+`Score = 功能权重×功能 + 视觉权重×视觉还原 + 可维护权重×可维护 + 性能权重×性能`；及格线取报告配置。
 
-- 功能：CRUD / 业务主路径冒烟通过率 ≥80%
-- 视觉：视觉闸门项通过率 ≥80%（全屏闸门，见 visual-fidelity.md）
+- 功能：CRUD / 业务主路径冒烟通过率（阈值取报告配置）
+- 视觉：视觉闸门项通过率（全屏闸门，见 visual-fidelity.md）

@@ -37,7 +37,7 @@
  *
  * Usage（仓库根，需 api + web 已启动；必须 gate 模式取值，否则数据会随日期变）：
  *   npm run visual:text
- *   node scripts/check-text.mjs --screen=modal-batch-schedule
+ *   node scripts/check-text.mjs --screen=<spec.screens[].id>
  *   node scripts/check-text.mjs --probe        # 打印逐项偏差 + 未命中/多余清单
  * Env: WEB_URL / VISUAL_TEXT_TOL / VISUAL_TEXT_SIZE_TOL
  */
@@ -150,19 +150,38 @@ const COLLECT = ({ modal }) => {
     if (!p || !inScope(p) || !shown(p)) continue;
     const tag = p.tagName;
     if (tag === "SCRIPT" || tag === "STYLE") continue;
-    if (p.closest(CTRL)) continue; // 控件内文本（值/占位符）走控件值断言，避免与控件路径重复计数
     if (p.closest("svg")) continue; // SVG 里的文字是图形（图表标签/图标字形），归像素腿
-    if (!groups.has(p)) groups.set(p, { cls: p.className?.toString?.().slice(0, 40) || tag, texts: [], rects: [] });
-    const g = groups.get(p);
-    g.texts.push(t);
+    let box = null;
     try {
       const r = document.createRange();
       r.selectNodeContents(n);
       const b = r.getBoundingClientRect();
-      if (b.width > 0 || b.height > 0) g.rects.push(b);
+      if (b.width > 0 || b.height > 0) box = b;
     } catch {
       /* ignore */
     }
+    // 组件库的离屏量测节点（如 recharts 的 #recharts_measurement_span：aria-hidden + top:-20000px）
+    // 不是界面内容 → 跳过（框架通用规则，非按屏配置）
+    if (p.closest('[aria-hidden="true"]') && (!box || box.top < -1000 || box.left < -1000)) continue;
+    // 控件内文本（值/占位符）走控件值断言，避免与控件路径重复计数。
+    // 判据与 IR 侧 `inCtrl` 一致：文本盒必须落在控件框内才算控件文本——
+    // TextArea 的 showCount 挂在控件元素内、却画在控件框下方，仍应是普通文本
+    // （否则 IR 有 / DOM 无 → 假「缺文本」）
+    const host = p.closest(CTRL);
+    if (host) {
+      const hr = host.getBoundingClientRect();
+      const inside =
+        box &&
+        box.left >= hr.left - 1 &&
+        box.right <= hr.right + 1 &&
+        box.top >= hr.top - 1 &&
+        box.bottom <= hr.bottom + 1;
+      if (inside) continue;
+    }
+    if (!groups.has(p)) groups.set(p, { cls: p.className?.toString?.().slice(0, 40) || tag, texts: [], rects: [] });
+    const g = groups.get(p);
+    g.texts.push(t);
+    if (box) g.rects.push(box);
   }
   const texts = [];
   for (const [p, g] of groups) {

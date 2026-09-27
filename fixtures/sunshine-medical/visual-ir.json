@@ -4,7 +4,7 @@
   "figma": {
     "fileKey": "KLYzRbufrish4gmY4jpUS0",
     "url": "https://www.figma.com/design/KLYzRbufrish4gmY4jpUS0",
-    "extractedAt": "2026-09-24T06:59:22.561Z"
+    "extractedAt": "2026-09-27T14:28:57.595Z"
   },
   "tokens": {
     "color": {
@@ -80,32 +80,11 @@
             "订单管理",
             "评价管理"
           ]
-        },
-        {
-          "id": "operations",
-          "label": "系统运营",
-          "items": [
-            "地址管理",
-            "广告图管理",
-            "公告管理",
-            "新闻列表",
-            "新闻分类",
-            "导航栏",
-            "意见反馈",
-            "预约规则",
-            "消息通知"
-          ]
-        },
-        {
-          "id": "system",
-          "label": "系统管理",
-          "items": [
-            "用户管理",
-            "角色管理",
-            "操作日志"
-          ]
         }
-      ]
+      ],
+      "badges": {
+        "预约记录": "3"
+      }
     },
     "header": {
       "height": 56,
