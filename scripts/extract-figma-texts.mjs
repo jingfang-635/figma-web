@@ -6,6 +6,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { initFigma, resolveFileKey, figmaGet } from "./lib/figma.mjs";
+import { mapPool, chunk, batchSizeFromEnv } from "./lib/concurrency.mjs";
 
 const root = resolve(process.cwd());
 initFigma(root);
@@ -43,22 +44,28 @@ function collectTexts(node, depth = 0, acc = []) {
   return acc;
 }
 
-const CHUNK = 4;
+const CHUNK = batchSizeFromEnv("FIGMA_TEXT_BATCH", 8);
 const nodes = {};
-for (let i = 0; i < frames.length; i += CHUNK) {
-  const chunk = frames.slice(i, i + CHUNK);
-  const ids = chunk.map((f) => f.id).join(",");
-  const data = await figmaGet(
-    `/files/${fileKey}/nodes?ids=${encodeURIContent(ids)}&depth=12`,
-    token,
-  );
-  Object.assign(nodes, data.nodes || {});
-  console.log(`fetched ${Math.min(i + CHUNK, frames.length)}/${frames.length}`);
+// 分块 + 块间并发（旧实现串行 CHUNK=4，4 次往返被串起来）
+const batchResults = await mapPool(
+  chunk(frames, CHUNK),
+  (chunkFrames) =>
+    figmaGet(
+      `/files/${fileKey}/nodes?ids=${encodeURIComponent(chunkFrames.map((f) => f.id).join(","))}&depth=12`,
+      token,
+    ),
+  { concurrency: batchSizeFromEnv("FIGMA_NODES_CONCURRENCY", 3) },
+);
+let fetched = 0;
+for (const r of batchResults) {
+  if (r.ok) {
+    Object.assign(nodes, r.value.nodes || {});
+    fetched += 1;
+  } else {
+    console.warn("text batch failed:", r.error?.message || r.error);
+  }
 }
-
-function encodeURIContent(ids) {
-  return encodeURIComponent(ids);
-}
+console.log(`fetched ${fetched}/${batchResults.length} batches, ${Object.keys(nodes).length} nodes`);
 
 const out = frames.map((frame) => {
   const doc = nodes[frame.id]?.document;

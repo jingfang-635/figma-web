@@ -1,93 +1,89 @@
 #!/usr/bin/env node
 /**
- * 批量截图脚本：一次性截取所有运行时页面
- * 
+ * 单一采集趟次：一趟导航同时产出「运行时截图 + DOM 采集快照 + 宽视口探针」。
+ *
+ * 为什么合并（原实现的结构性浪费）：
+ *   capture / check-text / check-geometry / check-data-backfill / check-live-data /
+ *   visual-gate-lock **各自启动浏览器、各自登录、各自把全部屏导航一遍**——一轮下来
+ *   6 次启动、约 45 次导航、截图跑 3 遍（capture 一遍、gate 又一遍、lock 再一遍），
+ *   而它们的导航目标完全重叠。这里把「采集」与「断言」拆开：
+ *   本脚本负责**采一次**（gate 档 + live 档 + 宽档 + base 探针），
+ *   各腿只读 `artifacts/visual-diff/dom-snapshot.json` 做纯断言（不再开浏览器）。
+ *
+ * 产物（路径与既有消费方保持兼容）：
+ *   artifacts/visual-diff/round-<n>/actuals/<屏名>.png  + manifest.json  ← visual-compare
+ *   artifacts/visual-diff/gate-actual/<id>.png                           ← visual-gate
+ *   artifacts/visual-diff/dom-snapshot.json                              ← 文本/几何/回填/活数据腿
+ *
  * 用法：
- *   node scripts/capture-screens.mjs --round=1
- *   node scripts/capture-screens.mjs --round=<n> --screens=<id>,<id>   # 屏 id 取 spec.screens[].id
- * 
- * 输出：artifacts/visual-diff/round-N/actuals/*.png
+ *   node scripts/capture-screens.mjs [--round=N] [--screens=<id>,<id>] [--no-live] [--no-wide]
+ * 视口一律取 Layout IR（viewportForScreen），脚本内不写死任何屏尺寸。
  */
-
-import { createRequire } from "node:module";
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolveProject, gateCredentials, shadowPad } from "./lib/project.mjs";
+import { createRequire } from "node:module";
+import { resolveProject, gateCredentials, shadowPad, viewportForScreen, loadRootEnv } from "./lib/project.mjs";
+import { computeSourcesHash } from "./lib/snapshot.mjs";
+import { loadPlaywright, openSession, openRoute, openModal, closeSession, waitStable, waitBoxStable } from "./lib/browser-session.mjs";
+import {
+  COLLECT_TEXT,
+  COLLECT_GEOMETRY,
+  COLLECT_BACKFILL,
+  COLLECT_LIVE,
+  PROBE_SELECTORS,
+  PROBE_LAYOUT,
+} from "./lib/dom-collect.mjs";
 
 const require = createRequire(import.meta.url);
+const { PNG } = require("pngjs");
 const root = resolve(process.cwd());
+loadRootEnv(root);
 
-// 解析命令行参数
 const args = process.argv.slice(2);
-const roundArg = args.find(a => a.startsWith('--round='));
-const screensArg = args.find(a => a.startsWith('--screens='));
-
-const round = roundArg ? roundArg.split('=')[1] : '1';
-const targetScreens = screensArg ? screensArg.split('=')[1].split(',') : null;
+const round = (args.find((a) => a.startsWith("--round=")) || "--round=1").split("=")[1];
+const screensArg = (args.find((a) => a.startsWith("--screens=")) || "").split("=")[1];
+const targetScreens = screensArg ? screensArg.split(",") : null;
+const doLive = !args.includes("--no-live");
+const doWide = !args.includes("--no-wide");
 
 const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
+// 宽视口宽度属通用闸门参数，取 .env（不写死）
+const WIDE_WIDTH = Number(process.env.VISUAL_WIDE_WIDTH || 1888);
+
 const { slug, spec } = resolveProject(root);
-const { email, password, storageKey } = gateCredentials(root);
+if (!slug) {
+  console.error("❌ 未解析到项目 slug，先跑 npm run init:project");
+  process.exit(1);
+}
+const credentials = gateCredentials(root);
 
-// 从 app-spec 读取弹窗清单（type=modal，含 trigger），与页面截图走同一套命名/目录
-function loadModalTargets() {
-  const screens = spec?.screens || [];
-  return screens
-    .filter((s) => s.type === "modal" && s.route && s.modal?.trigger)
-    .map((s) => ({ id: s.id, route: s.route, name: s.name, trigger: s.modal.trigger }));
+const keep = (s) => !targetScreens || targetScreens.some((x) => String(s.id).includes(x) || String(s.name).includes(x));
+
+/** 目标屏：spec.screens 全量（非 chrome），含弹窗（trigger 驱动）。 */
+const screens = (spec?.screens || []).filter((s) => s.type !== "chrome" && !s.needsReview && s.route && keep(s));
+const pages = screens.filter((s) => s.type !== "modal");
+const modals = screens.filter((s) => s.type === "modal");
+
+/**
+ * 弹窗的**视口**必须取宿主屏的 IR frame，而不是弹窗自己的 IR frame——
+ * 弹窗 IR 的 frame 是「弹窗卡片自身尺寸」（如 520×739），拿它当浏览器视口会把
+ * 整个后台布局压到 520px 宽，label 列 / 复选框行全部重排（实测 dy=68 的换行错位）。
+ * 弹窗自己的 IR frame 只用于「卡片尺寸」类判据，不用于视口。
+ */
+const hostViewportFor = (modal) => {
+  const host = pages.find((p) => p.route === modal.route) || pages[0];
+  if (!host) throw new Error(`弹窗 ${modal.id} 找不到宿主屏（route=${modal.route}）`);
+  return viewportForScreen(root, host.id);
+};
+
+if (!pages.length && !modals.length) {
+  console.error("❌ 无可采集屏（检查 spec.screens 的 route/type/needsReview）");
+  process.exit(1);
 }
 
-// 从 screenConfigs 读取路由列表
-function loadScreenConfigs() {
-  const configPath = resolve(root, "apps/web/src/generated/screenConfigs.ts");
-  if (!existsSync(configPath)) {
-    console.error("❌ screenConfigs.ts 不存在，请先运行 npm run visual:gen");
-    process.exit(1);
-  }
-  
-  const content = readFileSync(configPath, "utf-8");
-  const routes = [];
-  
-  // 解析 routeConfig 数组（JSON 键序：name 在 route 前，支持两种顺序）
-  const routeRegex = /"?(?:route)"?\s*:\s*['"]([^'"]+)['"][\s\S]{0,160}?"?(?:name)"?\s*:\s*['"]([^'"]+)['"]|"?(?:name)"?\s*:\s*['"]([^'"]+)['"][\s\S]{0,160}?"?(?:route)"?\s*:\s*['"]([^'"]+)['"]/g;
-  let match;
-  while ((match = routeRegex.exec(content)) !== null) {
-    if (match[1] !== undefined) {
-      routes.push({ route: match[1], name: match[2] });
-    } else {
-      routes.push({ route: match[4], name: match[3] });
-    }
-  }
-  
-  // chrome 组件（sidebar 等）不是页面，跳过
-  return routes.filter((r) => r.route && r.route !== '/sidebar');
-}
-
-// 从 Layout IR 读取视口配置
-function loadViewport(screenName) {
-  const layoutIRPath = resolve(root, `fixtures/${slug}/layout-ir/${screenName}.json`);
-  
-  if (existsSync(layoutIRPath)) {
-    const layoutIR = JSON.parse(readFileSync(layoutIRPath, "utf-8"));
-    if (layoutIR.screen && layoutIR.screen.width && layoutIR.screen.height) {
-      return {
-        width: layoutIR.screen.width,
-        height: layoutIR.screen.height
-      };
-    }
-  }
-  
-  // 默认视口
-  return { width: 1440, height: 1068 };
-}
-
-async function main() {
-  const playwright = require("playwright");
-const { PNG } = require("pngjs");
-
-/** 弹窗截图补白边：按 IR 阴影余量四边补（详见 lib/project.mjs shadowPad）
- *  旧实现固定 12px 四边 → 纵向与标杆错位 shadow.y（本设计 4px）→ 逐像素比必判结构错位 */
-function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
+/** 弹窗截图补白边：按 IR 阴影余量四边补（余量从 IR 派生，见 lib/project.mjs shadowPad）。 */
+function padWhite(buf, pad) {
+  if (!pad || (!pad.left && !pad.right && !pad.top && !pad.bottom)) return buf;
   const inner = PNG.sync.read(buf);
   const padded = new PNG({
     width: inner.width + pad.left + pad.right,
@@ -97,210 +93,195 @@ function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
   PNG.bitblt(inner, padded, 0, 0, inner.width, inner.height, pad.left, pad.top);
   return PNG.sync.write(padded);
 }
-  
-  console.log(`🔄 开始第 ${round} 轮批量截图...\n`);
-  
-  // 加载路由配置
-  const routes = loadScreenConfigs();
-  const filteredRoutes = targetScreens 
-    ? routes.filter(r => targetScreens.some(s => r.route.includes(s) || r.name.includes(s)))
-    : routes;
-  
-    console.log(`📄 待截图页面：${filteredRoutes.length} 个`);
-  if (targetScreens) {
-    console.log(`   筛选：${targetScreens.join(', ')}`);
-  }
-  console.log('');
 
-  // 弹窗目标（app-spec type=modal；--screens 过滤同样生效）
-  const modalTargets = loadModalTargets().filter((m) =>
-    !targetScreens || targetScreens.some((s) => m.route.includes(s) || m.name.includes(s) || m.id.includes(s))
-  );
-  if (modalTargets.length) {
-    console.log(`🪟 待截图弹窗：${modalTargets.length} 个（trigger 驱动，截 .ant-modal-content）`);
-    for (const m of modalTargets) console.log(`   - ${m.name} (${m.route}, trigger: ${m.trigger})`);
-    console.log('');
-  }
-  
-  // 准备输出目录
-  const outDir = resolve(root, `artifacts/visual-diff/round-${round}/actuals`);
-  mkdirSync(outDir, { recursive: true });
-  
-  // 启动浏览器
-  let browser;
-  try {
-    browser = await playwright.chromium.launch({ headless: true });
-    const page = await browser.newPage();
-    
-    // 1. 一次性登录
-    console.log("🔑 正在登录...");
-    const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: gateCredentials(root).username, password }),
-    });
-    const loginBody = await loginRes.json().catch(() => ({}));
-    const accessToken = loginBody.access_token || loginBody.token;
-    
-    if (!loginRes.ok || !accessToken) {
-      console.error("❌ 登录失败", loginRes.status, loginBody);
-      process.exit(1);
-    }
-    
-    console.log("✅ 登录成功\n");
-    
-    // 2. 设置登录态
-    await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-    await page.evaluate(
-      ({ token, user, storageKey }) => {
-        localStorage.setItem(storageKey, token);
-        localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-      },
-      { token: accessToken, user: loginBody.user, storageKey }
-    );
-    
-    // 3. 批量截图所有页面 + 弹窗
-    console.log("📸 开始批量截图...\n");
-    const screenshots = [];
+const actualsDir = resolve(root, `artifacts/visual-diff/round-${round}/actuals`);
+const gateActualDir = resolve(root, "artifacts/visual-diff/gate-actual");
+mkdirSync(actualsDir, { recursive: true });
+mkdirSync(gateActualDir, { recursive: true });
 
-    for (const route of filteredRoutes) {
-      const routeName = route.name || route.route.replace('/', '') || 'home';
-      const screenshotName = `${routeName}.png`;
-      
-      console.log(`   截图：${routeName} (${route.route})`);
-      
-      try {
-        // 从 Layout IR 读取视口（动态尺寸）
-        const viewport = loadViewport(routeName);
-        await page.setViewportSize(viewport);
-        
-        // 访问页面（带 visualGate=1 冻结数据）
-        await page.goto(`${WEB_URL}${route.route}?visualGate=1`, { 
-          waitUntil: "networkidle",
-          timeout: 30000
-        });
-        
-        // 等待字体加载完成
-        await page.evaluate(() => document.fonts.ready);
-        
-        // 等待侧栏加载（确保页面已完全渲染）
-        try {
-          await page.waitForSelector(".app-sider", { timeout: 10000 });
-        } catch {
-          // 某些页面可能没有侧栏
-        }
-        
-        // 截图
-        const screenshot = await page.screenshot({ fullPage: false });
-        const outputPath = resolve(outDir, screenshotName);
-        writeFileSync(outputPath, screenshot);
-        
-        screenshots.push({
-          name: routeName,
-          route: route.route,
-          path: outputPath,
-          status: 'success',
-          viewport
-        });
-        
-        console.log(`      ✅ 成功 (视口：${viewport.width}×${viewport.height})\n`);
-      } catch (error) {
-        console.error(`      ❌ 失败：${error.message}\n`);
-        screenshots.push({
-          name: routeName,
-          route: route.route,
-          path: null,
-          status: 'failed',
-          error: error.message,
-          viewport: loadViewport(routeName)
-        });
-      }
-    }
-    
-    // 4. 弹窗截图（点击 trigger → 截 .ant-modal-content，命名与标杆图一致）
-    for (const m of modalTargets) {
-      console.log(`   弹窗：${m.name} (${m.route}, trigger: ${m.trigger})`);
-      try {
-        const viewport = loadViewport(m.id);
-        await page.setViewportSize(viewport);
-        await page.goto(`${WEB_URL}${m.route}?visualGate=1`, { waitUntil: "networkidle", timeout: 30000 });
-        await page.evaluate(() => document.fonts.ready);
-        try {
-          await page.waitForSelector(".ant-table, .calendar-grid, .app-content", { timeout: 10000 });
-        } catch {
-          // 页面主体选择器缺失时仍尝试点击
-        }
-        await page.getByRole("button", { name: m.trigger }).first().click({ force: true });
-        await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
-        await page.waitForTimeout(400);
-        await page.evaluate(() => document.fonts.ready);
+const snapshot = {
+  generatedAt: new Date().toISOString(),
+  webUrl: WEB_URL,
+  slug,
+  round: Number(round),
+  // 判据来源指纹：各腿读快照时重算比对，过期即拒用（防陈旧快照静默放行）
+  sourcesHash: computeSourcesHash(root, slug),
+  gate: {},
+  live: {},
+  probeBase: {},
+  probeWide: {},
+  failures: [],
+};
 
-        const content = page.locator(".ant-modal-content").last();
-        const box = await content.boundingBox();
-        if (!box) throw new Error("modal content not visible");
-        const clip = {
-          x: Math.max(0, Math.round(box.x)),
-          y: Math.max(0, Math.round(box.y)),
-          width: Math.ceil(box.width),
-          height: Math.ceil(box.height),
-        };
-        const screenshot = await page.screenshot({ type: "png", clip, animations: "disabled", caret: "hide" });
-        const outputPath = resolve(outDir, `${m.name}.png`);
-        writeFileSync(outputPath, padWhite(screenshot, shadowPad(root, m.id)));
-        screenshots.push({ name: m.name, route: m.route, path: outputPath, status: 'success', modal: true, viewport: clip });
-        console.log(`      ✅ 成功 (弹窗 ${clip.width}×${clip.height})\n`);
-      } catch (error) {
-        console.error(`      ❌ 失败：${error.message}\n`);
-        screenshots.push({ name: m.name, route: m.route, path: null, status: 'failed', modal: true, error: error.message });
-      }
-    }
+const records = [];
+const fail = (id, stage, message) => {
+  snapshot.failures.push({ id, stage, message });
+  console.error(`      ❌ ${stage}：${message}`);
+};
 
-    // 5. 输出统计
-    const successCount = screenshots.filter(s => s.status === 'success').length;
-    const failedCount = screenshots.filter(s => s.status === 'failed').length;
-    
-    console.log("\n" + "=".repeat(60));
-    console.log("📊 截图统计：");
-    console.log(`   总页面数：${screenshots.length}`);
-    console.log(`   ✅ 成功：${successCount}`);
-    console.log(`   ❌ 失败：${failedCount}`);
-    console.log(`   输出目录：${outDir}`);
-    
-    if (failedCount > 0) {
-      console.log("\n   失败的页面：");
-      screenshots.filter(s => s.status === 'failed').forEach(s => {
-        console.log(`   - ${s.name}: ${s.error}`);
-      });
-    }
-    
-    console.log("=".repeat(60) + "\n");
-    
-    // 保存截图清单
-    const manifest = {
-      round: parseInt(round),
-      timestamp: new Date().toISOString(),
-      totalScreens: screenshots.length,
-      successCount,
-      failedCount,
-      screenshots
-    };
-    
-    writeFileSync(
-      resolve(outDir, "manifest.json"),
-      JSON.stringify(manifest, null, 2)
-    );
-    
-    console.log("✅ 批量截图完成！");
-    console.log(`   清单文件：${resolve(outDir, "manifest.json")}\n`);
-    
-  } catch (error) {
-    console.error("❌ 脚本执行失败:", error);
-    process.exit(1);
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
-  }
+async function captureModalShot(page, id, dest) {
+  const content = page.locator(".ant-modal-content").last();
+  const box = await content.boundingBox();
+  if (!box) throw new Error("modal content not visible");
+  const clip = {
+    x: Math.max(0, Math.round(box.x)),
+    y: Math.max(0, Math.round(box.y)),
+    width: Math.ceil(box.width),
+    height: Math.ceil(box.height),
+  };
+  const shot = await page.screenshot({ type: "png", clip, animations: "disabled", caret: "hide" });
+  const padded = padWhite(shot, shadowPad(root, id));
+  writeFileSync(dest, padded);
+  writeFileSync(resolve(gateActualDir, `${id}.png`), padded);
+  return { clip, bytes: padded.length };
 }
 
-main().catch(console.error);
+async function capturePageShot(page, id, dest) {
+  const shot = await page.screenshot({ fullPage: false, animations: "disabled", caret: "hide" });
+  writeFileSync(dest, shot);
+  writeFileSync(resolve(gateActualDir, `${id}.png`), shot);
+  return { bytes: shot.length };
+}
+
+async function main() {
+  const playwright = loadPlaywright();
+  console.log(`🔄 采集趟次 round=${round}：${pages.length} 屏 + ${modals.length} 弹窗\n`);
+
+  const session = await openSession({
+    playwright,
+    webUrl: WEB_URL,
+    credentials,
+    viewport: { width: 1440, height: 1068 },
+  });
+  const { page } = session;
+
+  try {
+    for (const s of pages) {
+      const viewport = viewportForScreen(root, s.id);
+      const name = s.name;
+      const dest = resolve(actualsDir, `${name}.png`);
+      console.log(`   屏：${name} (${s.route}) @${viewport.width}×${viewport.height}`);
+
+      // ① gate 档：截图 + 文本/几何采集 + base 宽视口探针（同一次导航，零额外往返）
+      try {
+        await openRoute(page, WEB_URL, s.route, viewport, { gate: true });
+        const shot = await capturePageShot(page, s.id, dest);
+        const text = await page.evaluate(COLLECT_TEXT, { modal: false });
+        const geo = await page.evaluate(COLLECT_GEOMETRY);
+        const probe = await page.evaluate(PROBE_LAYOUT, PROBE_SELECTORS);
+        snapshot.gate[s.id] = {
+          texts: text?.texts || [],
+          controls: text?.controls || [],
+          graphics: text?.graphics || [],
+          geoControls: geo || [],
+        };
+        snapshot.probeBase[s.id] = probe;
+        records.push({ name, route: s.route, path: dest, status: "success", viewport, id: s.id, bytes: shot.bytes });
+        console.log(`      ✅ 截图 ${shot.bytes}B，文本 ${snapshot.gate[s.id].texts.length} 项，控件 ${geo.length} 个`);
+      } catch (error) {
+        fail(s.id, "gate 采集", error.message);
+        records.push({ name, route: s.route, path: null, status: "failed", error: error.message, viewport, id: s.id });
+        continue;
+      }
+
+      // ② live 档（真实接口，非 gate）：回填值 + 正文 + 表格行
+      if (doLive) {
+        try {
+          await openRoute(page, WEB_URL, s.route, viewport, { gate: false });
+          const backfill = await page.evaluate(COLLECT_BACKFILL);
+          const live = await page.evaluate(COLLECT_LIVE);
+          snapshot.live[s.id] = {
+            formVals: backfill?.formVals || {},
+            kpis: backfill?.kpis || {},
+            bodyText: live?.bodyText || backfill?.bodyText || "",
+            tableRows: live?.tableRows || [],
+          };
+          console.log(`      ✅ live 采集：表单 ${Object.keys(snapshot.live[s.id].formVals).length} 字段`);
+        } catch (error) {
+          fail(s.id, "live 采集", error.message);
+        }
+      }
+
+      // ③ 宽档：仅探测（不截图），用于「只横向自适应」校验
+      if (doWide) {
+        try {
+          await openRoute(page, WEB_URL, s.route, { width: WIDE_WIDTH, height: viewport.height }, { gate: true });
+          snapshot.probeWide[s.id] = await page.evaluate(PROBE_LAYOUT, PROBE_SELECTORS);
+        } catch (error) {
+          fail(s.id, "宽视口探测", error.message);
+        }
+      }
+    }
+
+    for (const m of modals) {
+      const viewport = hostViewportFor(m);
+      const dest = resolve(actualsDir, `${m.name}.png`);
+      const trigger = m.modal?.trigger;
+      console.log(`   弹窗：${m.name} (${m.route}, trigger: ${trigger})`);
+      if (!trigger) {
+        fail(m.id, "弹窗采集", "spec 缺 modal.trigger");
+        records.push({ name: m.name, route: m.route, path: null, status: "failed", modal: true, error: "缺 trigger", viewport, id: m.id });
+        continue;
+      }
+      try {
+        await openRoute(page, WEB_URL, m.route, viewport, { gate: true });
+        await openModal(page, trigger);
+        const shot = await captureModalShot(page, m.id, dest);
+        const text = await page.evaluate(COLLECT_TEXT, { modal: true });
+        snapshot.gate[m.id] = {
+          texts: text?.texts || [],
+          controls: text?.controls || [],
+          graphics: text?.graphics || [],
+          geoControls: [],
+        };
+        snapshot.probeBase[m.id] = await page.evaluate(PROBE_LAYOUT, PROBE_SELECTORS);
+        records.push({ name: m.name, route: m.route, path: dest, status: "success", modal: true, viewport: shot.clip, id: m.id, bytes: shot.bytes });
+
+        if (doWide) {
+          await openRoute(page, WEB_URL, m.route, { width: WIDE_WIDTH, height: viewport.height }, { gate: true });
+          await openModal(page, trigger);
+          snapshot.probeWide[m.id] = await page.evaluate(PROBE_LAYOUT, PROBE_SELECTORS);
+        }
+        console.log(`      ✅ 弹窗 ${shot.clip.width}×${shot.clip.height}，文本 ${snapshot.gate[m.id].texts.length} 项`);
+      } catch (error) {
+        fail(m.id, "弹窗采集", error.message);
+        records.push({ name: m.name, route: m.route, path: null, status: "failed", modal: true, error: error.message, viewport, id: m.id });
+      }
+    }
+  } finally {
+    await closeSession(session);
+  }
+
+  const successCount = records.filter((r) => r.status === "success").length;
+  const failedCount = records.length - successCount;
+
+  writeFileSync(
+    resolve(actualsDir, "manifest.json"),
+    JSON.stringify(
+      {
+        round: parseInt(round),
+        timestamp: new Date().toISOString(),
+        totalScreens: records.length,
+        successCount,
+        failedCount,
+        screenshots: records,
+      },
+      null,
+      2,
+    ),
+  );
+  writeFileSync(resolve(root, "artifacts/visual-diff/dom-snapshot.json"), JSON.stringify(snapshot, null, 2));
+
+  console.log("\n" + "=".repeat(60));
+  console.log(`📊 采集统计：${records.length} 目标，✅ ${successCount}，❌ ${failedCount}`);
+  console.log(`   截图：${actualsDir}`);
+  console.log(`   门用图：${gateActualDir}`);
+  console.log(`   DOM 快照：artifacts/visual-diff/dom-snapshot.json`);
+  console.log("=".repeat(60) + "\n");
+  if (failedCount) process.exitCode = 1;
+}
+
+main().catch((e) => {
+  console.error("❌ 采集趟次失败:", e);
+  process.exit(1);
+});

@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { resolve } from "node:path";
 import { initFigma, resolveFileKey, figmaGet } from "./lib/figma.mjs";
 import { resolveProject } from "./lib/project.mjs";
+import { mapPool, concurrencyFromEnv } from "./lib/concurrency.mjs";
 
 const root = resolve(process.cwd());
 const { slug } = resolveProject(root);
@@ -67,32 +68,49 @@ const data = await figmaGet(
 );
 const images = data.images || {};
 
-for (const item of exportables) {
-  const url = images[item.nodeId];
-  if (!url) {
-    console.warn("no image for", item.kind, item.label, item.nodeId);
+// 并发下载（通用并发度取自 .env）。旧实现逐个 `await fetch(url)`，
+// 68 个资产的往返被完全串起来 → 下载占掉大半时间。
+//
+// 注意：worker 只下载并返回「落哪个文件」，**不直接改 manifest**——
+// 并发完成顺序不确定，若在 worker 里写 manifest，键序会随调度漂移，
+// 生成物每次 diff 都变（值相同也噪声极大）。manifest 在收集后按 exportables 原序组装。
+const downloads = await mapPool(
+  exportables,
+  async (item) => {
+    const url = images[item.nodeId];
+    if (!url) {
+      console.warn("no image for", item.kind, item.label, item.nodeId);
+      return null;
+    }
+    const img = await fetch(url);
+    const buf = Buffer.from(await img.arrayBuffer());
+    const file = `${slugLabel(item.label || item.name || item.nodeId)}.png`;
+    const dir = item.kind === "nav" || item.kind === "dept" || item.kind === "brand" ? item.kind : "";
+    const rel = dir ? `${dir}/${file}` : file;
+    writeFileSync(resolve(outDir, rel), buf);
+    return { kind: item.kind, label: item.label, rel, bytes: buf.length };
+  },
+  { concurrency: concurrencyFromEnv() },
+);
+
+let saved = 0;
+for (let i = 0; i < downloads.length; i++) {
+  const r = downloads[i];
+  if (!r.ok) {
+    console.warn("download failed:", exportables[i].label || exportables[i].nodeId, r.error?.message || r.error);
     continue;
   }
-  const img = await fetch(url);
-  const buf = Buffer.from(await img.arrayBuffer());
-  let dest;
-  const file = `${slugLabel(item.label || item.name || item.nodeId)}.png`;
-  if (item.kind === "nav") {
-    dest = resolve(outDir, "nav", file);
-    manifest.nav[item.label] = `/assets/nav/${file}`;
-  } else if (item.kind === "dept") {
-    dest = resolve(outDir, "depts", file);
-    manifest.depts[item.label] = `/assets/depts/${file}`;
-  } else if (item.kind === "brand") {
-    dest = resolve(outDir, "brand", file);
-    if (!manifest.brand) manifest.brand = `/assets/brand/${file}`;
-  } else {
-    dest = resolve(outDir, file);
+  if (!r.value) continue;
+  const { kind, label, rel } = r.value;
+  if (kind === "nav") manifest.nav[label] = `/assets/${rel}`;
+  else if (kind === "dept") manifest.depts[label] = `/assets/${rel}`;
+  else if (kind === "brand") {
+    if (!manifest.brand) manifest.brand = `/assets/${rel}`;
   }
-  writeFileSync(dest, buf);
   manifest.exported += 1;
-  console.log("saved", dest, buf.length);
+  saved += 1;
 }
+console.log("downloaded", saved, "assets");
 
 writeFileSync(resolve(outDir, "manifest.json"), JSON.stringify(manifest, null, 2), "utf8");
 const genDir = resolve(root, "apps/web/src/generated");

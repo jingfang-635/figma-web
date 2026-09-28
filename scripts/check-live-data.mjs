@@ -24,24 +24,12 @@
  * Usage（仓库根，api + web 已启动）：node scripts/check-live-data.mjs
  * Env: WEB_URL（web 地址）
  */
-import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { writeFileSync } from "node:fs";
-import { resolveProject, gateCredentials, viewportForScreen } from "./lib/project.mjs";
+import { resolveProject, gateCredentials } from "./lib/project.mjs";
+import { loadSnapshot } from "./lib/snapshot.mjs";
 
-const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
-
-function loadDep(name) {
-  try {
-    return require(name);
-  } catch {
-    console.error(`Missing ${name}. Run: npm install -D playwright`);
-    process.exit(1);
-  }
-}
-
-const { chromium } = loadDep("playwright");
 const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
 
 const { slug, spec } = resolveProject(root);
@@ -151,30 +139,20 @@ async function main() {
     }
   }
 
-  // ══ C. DOM 渲染（非 gate）══
+  // ══ C. DOM 渲染（非 gate；数据取自统一采集趟次的「live 档」）══
   const statsResp = await apiGet("/dashboard/stats");
-  const browser = await chromium.launch({ headless: true });
-  // 视口按屏从 Layout IR 取（见 viewportForScreen），脚本里不写死视口
-  const page = await browser.newPage();
-  await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-  await page.evaluate(
-    ({ token, user, storageKey }) => {
-      localStorage.setItem(storageKey, token);
-      localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-    },
-    { token, user: loginBody.user, storageKey },
-  );
+  const snap = loadSnapshot({ root, slug, leg: "活数据闸门" });
 
-  const screens = (spec.screens || []).filter((s) => s.route && !s.modal);
+  const screens = (spec.screens || []).filter((s) => s.route && !s.modal && s.type !== "chrome");
   for (const scr of screens) {
     const route = scr.route;
-    await page.setViewportSize(viewportForScreen(root, scr.id));
-    await page.goto(`${WEB_URL}${route}`, { waitUntil: "networkidle", timeout: 30000 });
-    await page.waitForTimeout(900);
-    const bodyText = await page.evaluate(
-      () => document.querySelector(".app-content")?.textContent || document.body.textContent || "",
-    );
-    const body = norm(bodyText);
+    const live = snap.live?.[scr.id];
+    if (!live) {
+      fail(`${scr.name}（${route}）：DOM 快照缺该屏的 live 采集（重跑 npm run visual:capture）`);
+      continue;
+    }
+    const body = norm(live.bodyText);
+    const domRows = live.tableRows || [];
 
     if (scr.type === "dashboard") {
       for (const [k, v] of Object.entries(statsResp || {})) {
@@ -196,9 +174,6 @@ async function main() {
     const derivedFields = relations.filter((r) => r.entity === entity?.name);
 
     if (scr.type === "list" && Array.isArray(rows) && derivedFields.length) {
-      const domRows = await page.$$eval(".ant-table-tbody tr.ant-table-row", (trs) =>
-        trs.map((tr) => tr.textContent.replace(/\s+/g, "")),
-      );
       if (!domRows.length) {
         fail(`${scr.name}（${route}）：表格无数据行`);
         continue;
@@ -234,7 +209,6 @@ async function main() {
     }
   }
 
-  await browser.close();
   writeFileSync(
     resolve(root, "artifacts/visual-diff/live-data.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), failures, notes }, null, 2),

@@ -105,16 +105,32 @@ npm run visual:shots       # 全屏对照 PNG → imports/figma/screens/
 npm run visual:shots:all   # 全量屏 + 弹窗 PNG
 npm run visual:gen         # tokens.css + 主题文件 + Blueprint + screenConfigs
 npm run visual:assets      # 按 Layout IR nodeId 导出原图
-npm run dev:up             # 服务就绪闸：api+web 已在跑则跳过；未跑则清旧实例 → 后台启动 → 探活
+npm run dev:up             # 服务就绪闸：api+web 已在跑则跳过；未跑则**并发**起 api+web（按端口清旧实例）→ 探活
 npm run visual:fields      # 字段一致性校验
+npm run visual:capture     # 单趟采集：一个会话 → 截图 + DOM 快照（下列各腿都消费它）
 npm run visual:gate        # Playwright 像素四腿（三像素腿 AND + flatBg，阈值取 .env）
 npm run visual:data        # 数据腿：config↔API 闭环 + 非 gate DOM 回填 + 活数据（聚合/关联字段）
 npm run visual:geom        # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
 npm run visual:text        # 文本腿：Layout IR TEXT ↔ DOM 文本盒
-npm run visual:round       # 还原轮次：Playwright 截图 + 对比热力图 + data + geom + dev:up
-npm run visual:all         # layout/extract/shots/gen/assets/fields/gate/data/geom
+npm run visual:round       # 还原轮次：单趟采集 + 对比热力图 + gate(宽锁) + data + text + geom + dev:up（带逐阶段打点）
+npm run visual:all         # layout/extract/shots/gen/assets/capture/fields/gate/data/text/geom（带逐阶段打点）
+npm run pipeline:budget    # 打印打点表 + 预算判定（超 .env 的 PIPELINE_BUDGET_SEC 即 exit 1）
 npm run docs:lint          # 流程文档零硬编码复查
 ```
+
+**性能契约（单趟采集）**：`visual:capture` 起**一个**浏览器会话把全部屏（含弹窗）导航一遍，
+落 `artifacts/visual-diff/dom-snapshot.json`（截图 + 文本盒 + 控件框 + 回填值 + 活数据 + 宽视口探针）；
+`visual:gate` / `visual:text` / `visual:geom` / `visual:data` **只消费该快照**（纯计算），
+不再各自 launch 浏览器。快照带**新鲜度哈希**（`app-spec` + `layout-ir` + `apps/web/src` + `WEB_URL`）——
+产物改了却复用旧快照即 exit 1。等待判据**既看 DOM 签名又看在途请求**（只看 DOM 会在
+「数据请求在途、图表只画了坐标轴」的中间态误判稳定，采到的快照缺图表值 → 活数据腿误报）。
+
+**耗时预算**：链路定义**只有一处** `scripts/pipeline-timing.mjs`（`visual:all` / `visual:round` 均委托它，
+不得在 `package.json` 再写长 `&&` 串）；逐阶段耗时落 `artifacts/pipeline-timing.json`，
+超 `.env` 的 `PIPELINE_BUDGET_SEC` 即 exit 1。抽取阶段并发化（Figma `/nodes` 批量 + 资产/截图/文本并发）
+走通用池 `scripts/lib/concurrency.mjs`，并发度全部取 `.env`（`PIPELINE_CONCURRENCY` / `FIGMA_NODES_BATCH` /
+`FIGMA_NODES_CONCURRENCY` / `FIGMA_TEXT_BATCH`）。`visual:doctor` 必含
+「✅ 单趟 DOM 采集（快照消费 + 新鲜度）」与「✅ 流水线预算打点」。
 
 闸门跑次：URL 加 `?visualGate=1` 冻结 Blueprint `sample` 数据、关闭动画与滚动条。
 
@@ -361,11 +377,10 @@ IR 里一行是**四段**：`label 宽 + 段间距 + 控件宽 = 列宽`；两�
 
 **有效性自证（防「加了闸门其实没用」）**：补这条腿后应立刻回抓出闸门前已存在的同类缺陷（否则说明判据失明）；修完后弹窗文本节点应全部落在容差内。
 
-**已知挂起项（别以为绿了就没事）**
+**已知边界（别以为绿了就没事）**
 
-- 文本腿只覆盖 **HTML 文本**；SVG/canvas 里的文字归像素腿
-- 内容屏可能仍有挂起差异（chrome 用户名/头像、侧栏条目数量与灰显色、form 屏 label 右缘、列表单元格文本位移、字号差等）——**像素腿本来就是 PASS，属结构性失明**
-- 这些必须在后续还原轮次里清掉；**清完才把 `visual:text` 并入 `visual:all` / `visual:round` 的阻断链路**（当前未并入，故还原轮次每轮手动必跑）
+- 文本腿只覆盖 **HTML 文本**；SVG/canvas 里的文字归像素腿（图表标签）
+- 已清完全屏挂起差异，故 `visual:text` **已并入** `visual:all` / `visual:round` 的阻断链路——此后任何文本级偏差都会让每轮 FAIL（这正是目的：**像素 PASS 从不等于文本还原到位**）
 
 ## 页面层零硬编码（硬规则）
 
@@ -455,9 +470,9 @@ IR 里一行是**四段**：`label 宽 + 段间距 + 控件宽 = 列宽`；两�
 
 每轮：
 
-1. `npm run visual:doctor -- --quick`（含 **Layout IR 完整性**、**几何/文本闸门**、**流程文档零硬编码**、**页面层零硬编码**）必须全绿后才继续
-2. `npm run visual:round`：按 `screenConfigs` 路由逐页 Playwright 截图（视口取 IR）→ 与 `imports/figma/screens/` 对比 → 输出热力图 + 差异 JSON → **宽视口锁定**（同一屏原型帧宽 vs `VISUAL_WIDE_WIDTH` 截同一区域互比，防还原轮次里改出宽屏拉伸）→ `visual:data` → `visual:geom` → **`dev:up`（服务就绪闸，幂等：收尾必然留下可访问的 api + web）**
-2a. **紧接第 2 步再跑 `npm run visual:text`（每轮必跑，不可省）**：IR TEXT ↔ DOM 文本盒，抓像素腿与几何腿都看不见的文本级偏差——**它尚未并入 `visual:round` / `visual:all` 的自动链路**（挂起文本差异会让每轮直接 FAIL），故必须手动跑并把结果并进差异表；挂起项清完后才并入阻断链路
+1. `npm run visual:doctor -- --quick`（含 **Layout IR 完整性**、**几何/文本闸门**、**活数据闸门**、**单趟 DOM 采集**、**流水线预算打点**、**流程文档零硬编码**、**页面层零硬编码**）必须全绿后才继续
+2. `npm run visual:round`：**单趟采集**（一个会话把全部屏含弹窗导航一遍 → 截图 + DOM 快照）→ 与 `imports/figma/screens/` 对比输出热力图 + 差异 JSON → **宽视口锁定**（同一屏原型帧宽 vs `VISUAL_WIDE_WIDTH` 截同一区域互比，防还原轮次里改出宽屏拉伸）→ `visual:gate`（宽锁）→ `visual:data` → **`visual:text`** → `visual:geom` → **`dev:up`（服务就绪闸，幂等：收尾必然留下可访问的 api + web）**。各腿都改由快照消费，**不再各自 launch 浏览器**（重复导航曾是轮次最大开销）
+2a. **文本腿已并入第 2 步**（`visual:round` / `visual:all` 都含 `visual:text`）：IR TEXT ↔ DOM 文本盒，抓像素腿与几何腿都看不见的文本级偏差。**它是阻断项**——出现偏差即每轮 FAIL，须当场修
 3. **列出差异表并修复代码**（字段文案 + 页面几何/token/组件）：
 
    | 屏 | 类型（字段/页面） | 差异 | 拟改文件 |
@@ -467,7 +482,8 @@ IR 里一行是**四段**：`label 宽 + 段间距 + 控件宽 = 列宽`；两�
    > 不能只列像素分数不达标项——**像素 PASS 不等于文本还原到位**
 
 4. 重截已改页，确认本轮差异已关
-4a. **收尾：`npm run dev:up`**（幂等，服务就绪闸）——提问前必须确认 api + web 都在跑：轮次结束时服务若已停，用户点开就是打不开的站点，下一轮也无从开跑。已在跑则跳过；未跑则按端口清旧实例 → 后台启动 → 探活，未就绪即 exit 1（先看 `artifacts/dev/*.log`）。`visual:round` 末尾已串联此步，此处显式再跑一次做兜底。
+4a. **收尾：`npm run dev:up`**（幂等，服务就绪闸）——提问前必须确认 api + web 都在跑：轮次结束时服务若已停，用户点开就是打不开的站点，下一轮也无从开跑。已在跑则跳过；未跑则**并发**起 api + web（按端口清旧实例）→ 探活，未就绪即 exit 1（先看 `artifacts/dev/*.log`）。`visual:round` 末尾已串联此步，此处显式再跑一次做兜底。
+4b. **看耗时：`npm run pipeline:budget`**（逐阶段秒数 + 合计 + 预算判定；超 `.env` 的 `PIPELINE_BUDGET_SEC` 即 exit 1）。某阶段异常慢时先查是不是有腿退回了「各自 launch 浏览器」——`visual:doctor` 的「✅ 单趟 DOM 采集」会拦这类回退。
 5. **询问是否进入下一轮还原**（原话）：「本轮字段还原和页面还原已完成。是否进入下一轮还原？」
    - 进入 / 下一轮 / 继续 → 从步骤 1 再跑一轮
    - 不进入 / 结束 / 停止 → 写 GENERATED.md，本阶段结束
@@ -482,6 +498,10 @@ IR 里一行是**四段**：`label 宽 + 段间距 + 控件宽 = 列宽`；两�
 - **把业务/设计字面量写进流程文档**：屏名、slug、尺寸、百分比、颜色、凭证一律从 `app-spec` / Layout IR / `.env` 派生；由 `npm run docs:lint` 强制
 - **以为全屏像素腿能抓几何偏差**：SSIM / mismatch / flatBg 都是全屏统计量，对「控件尺寸/位置错了」结构性失明——必须由几何腿 `visual:geom` 兜底；缺腿时先问「我的判据测量的是哪一维」，不要调紧像素阈值
 - **以为像素腿/几何腿能抓文本偏差**：几何腿只认「带 `stroke` 的 RECTANGLE」，TEXT 节点不是 rect；文本 ink 占画面比例极小，色差阈值看不见整列位移与字号差——文本位置/字号/颜色/「DOM 多出」必须由文本腿 `visual:text` 兜底
+- **在 `package.json` 里再写一份长 `&&` 链路**：链路定义**只有一处**（`scripts/pipeline-timing.mjs`），`visual:all` / `visual:round` 都委托它；多一个入口就多一份真相，且耗时打不上点（预算无从判定）
+- **让每条腿各自 launch 浏览器**：同一次页面渲染被导航 N 遍，是还原轮次最大的可避免开销；`visual:capture` 采一趟、各腿消费 `dom-snapshot.json`（纯计算），并带新鲜度哈希防陈旧快照
+- **只轮询 DOM 签名判断「渲染完成」**：图表库分阶段渲染，在**数据请求在途**时「只画了坐标轴」的中间态可以静止数百 ms > 阈值 → 快照缺图表值、活数据腿误报。判据必须**同时**要求签名不变**且在途请求归零**
+- **把并发度 / 预算写死在脚本里**：并发度（`PIPELINE_CONCURRENCY` / `FIGMA_NODES_BATCH` / `FIGMA_NODES_CONCURRENCY` / `FIGMA_TEXT_BATCH`）与预算（`PIPELINE_BUDGET_SEC`）一律从 `.env` 读，实现走通用池（无业务值）
 - **以为闸门全绿就说明数据链路通**：像素/几何/文本腿都在 gate 模式下跑、冻结 Blueprint `sample`，测的是「实现 vs IR」，与真实接口/数据库无关；数据链路必须由**非 gate** 的活数据闸门（`visual:data` 第三条腿）兜底
 - **用绝对历史日期充当时间窗口数据**：窗口聚合按当前日期过滤 → 命中 0 行，KPI 与图表全空；时间窗口类种子必须用**相对日期偏移**（spec 声明、codegen 求值），且窗口内外都要有行
 - **前端样例兜底 / `?? 0` 掩盖缺字段**：缺陷从「空白」变成「假数据」，比空白更难发现；缺字段必须在闸门暴露，不许被兜底抹平

@@ -17,6 +17,7 @@ import {
   collectExportables,
   collectTexts,
 } from "./lib/layout-ir.mjs";
+import { mapPool, chunk, batchSizeFromEnv } from "./lib/concurrency.mjs";
 
 const root = resolve(process.cwd());
 initFigma(root);
@@ -70,14 +71,25 @@ mkdirSync(outDir, { recursive: true });
 
 const nodes = {};
 try {
-  for (const t of ready) {
-    const data = await figmaGet(
-      `/files/${fileKey}/nodes?ids=${encodeURIComponent(t.frame.id)}`,
-      token,
-    );
-    Object.assign(nodes, data.nodes || {});
-    await new Promise((r) => setTimeout(r, 800));
+  // 批量 + 并发图取：屏帧 id 分块（块大小通用参数，取 .env），块间并发。
+  // 旧实现逐屏串行 `/nodes` 且每次后固定 `sleep(800)`——10 屏 = 10 次往返 + 8s 纯睡眠，
+  // 是图取阶段最大的单点浪费。`figmaGet` 自身已实现 429 指数退避，无需外部固定节流；
+  // 并发度保持保守（大 payload 请求更易触发限流）。
+  const batches = chunk(
+    ready.map((t) => t.frame.id),
+    batchSizeFromEnv("FIGMA_NODES_BATCH", 5),
+  );
+  const results = await mapPool(
+    batches,
+    (ids) => figmaGet(`/files/${fileKey}/nodes?ids=${encodeURIComponent(ids.join(","))}`, token),
+    { concurrency: batchSizeFromEnv("FIGMA_NODES_CONCURRENCY", 3) },
+  );
+  let firstErr = null;
+  for (const r of results) {
+    if (r.ok) Object.assign(nodes, r.value.nodes || {});
+    else if (!firstErr) firstErr = r.error;
   }
+  if (firstErr) throw firstErr;
 } catch (err) {
   console.warn("Figma extract failed:", err.message);
   if (existsSync(resolve(outDir, "index.json"))) {

@@ -350,6 +350,74 @@ checkSync("活数据闸门（spec 派生聚合 / 关联字段）", () => {
   return `relations=${rels} charts=${charts}，路由屏 ${screens.length} 个（序列非空/非平坦 + 派生字段交叉验证 + DOM 渲染）`;
 });
 
+// 6h. 单趟 DOM 采集 + 快照新鲜度（2026-09-28 性能事故：text/geom/backfill/live/gate
+//     五条腿各自 launch 一个 chromium、各自把 9 屏导航一遍 —— 同一次页面渲染被采集 5 遍，
+//     单是「重复导航」就占掉还原轮次的大头，且各腿之间可能读到不同时刻的 DOM。
+//     改为 capture 单趟采集落 dom-snapshot.json，各腿消费同一份快照（纯计算）。
+//     本项校验：①快照库存在 ②消费方确实走快照（脚本存在却不读 = 退回多趟，闸门仍会「过」但慢）
+//     ③新鲜度闸门已接线（改了 IR/源码却复用旧快照 = 拿陈旧 DOM 断言，静默放行）。）
+checkSync("单趟 DOM 采集（快照消费 + 新鲜度）", () => {
+  const snapLib = "scripts/lib/snapshot.mjs";
+  if (!existsSync(resolve(root, snapLib))) {
+    throw new Error(`缺 ${snapLib}（五条腿会退回各自 launch 浏览器）`);
+  }
+  for (const rel of ["scripts/capture-screens.mjs"]) {
+    if (!existsSync(resolve(root, rel))) throw new Error(`缺 ${rel}`);
+  }
+  const consumers = [
+    "scripts/check-geometry.mjs",
+    "scripts/check-text.mjs",
+    "scripts/check-data-backfill.mjs",
+    "scripts/check-live-data.mjs",
+    "scripts/visual-gate.mjs",
+  ];
+  const missing = consumers.filter((rel) => {
+    if (!existsSync(resolve(root, rel))) return true;
+    return !readFileSync(resolve(root, rel), "utf8").includes("dom-snapshot")
+      && !readFileSync(resolve(root, rel), "utf8").includes("snapshot.mjs");
+  });
+  if (missing.length) {
+    throw new Error(
+      `${missing.join(", ")} 未消费 dom-snapshot（各自 launch 浏览器 = 重复导航，轮次被拖慢）`,
+    );
+  }
+  const snap = resolve(root, "artifacts/visual-diff/dom-snapshot.json");
+  return existsSync(snap)
+    ? `${consumers.length} 条腿走同一份快照（含新鲜度校验）`
+    : `${consumers.length} 条腿走同一份快照（含新鲜度校验）；尚无快照，跑 visual:capture 生成`;
+});
+
+// 6i. 预算打点（此前「全量生成 ≤ N 分钟」没有任何落盘数据可验证，
+//     链路定义还散在 package.json 的长 `&&` 串里 —— 多个入口各写一份必然漂移。
+//     现在 scripts/pipeline-timing.mjs 是**唯一**链路定义处，visual:all / visual:round 均委托它，
+//     每阶段耗时落 artifacts/pipeline-timing.json 并按 .env 的 PIPELINE_BUDGET_SEC 判定。
+//     本项校验：阈值在 .env + 两个入口确实委托 + 报告脚本已挂 npm。）
+checkSync("流水线预算打点", () => {
+  const runner = "scripts/pipeline-timing.mjs";
+  if (!existsSync(resolve(root, runner))) throw new Error(`缺 ${runner}（耗时无从验证）`);
+  const p = resolve(root, ".env");
+  if (!existsSync(p)) throw new Error("缺 .env（PIPELINE_BUDGET_SEC 必须从根 .env 读入）");
+  const raw = readFileSync(p, "utf-8");
+  const m = raw.match(/^PIPELINE_BUDGET_SEC=(.*)$/m);
+  if (!m || !(Number(m[1].trim()) > 0)) {
+    throw new Error(".env 缺 PIPELINE_BUDGET_SEC（未配置则只报告不阻断，预算形同虚设）");
+  }
+  const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+  const drifted = ["visual:all", "visual:round"].filter(
+    (k) => !String(pkg.scripts?.[k] || "").includes("pipeline-timing.mjs"),
+  );
+  if (drifted.length) {
+    throw new Error(
+      `${drifted.join(", ")} 未委托 pipeline-timing.mjs（链路定义出现第二份真相，耗时无法打点）`,
+    );
+  }
+  for (const rel of ["scripts/lib/concurrency.mjs"]) {
+    if (!existsSync(resolve(root, rel))) throw new Error(`缺 ${rel}（并发池，抽取阶段会被串行拖慢）`);
+  }
+  const budgetMin = (Number(m[1].trim()) / 60).toFixed(1);
+  return `预算 ${budgetMin}min，链路单一定义（visual:all / visual:round 委托打点），报告：npm run pipeline:budget`;
+});
+
 // 7. gate-masks.json 可解析（可选）
 checkSync("gate-masks.json", () => {
   const masks = gateMasks(root);

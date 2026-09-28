@@ -31,6 +31,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveProject, gateCredentials, loadRootEnv } from "./lib/project.mjs";
+import { loadSnapshot } from "./lib/snapshot.mjs";
 
 const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
@@ -80,36 +81,9 @@ export function irControlBoxes(ir) {
   return out.sort((a, b) => a.y - b.y || a.x - b.x);
 }
 
-/** DOM 侧取最外层输入控件框（去重嵌套） */
-const DOM_COLLECT = () => {
-  const SEL = [
-    "input.ant-input",
-    "textarea.ant-input",
-    ".ant-input-affix-wrapper",
-    ".ant-select-selector",
-    ".ant-picker",
-    ".ant-input-number",
-  ].join(",");
-  const els = [...document.querySelectorAll(SEL)].filter((e) => {
-    if (e.closest(".ant-modal-root")) return false; // 弹窗内部控件由壳屏断言，此处不比
-    const r = e.getBoundingClientRect();
-    const cs = getComputedStyle(e);
-    return r.width > 0 && r.height > 0 && cs.visibility !== "hidden" && cs.display !== "none";
-  });
-  const outer = els.filter((e) => !els.some((o) => o !== e && o.contains(e)));
-  return outer
-    .map((e) => {
-      const r = e.getBoundingClientRect();
-      return {
-        cls: e.className?.toString?.().slice(0, 48) || e.tagName,
-        x: Math.round(r.x),
-        y: Math.round(r.y),
-        w: Math.round(r.width),
-        h: Math.round(r.height),
-      };
-    })
-    .sort((a, b) => a.y - b.y || a.x - b.x);
-};
+/** DOM 侧最外层输入控件框：改由统一采集趟次（npm run visual:capture）收集，
+ *  见 lib/dom-collect.mjs 的 COLLECT_GEOMETRY —— 本腿不再自己开浏览器，
+ *  避免每个腿部脚本重复导航同一批屏（快照新鲜度由 lib/snapshot.mjs 校验）。 */
 
 /** 目标屏：IR 含控件框的非 chrome/modal 屏（供 doctor 复算，确认判据未失明） */
 export function loadTargets() {
@@ -139,15 +113,6 @@ export function loadTargets() {
 }
 
 async function main() {
-  const { chromium } = (() => {
-    try {
-      return require("playwright");
-    } catch {
-      console.error("缺少 playwright。Run: npm i -D playwright");
-      process.exit(1);
-    }
-  })();
-
   const targets = loadTargets().filter(
     (t) => !screenArg || t.id === screenArg || t.name === screenArg,
   );
@@ -156,29 +121,8 @@ async function main() {
     return;
   }
 
-  const { username, password, storageKey } = gateCredentials(root);
-  const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  const loginBody = await loginRes.json().catch(() => ({}));
-  const token = loginBody.access_token || loginBody.token;
-  if (!loginRes.ok || !token) {
-    console.error(`登录失败 ${loginRes.status}，请确认 api(3001)/web(5173) 已启动且 seedAdmin 有效`);
-    process.exit(1);
-  }
-
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1068 } });
-  await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-  await page.evaluate(
-    ({ token, user, storageKey }) => {
-      localStorage.setItem(storageKey, token);
-      localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-    },
-    { token, user: loginBody.user, storageKey },
-  );
+  const { slug } = resolveProject(root);
+  const snap = loadSnapshot({ root, slug, leg: "几何闸门" });
 
   console.log(
     `📐 几何闸门（Layout IR 控件框 ↔ DOM 框，容差 ${TOL}px，1440 视口）— ${targets.length} 屏\n`,
@@ -187,14 +131,16 @@ async function main() {
   let failed = 0;
   const results = [];
   for (const t of targets) {
-    const viewport = { width: t.ir.frame?.w || 1440, height: t.ir.frame?.h || 1068 };
-    await page.setViewportSize(viewport);
-    await page.goto(`${WEB_URL}${t.route}?visualGate=1`, { waitUntil: "networkidle", timeout: 30000 });
-    await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(300);
-    const dom = await page.evaluate(DOM_COLLECT);
+    const collected = snap.gate?.[t.id];
+    if (!collected) {
+      failed++;
+      console.log(`❌ ${t.name} (${t.route}) — 快照缺少该屏（重跑 npm run visual:capture）`);
+      results.push({ screen: t.name, route: t.route, ok: false, problems: ["快照缺少该屏"] });
+      continue;
+    }
+    const dom = collected.geoControls || [];
 
-    const problems = [];
+    const problems = []
     if (dom.length !== t.boxes.length) {
       problems.push(`控件数量不符：IR ${t.boxes.length} 个 vs DOM ${dom.length} 个`);
       if (probe) {
@@ -248,7 +194,6 @@ async function main() {
     });
   }
 
-  await browser.close();
   writeFileSync(
     resolve(root, "artifacts/visual-diff/geometry.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), tol: TOL, results }, null, 2),

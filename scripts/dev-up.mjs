@@ -149,7 +149,7 @@ const apiReady = async () => {
   return s !== null && s < 500;
 };
 
-async function waitFor(label, fn) {
+async function waitFor(label, fn, { pollMs = POLL_MS } = {}) {
   const t0 = Date.now();
   let lastLog = 0;
   for (;;) {
@@ -160,45 +160,51 @@ async function waitFor(label, fn) {
       lastLog = elapsed;
       console.log(`   … ${label} 启动中（${Math.round(elapsed / 1000)}s / ${Math.round(TIMEOUT_MS / 1000)}s）`);
     }
-    await new Promise((r) => setTimeout(r, POLL_MS));
+    await new Promise((r) => setTimeout(r, pollMs));
   }
+}
+
+/**
+ * 启动一个服务到就绪（已在跑则跳过）。
+ * 并发调用两个服务：此前是「先 web 等就绪 → 再 api」，总耗时 = web + api；
+ * 两者互不依赖（api 探活走 web 的 /api 代理，但轮询自然会等到 web 起来），
+ * 故并发启动后总耗时 ≈ max(web, api) = api 的启动时间，省下 web 那一段。
+ */
+async function bringUp({ name, argv, ready, port, pollMs }) {
+  if (await ready()) {
+    console.log(`   ✅ ${name} 已在运行（跳过启动）`);
+    return { name, ok: true, started: false };
+  }
+  const killed = killPort(port);
+  if (killed.length) console.log(`   ♻️  ${name} 端口旧实例已清理：PID ${killed.join(", ")}`);
+  const p = launch(name, argv);
+  console.log(`   ▶️  ${name} 已后台启动（PID ${p.pid}）→ ${p.logPath}`);
+  const sec = await waitFor(name, ready, { pollMs });
+  if (sec === null) {
+    console.error(`\n❌ ${name} 未在超时内就绪。日志：${p.logPath}`);
+    return { name, ok: false, started: true };
+  }
+  console.log(`   ✅ ${name} 就绪（${sec}s）`);
+  return { name, ok: true, started: true, pid: p.pid };
 }
 
 console.log(`🛫 服务就绪闸（web ${WEB_URL} / api 端口 ${apiPort() ?? "?"}）`);
-const started = [];
 
-// —— web ——
-if (await webReady()) {
-  console.log("   ✅ web 已在运行（跳过启动）");
-} else {
-  const killed = killPort(portOf(WEB_URL));
-  if (killed.length) console.log(`   ♻️  web 端口旧实例已清理：PID ${killed.join(", ")}`);
-  const p = launch("web", "npm run web");
-  started.push({ name: "web", ...p });
-  console.log(`   ▶️  web 已后台启动（PID ${p.pid}）→ ${p.logPath}`);
-  if ((await waitFor("web", webReady)) === null) {
-    console.error(`\n❌ web 未在超时内就绪。日志：${p.logPath}`);
-    process.exit(1);
-  }
-}
+// web 是 Vite dev server（秒级），api 是 Spring Boot（十秒级）→ 并发发出，互不阻塞等待
+const [web, api] = await Promise.all([
+  bringUp({ name: "web", argv: "npm run web", ready: webReady, port: portOf(WEB_URL), pollMs: 500 }),
+  bringUp({ name: "api", argv: "npm run api", ready: apiReady, port: apiPort(), pollMs: 1000 }),
+]);
 
-// —— api（web 已就绪后，经 /api 代理探活）——
-if (await apiReady()) {
-  console.log("   ✅ api 已在运行（登录探活通过）");
-} else {
-  const killed = killPort(apiPort());
-  if (killed.length) console.log(`   ♻️  api 端口旧实例已清理：PID ${killed.join(", ")}`);
-  const p = launch("api", "npm run api");
-  started.push({ name: "api", ...p });
-  console.log(`   ▶️  api 已后台启动（PID ${p.pid}）→ ${p.logPath}`);
-  if ((await waitFor("api", apiReady)) === null) {
-    console.error(`\n❌ api 未在超时内就绪。日志：${p.logPath}`);
-    process.exit(1);
-  }
+const failed = [web, api].filter((s) => !s.ok);
+if (failed.length) {
+  console.error(`\n❌ 未就绪：${failed.map((s) => s.name).join("、")}（日志 ${LOG_DIR}）`);
+  process.exit(1);
 }
 
 console.log("\n✅ 服务已就绪（api + web 均可访问）→ 可以询问是否进入下一轮还原");
-if (started.length) {
-  console.log(`   本次新启动：${started.map((s) => `${s.name}(PID ${s.pid})`).join("、")}`);
+const startedNow = [web, api].filter((s) => s.started);
+if (startedNow.length) {
+  console.log(`   本次新启动：${startedNow.map((s) => `${s.name}(PID ${s.pid})`).join("、")}`);
   console.log(`   日志：${LOG_DIR}`);
 }

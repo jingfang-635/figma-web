@@ -285,11 +285,11 @@ const ir = {
 const outDir = resolve(root, "fixtures", slug);
 mkdirSync(outDir, { recursive: true });
 const outPath = resolve(outDir, "visual-ir.json");
-writeFileSync(outPath, JSON.stringify(ir, null, 2), "utf8");
+writeFileSync(outPath, JSON.stringify(ir, null, 2) + "\n", "utf8");
 
 const genDir = resolve(root, "apps/web/src/generated");
 mkdirSync(genDir, { recursive: true });
-writeFileSync(resolve(genDir, "visual-ir.json"), JSON.stringify(ir, null, 2), "utf8");
+writeFileSync(resolve(genDir, "visual-ir.json"), JSON.stringify(ir, null, 2) + "\n", "utf8");
 
 console.log("Wrote", outPath);
 console.log(`screens=${screens.length} modals=${modals.length} notes=${notes.length}`);

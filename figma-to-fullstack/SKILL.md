@@ -54,7 +54,7 @@ Figma URL
   ↓
 6. 冒烟 + 闸门组             # fields + gate(AND×3) + data(闭环+回填+活数据) + geom(IR↔DOM 控件框) + text(IR↔DOM 文本盒)
   ↓
-7. 还原轮次                  # visual:round（含 data / geom / dev:up）+ 每轮必跑 visual:text → 列差异 → 修 → 重截确认 → dev:up 保证服务在跑 → 问是否下一轮
+7. 还原轮次                  # visual:round（单趟采集 → 三腿 AND + data + text + geom + dev:up）→ 列差异 → 修 → 重截确认 → 问是否下一轮
   ↓
 8. GENERATED.md 收尾
 ```
@@ -184,7 +184,8 @@ Web 实现顺序：`main.tsx` → chrome/Layout → Blueprint 页 → ResourceLi
 
 ```bash
 # 先跑 npm run dev:up（确保 api + web 在跑；幂等），然后：
-npm run dev:up            # 服务就绪闸：已在跑则跳过；未跑则按端口清旧实例 → 后台启动 → 探活
+npm run dev:up            # 服务就绪闸：已在跑则跳过；未跑则**并发**起 api+web（按端口清旧实例）→ 探活
+npm run visual:capture    # 单趟采集：一个会话 → 截图 + DOM 快照（text/geom/data/gate 都消费它）
 npm run visual:fields     # 字段一致性：config ↔ figma-fields 逐字比对；needsReview=0
 npm run visual:gate       # 视觉像素三腿 AND（阈值全部取 .env，勿在脚本/文档写死）
 npm run visual:data       # 数据：config↔API 闭环 + 非 gate DOM 回填（form/detail 不许空）+ 活数据（聚合非空/非平坦 + 派生字段交叉验证）
@@ -192,7 +193,12 @@ npm run visual:geom       # 几何：Layout IR 控件框 ↔ DOM 框逐框断言
 npm run visual:text       # 文本：Layout IR TEXT 节点 ↔ DOM 文本盒逐节点断言（位置 / 字号 / 颜色 / 数量）
 ```
 
+> 全链一步到位：`npm run visual:all`（上述阶段按序执行 + 逐阶段耗时打点）。
+> 链路定义只在 `scripts/pipeline-timing.mjs`；`npm run pipeline:budget` 打印打点表并按
+> `.env` 的 `PIPELINE_BUDGET_SEC` 判定（超预算 exit 1）。
+
 - 报告：`artifacts/visual-diff/score.json`、`data-backfill.json`、`geometry.json`、`text.json`
+- 耗时：`artifacts/pipeline-timing.json`（逐阶段秒数 + 合计，由 `pipeline-timing.mjs` 落盘）
 - 闸门模式 `?visualGate=1` 冻结 Blueprint `sample` 数据、关动画；`visual:data` **禁止**在 gate 模式下跑（必须走真实接口）
 - 未过任一闸门不得宣称完成
 - mask：图表区等不可像素对齐的区域，配置在 `fixtures/<slug>/gate-masks.json`
@@ -204,13 +210,19 @@ npm run visual:text       # 文本：Layout IR TEXT 节点 ↔ DOM 文本盒逐�
 
 **几何腿**：三条像素腿**全是全屏统计量**，对「尺寸/位置」偏差结构性失明（一个控件窄了几十像素，在整屏像素里只体现为极细的边框位移与白底缩水，占比极小 → 三腿可全过）。缺的不是更严的阈值，而是判据的**维度**。`npm run visual:geom` 把 Layout IR 控件框与 DOM 输入控件逐框配对断言，判据全部从 IR 派生（无按屏配置、无业务硬编码，新屏自动纳管）；`visual:doctor` 必含「✅ 几何闸门（IR↔DOM 控件框）」（校验 `.env` 有 `VISUAL_GEO_TOL` + 判据未失明）。详见 visual-fidelity.md「表单几何换算」。
 
-**文本腿**：几何腿只认带 `stroke` 的 RECTANGLE（**TEXT 节点不是 rect**）且不覆盖弹窗，弹窗文本会零覆盖；文本 ink 占画面比例极小，位移与字号差在像素腿里几乎不存在 → 会出现「弹窗全过像素闸门、但 label 集体偏移 / 字号错 / 深色值被渲染成灰占位符」。`npm run visual:text` 把 IR `TEXT` 节点与 DOM 文本盒逐节点配对断言（位置 ≤ `VISUAL_TEXT_TOL` / 字号 ≤ `VISUAL_TEXT_SIZE_TOL` / 颜色全等，控件内文本走值断言），**含弹窗**；`visual:doctor` 必含「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」。详见 visual-fidelity.md「文本级还原纪律与文本腿」。
+**文本腿**：几何腿只认带 `stroke` 的 RECTANGLE（**TEXT 节点不是 rect**）且不覆盖弹窗，弹窗文本会零覆盖；文本 ink 占画面比例极小，位移与字号差在像素腿里几乎不存在 → 会出现「弹窗全过像素闸门、但 label 集体偏移 / 字号错 / 深色值被渲染成灰占位符」。`npm run visual:text` 把 IR `TEXT` 节点与 DOM 文本盒逐节点配对断言（位置 ≤ `VISUAL_TEXT_TOL` / 字号 ≤ `VISUAL_TEXT_SIZE_TOL` / 颜色全等，控件内文本走值断言），**含弹窗**；**已并入** `visual:all` / `visual:round` 阻断链路；`visual:doctor` 必含「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」。详见 visual-fidelity.md「文本级还原纪律与文本腿」。
+
+**单趟采集（性能契约，别再退回多趟）**：`visual:capture` 起**一个**浏览器会话把全部屏（含弹窗）导航一遍，落 `artifacts/visual-diff/dom-snapshot.json`（截图 + 文本盒 + 控件框 + 回填值 + 活数据 + 宽视口探针）；text / geom / data / gate 各腿**只消费该快照**（纯计算，不再各自 launch 浏览器 —— 重复导航曾是轮次最大开销）。快照带**新鲜度哈希**（`app-spec` + `layout-ir` + `apps/web/src` + `WEB_URL`）：产物改了却复用旧快照即 exit 1（否则等于拿陈旧 DOM 静默放行）。等待判据必须**既看 DOM 签名又看在途请求**：只轮询 DOM 会在「数据请求在途、图表只画了坐标轴」时误判稳定（实测该中间态可静止数百 ms），采到的快照缺图表值 → 活数据腿误报。`visual:doctor` 必含「✅ 单趟 DOM 采集（快照消费 + 新鲜度）」。
+
+**耗时预算**：链路定义只在 `scripts/pipeline-timing.mjs`（`visual:all` / `visual:round` 均委托它，**不得在 `package.json` 里再写长 `&&` 串**）；逐阶段耗时落 `artifacts/pipeline-timing.json`，`npm run pipeline:budget` 打印并超 `.env` 的 `PIPELINE_BUDGET_SEC` 即 exit 1；`visual:doctor` 必含「✅ 流水线预算打点」。抽取阶段并发化（Figma `/nodes` 批量 + 资产/截图/文本并发）走通用池 `scripts/lib/concurrency.mjs`，并发度全部取 `.env`。
 
 **活数据腿**：前四条腿都在 gate 模式（`?visualGate=1`）下跑、冻结 Blueprint `sample`——它们测的是「实现是否忠实于 IR」，**与真实接口 / 数据库无关** → 「时间窗口类种子没有数据 / 映射层没产出派生字段 / 前端样例兜底」可以永远绿灯（实测：三屏「有标签无数据」时像素腿、几何腿、文本腿全 PASS）。`npm run visual:data` 的第三条腿 `scripts/check-live-data.mjs` 走**非 gate** 真实接口 + 真实 DOM：断言聚合序列非空且**非平坦**、`relations` 的 `count` 与关联表**交叉求和**一致、`lookup` 与目标行一致、页面确实渲染了这些值；`visual:doctor` 必含「✅ 活数据闸门」（校验脚本已挂入 `visual:data` + 判据未失明）。详见 visual-fidelity.md「数据链路与活数据闸门」。
 
 ### 9. 还原轮次（第一版之后必做）
 
-每轮：`npm run dev:up`（服务就绪闸，幂等：已在跑则跳过，未跑则按端口清旧实例后后台启动再探活）→ `npm run visual:doctor -- --quick`（**必含「✅ Layout IR 完整性」「✅ 页面层零硬编码」**，缺屏/退化先重跑 `visual:layout`，见 visual-fidelity.md「Layout IR 完整性」）→ `npm run visual:round`（截图 + AND 对比 + **visual:data** + **visual:geom**，**末尾自带 `dev:up`**）→ 再跑 **`npm run visual:text`**（必跑：差异表必须含文本腿条目——像素 PASS ≠ 文本还原到位）→ 列差异表（屏/类型/差异/拟改文件）→ 修代码 → 重截确认 → **收尾再跑一次 `npm run dev:up`** → **询问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」**。进入则再来一轮；用户停止后才写 GENERATED.md 收尾。
+每轮：`npm run visual:doctor -- --quick`（**必含「✅ Layout IR 完整性」「✅ 页面层零硬编码」「✅ 单趟 DOM 采集」**，缺屏/退化先重跑 `visual:layout`，见 visual-fidelity.md「Layout IR 完整性」）→ `npm run visual:round`（**单趟采集** + AND 对比 + `visual:data` + `visual:text` + `visual:geom`，**末尾自带 `dev:up`**；已带逐阶段耗时打点）→ 列差异表（屏/类型/差异/拟改文件）→ 修代码 → 重截确认 → **收尾再跑一次 `npm run dev:up`** → **询问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」**。进入则再来一轮；用户停止后才写 GENERATED.md 收尾。
+
+> **耗时**：每轮结束看 `npm run pipeline:budget`（逐阶段秒数 + 合计 + 预算判定）。超 `PIPELINE_BUDGET_SEC` 即 exit 1；若某阶段异常慢，先查是不是有腿退回了「各自 launch 浏览器」（`visual:doctor` 的「✅ 单趟 DOM 采集」会拦）。
 
 > **提问前服务必须在跑（本步不可省）**：轮次结束时 api/web 若已停，用户点开就是打不开的站点、下一轮也无从开跑（本轮实测踩过：轮次跑完服务已不在）。故 `dev:up` 是提问的**前置闸**——未就绪即 exit 1，先看 `artifacts/dev/*.log` 再动手；就绪了才提问。
 
@@ -291,7 +303,7 @@ npm run visual:text       # 文本：Layout IR TEXT 节点 ↔ DOM 文本盒逐�
    - 控件内文本走**控件值断言**（`<input>` 的值不是文本节点；Select 里还有值恒为空的隐藏搜索框，取值顺序错了会读成空串），位置归几何腿
    - 豁免（框架通用规则）：`*`、**单字符非中英文数字**（图标字形）、**中心落在 `<canvas>`/`<svg>` 内**（图表标签归像素腿，用 DOM 图形层矩形判定，不写死坐标）
 5. **有效性自证**：补腿后应立刻回抓出闸门前已存在的同类缺陷（否则说明判据失明）；清完弹窗文本后，最大偏差应落在容差内。
-6. **已知挂起项**：文本腿只覆盖 **HTML 文本**（SVG/canvas 归像素腿）；内容屏可能仍有挂起文本差异（chrome/侧栏 chrome、form 屏 label 右缘、单元格文本位移、字号差等）——**像素腿本来就是 PASS**，必须在还原轮次里逐条清掉，清完后才把 `visual:text` 并入 `visual:all` / `visual:round` 阻断链路。
+6. **已知边界**：文本腿只覆盖 **HTML 文本**（SVG/canvas 归像素腿）。已清完全屏挂起差异，故 `visual:text` **已并入** `visual:all` / `visual:round` 阻断链路——此后任何文本级偏差都会让每轮 FAIL（这正是目的：像素 PASS 从不等于文本还原到位）。
 7. **编辑纪律**：凡「关闭/补偿」组件库默认值（`colon` / `labelCol` / 按钮 `autoInsertSpace` / `Input` 高度 / label 间距），**必须用 DOM 探针实测**（元素 rect、`::after` 的 `content`/`margin`、文本 `Range` 盒），不能凭「我写了这条 CSS」假定生效。
 
 ### 活数据与统计聚合（数据链路）

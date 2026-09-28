@@ -35,27 +35,28 @@
  *
  * 豁免（框架通用规则，非按屏配置）：`*`（antd 必填星号由 CSS `::after` 渲染，无 DOM 文本节点）
  *
+ * DOM 数据来源：统一采集趟次（`npm run visual:capture`）落下的 `dom-snapshot.json`
+ *   —— 采集与断言解耦，本腿不再自己开浏览器/重复导航（见 lib/dom-collect.mjs）。
+ *   快照新鲜度由 lib/snapshot.mjs 校验（代码/IR 改过即拒用旧快照）。
+ *
  * Usage（仓库根，需 api + web 已启动；必须 gate 模式取值，否则数据会随日期变）：
  *   npm run visual:text
  *   node scripts/check-text.mjs --screen=<spec.screens[].id>
  *   node scripts/check-text.mjs --probe        # 打印逐项偏差 + 未命中/多余清单
  * Env: WEB_URL / VISUAL_TEXT_TOL / VISUAL_TEXT_SIZE_TOL
  */
-import { createRequire } from "node:module";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveProject, gateCredentials, loadRootEnv } from "./lib/project.mjs";
+import { resolveProject, loadRootEnv } from "./lib/project.mjs";
 import { isControlRect, irControlBoxes } from "./check-geometry.mjs";
+import { loadSnapshot } from "./lib/snapshot.mjs";
 
-const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
 loadRootEnv(root);
 
-const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
 const TOL = Number(process.env.VISUAL_TEXT_TOL || 3);
 const SIZE_TOL = Number(process.env.VISUAL_TEXT_SIZE_TOL || 0.6);
-const VIEWPORT = { width: 1440, height: 1068 };
 const screenArg = (process.argv.find((a) => a.startsWith("--screen=")) || "").split("=")[1];
 const probe = process.argv.includes("--probe");
 
@@ -117,148 +118,6 @@ export function irTextNodes(ir) {
   return out.sort((a, b) => a.y - b.y || a.x - b.x);
 }
 
-/** DOM 采集：按 parentElement 分组的文本盒 + 控件值/占位符 + 控件框（与几何腿同判据） */
-const COLLECT = ({ modal }) => {
-  const scopeEl = modal ? document.querySelector(".ant-modal-content") : document.documentElement;
-  if (!scopeEl) return null;
-  const o = modal ? scopeEl.getBoundingClientRect() : { x: 0, y: 0 };
-  const inScope = (el) => (modal ? scopeEl.contains(el) || el === scopeEl : true);
-  const shown = (el) => {
-    const cs = getComputedStyle(el);
-    if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) === 0) return false;
-    return el.getClientRects().length > 0;
-  };
-  const CTRL = [
-    "input.ant-input",
-    "textarea.ant-input",
-    ".ant-input-affix-wrapper",
-    ".ant-select-selector",
-    ".ant-picker",
-    ".ant-input-number",
-  ].join(",");
-  const ctrlEls = [...document.querySelectorAll(CTRL)].filter((e) => inScope(e) && shown(e));
-  const outerCtrl = ctrlEls.filter((e) => !ctrlEls.some((x) => x !== e && x.contains(e)));
-
-  // —— 文本节点按 parentElement 分组（同父的文本节点拼接＝IR 的一个 TEXT 节点）——
-  const groups = new Map();
-  const walker = document.createTreeWalker(scopeEl, NodeFilter.SHOW_TEXT);
-  let n;
-  while ((n = walker.nextNode())) {
-    const t = n.nodeValue;
-    if (!t || !t.trim()) continue;
-    const p = n.parentElement;
-    if (!p || !inScope(p) || !shown(p)) continue;
-    const tag = p.tagName;
-    if (tag === "SCRIPT" || tag === "STYLE") continue;
-    if (p.closest("svg")) continue; // SVG 里的文字是图形（图表标签/图标字形），归像素腿
-    let box = null;
-    try {
-      const r = document.createRange();
-      r.selectNodeContents(n);
-      const b = r.getBoundingClientRect();
-      if (b.width > 0 || b.height > 0) box = b;
-    } catch {
-      /* ignore */
-    }
-    // 组件库的离屏量测节点（如 recharts 的 #recharts_measurement_span：aria-hidden + top:-20000px）
-    // 不是界面内容 → 跳过（框架通用规则，非按屏配置）
-    if (p.closest('[aria-hidden="true"]') && (!box || box.top < -1000 || box.left < -1000)) continue;
-    // 控件内文本（值/占位符）走控件值断言，避免与控件路径重复计数。
-    // 判据与 IR 侧 `inCtrl` 一致：文本盒必须落在控件框内才算控件文本——
-    // TextArea 的 showCount 挂在控件元素内、却画在控件框下方，仍应是普通文本
-    // （否则 IR 有 / DOM 无 → 假「缺文本」）
-    const host = p.closest(CTRL);
-    if (host) {
-      const hr = host.getBoundingClientRect();
-      const inside =
-        box &&
-        box.left >= hr.left - 1 &&
-        box.right <= hr.right + 1 &&
-        box.top >= hr.top - 1 &&
-        box.bottom <= hr.bottom + 1;
-      if (inside) continue;
-    }
-    if (!groups.has(p)) groups.set(p, { cls: p.className?.toString?.().slice(0, 40) || tag, texts: [], rects: [] });
-    const g = groups.get(p);
-    g.texts.push(t);
-    if (box) g.rects.push(box);
-  }
-  const texts = [];
-  for (const [p, g] of groups) {
-    if (!g.rects.length) continue;
-    const cs = getComputedStyle(p);
-    // SVG（图表文字常见）用 fill 上色，`color` 只是 CSS 继承值 → 取 fill 才不会假报颜色不符
-    const isSvg = p.namespaceURI === "http://www.w3.org/2000/svg";
-    const paint = isSvg ? (cs.fill && cs.fill !== "none" ? cs.fill : cs.stroke) : cs.color;
-    const x0 = Math.min(...g.rects.map((r) => r.left));
-    const y0 = Math.min(...g.rects.map((r) => r.top));
-    const x1 = Math.max(...g.rects.map((r) => r.right));
-    const y1 = Math.max(...g.rects.map((r) => r.bottom));
-    texts.push({
-      key: g.texts.join("").replace(/\s+/g, ""),
-      raw: g.texts.join(""),
-      cls: (isSvg ? p.getAttribute("class") : p.className?.toString?.())?.slice(0, 40) || p.tagName,
-      x: Math.round(x0 - o.x),
-      y: Math.round(y0 - o.y),
-      w: Math.round(x1 - x0),
-      h: Math.round(y1 - y0),
-      size: Math.round(parseFloat(cs.fontSize) * 10) / 10,
-      color: paint,
-      nested: p.querySelector(CTRL) ? 1 : 0,
-    });
-  }
-  texts.sort((a, b) => a.y - b.y || a.x - b.x);
-
-  // —— 控件（与几何腿同选择器，取最外层），取其值/占位符文本 + 字号/颜色 ——
-  const controls = outerCtrl.map((e) => {
-    const r = e.getBoundingClientRect();
-    const pick = (() => {
-      // 顺序要紧：① e 自身就是 input/textarea 时 textContent 恒为空（值在 .value 上）
-      // ② antd v5 的 Select 里有一个隐藏的 `.ant-select-selection-search-input`（值恒为空），
-      //    若在取 item 之前先找 `input` 就会把值/占位符读成空字符串
-      if (e.tagName === "INPUT" || e.tagName === "TEXTAREA") {
-        const ph = !String(e.value).trim() && !!e.placeholder;
-        return { el: e, text: e.value || e.placeholder || "", ph };
-      }
-      const item = e.querySelector(".ant-select-selection-item, .ant-select-selection-placeholder");
-      if (item) {
-        const isPh = item.className?.toString?.().includes("placeholder");
-        return { el: item, text: item.textContent || "", ph: !!isPh };
-      }
-      const inner = e.querySelector("input, textarea");
-      if (inner) {
-        const ph = !String(inner.value).trim() && !!inner.placeholder;
-        return { el: inner, text: inner.value || inner.placeholder || "", ph };
-      }
-      return { el: e, text: e.textContent || "", ph: false };
-    })();
-    const cs = getComputedStyle(pick.el);
-    const phStyle = pick.el.tagName === "INPUT" || pick.el.tagName === "TEXTAREA" ? getComputedStyle(pick.el, "::placeholder") : null;
-    return {
-      cls: e.className?.toString?.().slice(0, 40) || e.tagName,
-      x: Math.round(r.x - o.x),
-      y: Math.round(r.y - o.y),
-      w: Math.round(r.width),
-      h: Math.round(r.height),
-      key: String(pick.text).replace(/\s+/g, ""),
-      raw: pick.text,
-      size: Math.round(parseFloat(cs.fontSize) * 10) / 10,
-      color: pick.ph && phStyle ? phStyle.color : cs.color,
-      placeholder: pick.ph ? 1 : 0,
-    };
-  });
-  controls.sort((a, b) => a.y - b.y || a.x - b.x);
-  // 图形层（canvas / svg）：里面的文字由图表库/图标库自己画，位置与字号不受我们用 CSS 约束，
-  // 其还原度归像素腿 —— IR 文本中心若落在这些矩形内就跳过（不写死图表区坐标）
-  const graphics = [...document.querySelectorAll("canvas, svg")]
-    .filter((c) => inScope(c) && shown(c))
-    .map((c) => {
-      const r = c.getBoundingClientRect();
-      return { x: r.x - o.x, y: r.y - o.y, w: r.width, h: r.height };
-    });
-  return { texts, controls, graphics };
-};
-
 /** 目标屏：全量非 chrome 屏（含 modal）。导出供 visual:doctor 复算判据（不可带副作用） */
 export function loadTargets() {
   const { slug, spec } = resolveProject(root);
@@ -286,14 +145,11 @@ export function loadTargets() {
 }
 
 async function main() {
-  const { chromium } = (() => {
-    try {
-      return require("playwright");
-    } catch {
-      console.error("缺少 playwright。Run: npm i -D playwright");
-      process.exit(1);
-    }
-  })();
+  const { slug } = resolveProject(root);
+  if (!slug) {
+    console.error("未解析到项目 slug，先跑 npm run init:project");
+    process.exit(1);
+  }
 
   const targets = loadTargets().filter((t) => !screenArg || t.id === screenArg || t.name === screenArg);
   if (!targets.length) {
@@ -301,29 +157,7 @@ async function main() {
     return;
   }
 
-  const { email, password, storageKey } = gateCredentials(root);
-  const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  const loginBody = await loginRes.json().catch(() => ({}));
-  const token = loginBody.access_token || loginBody.token;
-  if (!loginRes.ok || !token) {
-    console.error(`登录失败 ${loginRes.status}，请确认 api(3001)/web(5173) 已启动且 seedAdmin 有效`);
-    process.exit(1);
-  }
-
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: VIEWPORT });
-  await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-  await page.evaluate(
-    ({ token, user, storageKey }) => {
-      localStorage.setItem(storageKey, token);
-      localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-    },
-    { token, user: loginBody.user, storageKey },
-  );
+  const snap = loadSnapshot({ root, slug, leg: "文本闸门" });
 
   console.log(
     `🔤 文本闸门（Layout IR TEXT ↔ DOM 文本盒，容差 ${TOL}px / 字号 ${SIZE_TOL}px / 颜色全等）— ${targets.length} 屏\n`,
@@ -332,27 +166,11 @@ async function main() {
   let failed = 0;
   const results = [];
   for (const t of targets) {
-    await page.setViewportSize(VIEWPORT);
-    await page.goto(`${WEB_URL}${t.route}?visualGate=1`, { waitUntil: "networkidle", timeout: 30000 });
-    if (t.modal) {
-      try {
-        await page.getByRole("button", { name: t.trigger || /新增/ }).click({ force: true });
-        await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
-        await page.waitForTimeout(400);
-      } catch (err) {
-        failed++;
-        console.log(`❌ ${t.name} (${t.route}) — 弹窗打开失败：${err.message}`);
-        results.push({ screen: t.name, ok: false, problems: [`弹窗打开失败 ${err.message}`] });
-        continue;
-      }
-    }
-    await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(300);
-    const dom = await page.evaluate(COLLECT, { modal: !!t.modal });
+    const dom = snap.gate?.[t.id];
     if (!dom) {
       failed++;
-      console.log(`❌ ${t.name} (${t.route}) — 未取到 ${t.modal ? ".ant-modal-content" : "document"} 作用域`);
-      results.push({ screen: t.name, ok: false, problems: ["采集作用域缺失"] });
+      console.log(`❌ ${t.name} (${t.route}) — 快照缺少该屏（重跑 npm run visual:capture）`);
+      results.push({ screen: t.name, ok: false, problems: ["快照缺少该屏"] });
       continue;
     }
 
@@ -476,7 +294,6 @@ async function main() {
     });
   }
 
-  await browser.close();
   writeFileSync(
     resolve(root, "artifacts/visual-diff/text.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), tol: TOL, sizeTol: SIZE_TOL, results }, null, 2),

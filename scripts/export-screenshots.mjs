@@ -7,6 +7,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { initFigma, resolveFileKey, figmaGet, allFramesFor, pickFrame } from "./lib/figma.mjs";
+import { mapPool, concurrencyFromEnv } from "./lib/concurrency.mjs";
 
 const root = resolve(process.cwd());
 initFigma(root);
@@ -48,18 +49,24 @@ const outDir = resolve(root, "imports/figma/screens");
 mkdirSync(outDir, { recursive: true });
 
 const images = data.images || {};
-for (const frame of unique) {
-  const imageUrl = images[frame.id];
-  if (!imageUrl) {
-    console.warn("no image for", frame.name, frame.id);
-    continue;
-  }
-  const imgRes = await fetch(imageUrl);
-  const buf = Buffer.from(await imgRes.arrayBuffer());
-  const safe = frame.name.replace(/[\\/:*?"<>|]/g, "_");
-  const dest = resolve(outDir, `${safe}.png`);
-  writeFileSync(dest, buf);
-  console.log("saved", dest, buf.length, "bytes");
-}
+// 并发下载（旧实现逐个 `await fetch`）
+const results = await mapPool(
+  unique,
+  async (frame) => {
+    const imageUrl = images[frame.id];
+    if (!imageUrl) {
+      console.warn("no image for", frame.name, frame.id);
+      return null;
+    }
+    const imgRes = await fetch(imageUrl);
+    const buf = Buffer.from(await imgRes.arrayBuffer());
+    const safe = frame.name.replace(/[\\/:*?"<>|]/g, "_");
+    writeFileSync(resolve(outDir, `${safe}.png`), buf);
+    return { name: frame.name, bytes: buf.length };
+  },
+  { concurrency: concurrencyFromEnv() },
+);
+const okCount = results.filter((r) => r.ok && r.value).length;
+for (const r of results) if (!r.ok) console.warn("download failed:", r.error?.message || r.error);
 
-console.log("done", unique.length, "frames");
+console.log("done", okCount, "/", unique.length, "frames");

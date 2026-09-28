@@ -34,8 +34,9 @@
 import { createRequire } from "node:module";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolveProject, gateCredentials, gateMasks, loadRootEnv, shadowPad } from "./lib/project.mjs";
+import { resolveProject, gateMasks, loadRootEnv } from "./lib/project.mjs";
 import { flatBgDrift, flatBgDriftOverlay, FLATBG_DEFAULTS } from "./lib/pixel-metrics.mjs";
+import { loadSnapshot } from "./lib/snapshot.mjs";
 
 const CALIBRATE = process.argv.includes("--calibrate");
 // 只跑宽视口锁定（不比对标杆图，不需要 imports/figma/screens）：供 visual:round 挂载
@@ -54,17 +55,8 @@ function loadDep(name) {
   }
 }
 
-const { chromium } = loadDep("playwright");
 const pixelmatch = loadDep("pixelmatch");
 const { PNG } = loadDep("pngjs");
-
-async function launchBrowser() {
-  try {
-    return await chromium.launch({ headless: true, channel: "chrome" });
-  } catch {
-    return await chromium.launch({ headless: true });
-  }
-}
 
 const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
 // 阈值语义：SSIM（ssim.js 标准 MSSIM）作结构崩塌检测，mismatch 作像素保真。
@@ -93,7 +85,6 @@ if (!slug) {
   );
   process.exit(1);
 }
-const { email, password, storageKey } = gateCredentials(root);
 
 /** spec.screens 全屏 → gate targets（modal 用 spec.modal.trigger 匹配按钮） */
 function gateTargets() {
@@ -190,19 +181,6 @@ function clipPng(png, x, y, w, h) {
     }
   }
   return out;
-}
-
-/** 弹窗截图补白边：按 IR 阴影余量四边补（详见 lib/project.mjs shadowPad）
- *  旧实现固定 12px 四边 → 纵向与标杆错位 shadow.y（本设计 4px）→ 逐像素比必判结构错位 */
-function padWhite(buf, pad = { left: 12, right: 12, top: 12, bottom: 12 }) {
-  const inner = PNG.sync.read(buf);
-  const padded = new PNG({
-    width: inner.width + pad.left + pad.right,
-    height: inner.height + pad.top + pad.bottom,
-  });
-  padded.data.fill(255);
-  PNG.bitblt(inner, padded, 0, 0, inner.width, inner.height, pad.left, pad.top);
-  return PNG.sync.write(padded);
 }
 
 /**
@@ -362,121 +340,27 @@ if (CALIBRATE) {
 
 await waitForWeb();
 
-const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-const loginBody = await loginRes.json().catch(() => ({}));
-const accessToken = loginBody.access_token || loginBody.token;
-if (!loginRes.ok || !accessToken) {
-  console.error("API login failed", loginRes.status, loginBody);
-  process.exit(1);
-}
+// 采集与断言已解耦：截图与 DOM 探针由统一采集趟次产出
+// （npm run visual:capture → artifacts/visual-diff/gate-actual/*.png + dom-snapshot.json，
+//  见 scripts/capture-screens.mjs）。本闸门不再自己启动浏览器 / 重复导航/截图，
+// 只做像素与几何的**纯计算**；快照新鲜度由 lib/snapshot.mjs 校验（过期即拒用）。
+const snapshot = loadSnapshot({ root, slug, leg: "视觉闸门" });
 
-const browser = await launchBrowser();
-const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: 1 });
-
-await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-await page.evaluate(
-  ({ token, user, storageKey }) => {
-    localStorage.setItem(storageKey, token);
-    localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-  },
-  { token: accessToken, user: loginBody.user, storageKey },
-);
-await page.goto(`${WEB_URL}/?visualGate=1`, { waitUntil: "networkidle" });
-await page.waitForSelector(".app-sider", { timeout: 20000 });
-await page.evaluate(() => document.fonts.ready);
-
-// —— 单屏取图（1440 与宽视口共用同一路径，保证两次可比）——
-// 全屏：固定截 0..VIEWPORT.width（不含宽视口多出来的右侧）；弹窗：截弹窗自身 box
-async function openModal(t) {
-  if (!t.modal) return;
-  try {
-    // 等页面主体渲染（表格页有 .ant-table；日历/表单页退化为 .page-head/.app-content）
-    await page.waitForSelector(".ant-table, .calendar-grid, .app-content", { timeout: 10000 });
-    await page.getByRole("button", { name: t.trigger }).click({ force: true });
-    await page.getByRole("dialog").waitFor({ state: "visible", timeout: 8000 });
-    await page.waitForTimeout(400);
-  } catch (err) {
-    console.warn("modal open failed:", err.message);
+/** 门用运行时截图（采集趟次已按弹窗阴影余量补白边，见 capture-screens.mjs）。 */
+function gateActual(t) {
+  const p = resolve(root, "artifacts/visual-diff/gate-actual", `${t.id}.png`);
+  if (!existsSync(p)) {
+    throw new Error(`缺少门用截图 ${p} —— 先跑 npm run visual:capture（或 npm run visual:round）`);
   }
-}
-
-async function capture(t) {
-  if (t.modal) {
-    const content = page.locator(".dept-modal .ant-modal-content, .ant-modal-content").last();
-    let box = (await content.count()) > 0 ? await content.boundingBox() : null;
-    if (!box) box = await page.getByRole("dialog").boundingBox().catch(() => null);
-    if (box) {
-      const w = Math.ceil(box.width);
-      const h = Math.ceil(box.height);
-      const x = Math.max(0, Math.round(box.x + Math.max(0, box.width - w) / 2));
-      const y = Math.max(0, Math.round(box.y));
-      return page.screenshot({
-        type: "png",
-        clip: { x, y, width: w, height: h },
-        animations: "disabled",
-        caret: "hide",
-      });
-    }
-  }
-  return page.screenshot({
-    type: "png",
-    clip: t.clip || { x: 0, y: 0, width: VIEWPORT.width, height: VIEWPORT.height },
-    animations: "disabled",
-    caret: "hide",
-  });
-}
-
-async function shoot(t) {
-  await page.goto(`${WEB_URL}${t.route}?visualGate=1`, { waitUntil: "networkidle" });
-  await page.waitForTimeout(600);
-  await openModal(t);
-  await page.evaluate(() => document.fonts.ready);
-  return capture(t);
+  return readFileSync(p);
 }
 
 /**
  * 宽视口取样：量一批元素框 + 弹窗（含可用宽度）。
  * 量 DOM 而非比位图：位图重采样有噪声，而「每个框都精确等于 1440 框 × k」是
  * 「按比例自适应」的充要条件，且能直接指出是哪个元素没跟上。
+ * 探针由采集趟次在 gate 档/base 档 + 宽档各跑一次（见 lib/dom-collect.mjs 的 PROBE_LAYOUT）。
  */
-const PROBE_SELECTORS = [
-  ".app-content", ".page", ".page-head", ".kpi-strip", ".kpi-card",
-  ".chart-grid", ".chart-card", ".metric-grid", ".metric-cell",
-  ".ant-card", ".list-toolbar", ".ant-table", ".ant-table-thead > tr > th",
-  ".calendar-wrap", ".calendar-grid", ".calendar-cell", ".schedule-toolbar", ".legend-row",
-  ".org-card", ".org-grid", ".org-grid > .ant-form-item",
-];
-
-async function probeLayout() {
-  return page.evaluate((sels) => {
-    const items = [];
-    for (const sel of sels) {
-      for (const el of document.querySelectorAll(sel)) {
-        const r = el.getBoundingClientRect();
-        if (r.width < 1 || r.height < 1) continue;
-        items.push({ sel, x: +r.x.toFixed(2), y: +r.y.toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2) });
-      }
-    }
-    const mc = document.querySelector(".ant-modal-content");
-    const mr = mc ? mc.getBoundingClientRect() : null;
-    const page = document.querySelector(".page");
-    const pr = page ? page.getBoundingClientRect() : null;
-    const padRight = 24; // body padding（.app-content 24px）
-    return {
-      avail: document.documentElement.clientWidth,
-      docScrollW: document.documentElement.scrollWidth,
-      modal: mr ? { w: +mr.width.toFixed(2), h: +mr.height.toFixed(2), cx: +(mr.x + mr.width / 2).toFixed(2) } : null,
-      viewportCx: window.innerWidth / 2,
-      contentW: pr ? +pr.width.toFixed(2) : 0,
-      fillGap: pr ? +(window.innerWidth - pr.right).toFixed(2) - padRight : 0,
-      items,
-    };
-  }, PROBE_SELECTORS);
-}
 
 /**
  * 自适应校验（宽视口）：原型帧是按比例铺满，所以宽档要求
@@ -526,22 +410,23 @@ function proportionalLock(base, wide, isModal) {
 }
 
 const scores = [];
-const shots1440 = new Map();
-const probe1440 = new Map();
 for (const t of TARGETS) {
-  if (!VIEWPORT_LOCK_ONLY) {
-    const refPath = resolve(shotsDir, t.shot);
-    if (!existsSync(refPath)) {
-      console.warn("skip missing ref", t.shot);
-      scores.push({ name: t.id, pass: false, error: `missing ${t.shot}` });
-      continue;
-    }
-  }
-  const actual = await shoot(t);
-  shots1440.set(t.id, actual);
-  probe1440.set(t.id, await probeLayout());
   if (VIEWPORT_LOCK_ONLY) continue;
-  const result = compare(readFileSync(resolve(shotsDir, t.shot)), t.modal ? padWhite(actual, shadowPad(root, t.id)) : actual, t.id, { modal: !!t.modal });
+  const refPath = resolve(shotsDir, t.shot);
+  if (!existsSync(refPath)) {
+    console.warn("skip missing ref", t.shot);
+    scores.push({ name: t.id, pass: false, error: `missing ${t.shot}` });
+    continue;
+  }
+  let actual;
+  try {
+    actual = gateActual(t);
+  } catch (err) {
+    scores.push({ name: t.id, pass: false, error: err.message });
+    console.log(`${t.id}: ${err.message} FAIL`);
+    continue;
+  }
+  const result = compare(readFileSync(refPath), actual, t.id, { modal: !!t.modal });
   scores.push(result);
   console.log(
     `${t.id}: ssim=${result.ssim.toFixed(4)} mismatch=${(result.ratio * 100).toFixed(2)}% flatBg=${(result.flatbgRate * 100).toFixed(2)}%(≤${(result.flatbgMax * 100).toFixed(1)}%) ${result.pass ? "PASS" : "FAIL"}`,
@@ -549,25 +434,20 @@ for (const t of TARGETS) {
 }
 
 // —— 宽视口锁定：横向按可用宽度铺满，纵向骨架不变（不得重排 / 留白 / 溢出）——
-// 不依赖标杆图：同一屏在 1440 与 WIDE 下量同一批 DOM 框，校验「只横向自适应」。
+// 不依赖标杆图：同一屏在原型帧宽与 WIDE 下量同一批 DOM 框，校验「只横向自适应」。
+// 两档探针均由采集趟次产出（gate 档 + 宽档），本闸门只做纯比较。
 // 弹窗为固定尺寸对话框：只校验尺寸不变 + 水平居中。
 const wide = [];
 console.log(`\n宽视口锁定 ${VIEWPORT.width} → ${WIDE_WIDTH}（纵向允差 ${WIDE_TOL}px，铺满余量 ≤ ${FILL_TOL}px）`);
-await page.setViewportSize({ width: WIDE_WIDTH, height: VIEWPORT.height });
 for (const t of TARGETS) {
-  const base = probe1440.get(t.id);
-  if (!base) {
-    wide.push({ name: t.id, pass: false, error: "no 1440 probe" });
+  const base = snapshot.probeBase?.[t.id];
+  const wideProbe = snapshot.probeWide?.[t.id];
+  if (!base || !wideProbe) {
+    wide.push({ name: t.id, pass: false, error: "快照缺该屏探针（重跑 npm run visual:capture）" });
+    console.log(`${t.id}: 快照缺该屏探针 FAIL`);
     continue;
   }
-  try {
-    await shoot(t);
-  } catch (err) {
-    wide.push({ name: t.id, pass: false, error: err.message });
-    console.log(`${t.id}: ${err.message} FAIL`);
-    continue;
-  }
-  const r = proportionalLock(base, await probeLayout(), t.modal);
+  const r = proportionalLock(base, wideProbe, !!t.modal);
   wide.push({ name: t.id, ...r });
   const detail = r.error
     ? r.error
@@ -576,8 +456,6 @@ for (const t of TARGETS) {
       : `内容宽 ${r.contentW} 右侧余量 ${r.fillGap}px 纵向最大偏差 ${r.worst ? r.worst.dev : 0}px / 允差 ${WIDE_TOL}px${r.worst ? ` @${r.worst.sel}.${r.worst.key}(${r.worst.base}→${r.worst.wide})` : ""}`;
   console.log(`${t.id}: ${detail} ${r.pass ? "PASS" : "FAIL"}`);
 }
-
-await browser.close();
 
 const report = {
   generatedAt: new Date().toISOString(),

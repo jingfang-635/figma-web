@@ -83,25 +83,31 @@ npm run visual:shots    # 全屏对照 PNG
 npm run visual:gen      # tokens.css / 主题文件 / blueprints / screenConfigs
 npm run gen:backend     # 后端 codegen（按 spec.stack 分发 adapter）
 npm run visual:assets   # 图标原图
-npm run dev:up          # 服务就绪闸：api+web 已在跑则跳过；未跑则按端口清旧实例 → 后台启动 → 探活
+npm run dev:up          # 服务就绪闸：api+web 已在跑则跳过；未跑则**并发**起 api+web（按端口清旧实例）→ 探活
 npm run visual:fields   # 字段一致性校验
+npm run visual:capture  # 单趟采集：一个会话 → 截图 + DOM 快照（gate/text/geom/data 都消费它）
 npm run visual:gate     # 像素三腿 AND 视觉闸门（需 api+web 已启动）
 npm run visual:data     # config↔API 闭环 + 非 gate DOM 回填断言 + 活数据（聚合非空/非平坦 + 派生字段交叉验证）
 npm run visual:geom     # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
 npm run visual:text     # 文本腿：Layout IR TEXT 节点 ↔ DOM 文本盒/控件值（含弹窗）
-npm run visual:round    # 还原轮次：capture + compare + data + geom + dev:up（服务就绪闸）
+npm run visual:round    # 还原轮次：单趟采集 + compare + gate(宽锁) + data + text + geom + dev:up（带逐阶段打点）
+npm run pipeline:budget # 打点报表 + 预算判定（超 .env 的 PIPELINE_BUDGET_SEC 即 exit 1）
 npm run docs:lint       # 流程文档零硬编码复查
-# 或 npm run visual:all（init 外全部，gate 需先启动服务）
+# 或 npm run visual:all（init 外全部，gate 需先启动服务；带逐阶段打点）
 ```
 
-配置来源：`fixtures/<slug>/app-spec.json`（screens 全屏清单/路由/闸门账号）、`gate-masks.json`（mask）。**脚本不含任何业务硬编码；项目差异全部由 spec 驱动。**
+配置来源：`fixtures/<slug>/app-spec.json`（screens 全屏清单/路由/闸门账号）、`gate-masks.json`（mask）、根 `.env`（闸门阈值 + 并发度 + `PIPELINE_BUDGET_SEC`）。**脚本不含任何业务硬编码；项目差异全部由 spec 驱动。**
+
+**性能契约**：链路定义只在 `scripts/pipeline-timing.mjs`（`visual:all` / `visual:round` 均委托它）；
+一个采集趟次（`visual:capture`）产出 `dom-snapshot.json`，各腿只消费快照（不再各自 launch 浏览器）；
+快照带新鲜度哈希（产物改了却复用旧快照即 exit 1）；等待判据同时看 DOM 签名与在途请求。
 
 ## 被调用时的行为
 
 1. 缺决策 → 只提问
 2. `--yes` → 可跳过 App Spec 人工闸门
 3. 顺序：init-project → Spec 闸门 → 视觉抽取 → 字段回填 → visual:gen → DB/API → 前端（按选定框架）→ 闸门组（第一版：fields + gate + data + geom + text）→ **还原轮次**
-4. 还原轮次：`npm run visual:doctor -- --quick`（必含「✅ Layout IR 完整性」「✅ 几何闸门（IR↔DOM 控件框）」「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」「✅ 活数据闸门」「✅ 流程文档零硬编码」「✅ 页面层零硬编码」）→ Playwright 逐页截图对比 + **每轮必跑 `npm run visual:text`** → 列出差异并修代码（几何/字号/字色/文案逐项对照 `layout-ir/<id>.json`；像素 PASS ≠ 文本还原到位）→ **收尾 `npm run dev:up`**（幂等：确保提问前 api + web 都在跑，否则用户点开打不开）→ 问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」→ 直至用户选择不进入
+4. 还原轮次：`npm run visual:doctor -- --quick`（必含「✅ Layout IR 完整性」「✅ 几何闸门（IR↔DOM 控件框）」「✅ 文本闸门（IR TEXT ↔ DOM 文本盒）」「✅ 活数据闸门」「✅ 单趟 DOM 采集」「✅ 流水线预算打点」「✅ 流程文档零硬编码」「✅ 页面层零硬编码」）→ `npm run visual:round`（单趟采集 + 对比 + gate 宽锁 + data + **text** + geom + dev:up）→ 列出差异并修代码（几何/字号/字色/文案逐项对照 `layout-ir/<id>.json`；像素 PASS ≠ 文本还原到位）→ **收尾 `npm run dev:up`**（幂等：确保提问前 api + web 都在跑，否则用户点开打不开）→ 看 `npm run pipeline:budget`（逐阶段耗时 + 预算判定）→ 问「本轮字段还原和页面还原已完成。是否进入下一轮还原？」→ 直至用户选择不进入
 5. 结束汇报：页面、账号、启动命令、冒烟、**闸门组结果**、**还原轮次数与用户是否停止**
 
 详见 `figma-to-fullstack/SKILL.md` 与 `visual-fidelity.md`。

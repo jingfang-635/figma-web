@@ -107,13 +107,15 @@ node scripts/extract-figma-texts.mjs
 npm run visual:fields
 
 # 4. 闸门组 + 轮次（先 npm run dev:up 确保 api+web 在跑）
-npm run dev:up                  # 服务就绪闸（幂等）：清旧实例 → 后台启动 → 探活
+npm run dev:up                  # 服务就绪闸（幂等）：并发起 api+web → 探活
+npm run visual:capture          # 单趟采集：一个会话 → 截图 + DOM 快照（各腿都消费它）
 npm run visual:gate
 npm run visual:data             # 闭环 + 非 gate DOM 回填断言 + 活数据（聚合非空/非平坦 + 派生字段交叉验证）
 npm run visual:geom             # 几何腿：Layout IR 控件框 ↔ DOM 框逐框断言
 npm run visual:text             # 文本腿：Layout IR TEXT ↔ DOM 文本盒
-npm run visual:round            # capture-screens + visual-compare + data + geom + dev:up
-npm run visual:all              # 全链路（init 外）
+npm run visual:round            # 单趟采集 + 对比 + gate(宽锁) + data + text + geom + dev:up（带逐阶段打点）
+npm run visual:all              # 全链路（init 外；带逐阶段打点）
+npm run pipeline:budget         # 打点报表 + 预算判定（超 .env 的 PIPELINE_BUDGET_SEC 即 exit 1）
 npm run docs:lint               # 流程文档零硬编码复查
 
 # 5. 服务

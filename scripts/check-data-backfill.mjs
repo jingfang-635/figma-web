@@ -7,41 +7,25 @@
  *      页面 DOM 中（表单控件 value / KPI 文本 / 正文 textContent）
  *   2. 反向断言：form 屏的表单控件不允许全空（契约断裂信号——seed 有数据页面没回填）
  *
- * 机制：spec.screens 找 type=form|detail → Playwright 开真实页面（不带 visualGate）
- * → 读 DOM 实际值与 seed 逐字比对 → 有缺即 fail（exit 1）。
+ * 机制：spec.screens 找 type=form|detail → 读统一采集趟次落下的 DOM 快照
+ * （npm run visual:capture 的非 gate「live 档」）→ 与 seed 逐字比对 → 有缺即 fail（exit 1）。
+ * 本腿不再自己开浏览器：采集与断言解耦，避免每条腿重复导航同一批屏
+ * （快照新鲜度由 lib/snapshot.mjs 校验）。
  *
  * Usage (repo root, with api+web running):
  *   node scripts/check-data-backfill.mjs                # 全部 form/detail 屏
  *   node scripts/check-data-backfill.mjs --screen=<spec.screens[].id>
  * Env: WEB_URL (default http://localhost:5173)
  */
-import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { writeFileSync } from "node:fs";
-import { resolveProject, gateCredentials } from "./lib/project.mjs";
+import { resolveProject } from "./lib/project.mjs";
+import { loadSnapshot } from "./lib/snapshot.mjs";
 
-const require = createRequire(import.meta.url);
 const root = resolve(process.cwd());
-
-function loadDep(name) {
-  try {
-    return require(name);
-  } catch {
-    console.error(`Missing ${name}. Run: npm install -D playwright`);
-    process.exit(1);
-  }
-}
-
-const { chromium } = loadDep("playwright");
-const WEB_URL = process.env.WEB_URL || "http://localhost:5173";
 const screenArg = (process.argv.find((a) => a.startsWith("--screen=")) || "").split("=")[1];
 
 const { slug, spec } = resolveProject(root);
-if (!slug) {
-  console.error("No project slug resolved. Run init-project first.");
-  process.exit(1);
-}
-const { username, password, storageKey } = gateCredentials(root);
 
 // —— 目标屏：spec 里 type=form|detail 的屏（闸门全集，无业务硬编码）——
 function backfillTargets() {
@@ -81,28 +65,7 @@ async function main() {
     return;
   }
 
-  const loginRes = await fetch(`${WEB_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  const loginBody = await loginRes.json().catch(() => ({}));
-  const token = loginBody.access_token || loginBody.token;
-  if (!loginRes.ok || !token) {
-    console.error(`登录失败 ${loginRes.status}，请确认 api(3001)/web(5173) 已启动且 seedAdmin 有效`);
-    process.exit(1);
-  }
-
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1068 } });
-  await page.goto(`${WEB_URL}/login`, { waitUntil: "domcontentloaded" });
-  await page.evaluate(
-    ({ token, user, storageKey }) => {
-      localStorage.setItem(storageKey, token);
-      localStorage.setItem(storageKey + "_user", JSON.stringify(user));
-    },
-    { token, user: loginBody.user, storageKey },
-  );
+  const snap = loadSnapshot({ root, slug, leg: "数据回填闸门" });
 
   console.log(`📋 数据回填断言（非 gate 模式，DOM 实测 vs seed）— ${targets.length} 屏\n`);
   let failed = 0;
@@ -115,28 +78,8 @@ async function main() {
       continue;
     }
     try {
-      await page.goto(`${WEB_URL}${t.route}`, { waitUntil: "networkidle", timeout: 30000 });
-      await page.waitForTimeout(800); // 等接口回填
-      await page.evaluate(() => document.fonts.ready);
-
-      const dom = await page.evaluate(() => {
-        const formVals = {};
-        document.querySelectorAll(".ant-form-item").forEach((item) => {
-          const label = item.querySelector(".ant-form-item-label label")?.textContent?.replace("*", "").trim();
-          const ctrl = item.querySelector("input, textarea");
-          if (label && ctrl) formVals[label] = ctrl.value ?? "";
-        });
-        const kpis = {};
-        document.querySelectorAll(".kpi-card").forEach((c) => {
-          kpis[c.querySelector(".kpi-label")?.textContent?.trim() || ""] =
-            c.querySelector(".kpi-value")?.textContent?.trim() || "";
-        });
-        return {
-          formVals,
-          kpis,
-          bodyText: document.querySelector(".app-content")?.textContent || document.body.textContent || "",
-        };
-      });
+      const dom = snap.live?.[t.id];
+      if (!dom) throw new Error("快照缺少该屏的 live 采集（重跑 npm run visual:capture）");
 
       const misses = [];
       // 断言 1：每个 seed 非空值必须能在 DOM 中找到
@@ -167,7 +110,6 @@ async function main() {
     }
   }
 
-  await browser.close();
   writeFileSync(
     resolve(root, "artifacts/visual-diff/data-backfill.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2),
